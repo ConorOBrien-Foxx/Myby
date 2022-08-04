@@ -181,19 +181,30 @@ bool isNil(T)(T a) {
 
 class Verb {
     string display;
-    uint markedArity = 2;
     VerbMonad monad;
     VerbDyad dyad;
-    bool niladic = false;
-    Atom identity;
-    BigInt rangeStart = BigInt(0);
     
-    this(string di, VerbMonad m, VerbDyad d) {
+    uint markedArity = 2;
+    bool niladic = false;
+    BigInt rangeStart = BigInt(0);
+    Atom identity;
+    
+    this(string di) {
         display = di;
-        monad = m;
-        dyad = d;
         identity = Nil.nilAtom;
     }
+    
+    Verb setMonad(VerbMonad m) {
+        monad = m;
+        return this;
+    }
+    
+    Verb setDyad(VerbDyad d) {
+        dyad = d;
+        return this;
+    }
+    
+    @property bool initialized() { return monad && dyad; }
     
     Verb setMarkedArity(uint ma) {
         markedArity = ma;
@@ -213,14 +224,17 @@ class Verb {
     }
     
     Atom evaluate() {
+        assert(initialized, "Cannot call uninitialized Verb " ~ display);
         return monad(Nil.nilAtom);
     }
     
     Atom evaluate(Atom a) {
+        assert(initialized, "Cannot call uninitialized Verb " ~ display);
         return monad(a);
     }
     
     Atom evaluate(Atom l, Atom r) {
+        assert(initialized, "Cannot call uninitialized Verb " ~ display);
         return dyad(l, r);
     }
     
@@ -253,21 +267,17 @@ class Verb {
     }
     
     static Verb nilad(Atom constant) {
-        return new Verb(
-            to!string(constant),
-            _ => constant,
-            (_1, _2) => constant
-        )
-        .setNiladic(true);
+        return new Verb(to!string(constant))
+            .setMonad(_ => constant)
+            .setDyad((_1, _2) => constant)
+            .setNiladic(true);
     }
     
     static Verb fork(Verb f, Verb g, Verb h) {
-        return new Verb(
-            f.display ~ " " ~ g.display ~ " " ~ h.display,
-            a => g(f(a), h(a)),
-            (a, b) => g(f(a, b), h(a, b))
-        )
-        .setMarkedArity(f.niladic || h.niladic ? 1 : 2);
+        return new Verb(f.display ~ " " ~ g.display ~ " " ~ h.display)
+            .setMonad(a => g(f(a), h(a)))
+            .setDyad((a, b) => g(f(a, b), h(a, b)))
+            .setMarkedArity(f.niladic || h.niladic ? 1 : 2);
     }
     
     static Verb nilad(T)(T t) {
@@ -393,57 +403,54 @@ Verb getVerb(InsName name) {
         // maybe: setMonad, setDyad?
         
         // Addition
-        verbs[InsName.Add] = new Verb(
-            "+",
-            (Atom a) => a.match!(
+        verbs[InsName.Add] = new Verb("+")
+            // Absolute value/Length
+            .setMonad((Atom a) => a.match!(
                 (BigInt b) => Atom(b < 0 ? -b : b),
                 s => Atom(BigInt(s.length)),
                 _ => Nil.nilAtom,
-            ),
-            (Atom l, Atom r) => match!(
+            ))
+            // Addition
+            .setDyad((Atom l, Atom r) => match!(
                 (BigInt a, BigInt b) => Atom(a + b),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r)
-        )
-        .setMarkedArity(2)
-        .setIdentity(Atom(BigInt(0)));
+            )(l, r))
+            .setMarkedArity(2)
+            .setIdentity(Atom(BigInt(0)));
         
-        // Subtraction
-        verbs[InsName.Subtract] = new Verb(
-            "-",
-            (Atom a) => a.match!(
+        verbs[InsName.Subtract] = new Verb("-")
+            // Negate/Reverse
+            .setMonad((Atom a) => a.match!(
                 (BigInt n) => Atom(-n),
                 (Atom[] a) => Atom(a.retro.array),
                 _ => Nil.nilAtom,
-            ),
-            (Atom l, Atom r) => match!(
+            ))
+            // Subtraction
+            .setDyad((Atom l, Atom r) => match!(
                 (BigInt a, BigInt b) => Atom(a - b),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r)
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
-        // Multiplication
-        verbs[InsName.Multiply] = new Verb(
-            "*",
-            (Atom a) => a.match!(
+        verbs[InsName.Multiply] = new Verb("*")
+            .setMonad((Atom a) => a.match!(
                 (Atom[] a) => Atom(flatten(a)),
                 _ => Nil.nilAtom,
-            ),
-            (Atom l, Atom r) => match!(
+            ))
+            // Multiplication
+            .setDyad((Atom l, Atom r) => match!(
                 (BigInt a, BigInt b) => Atom(a * b),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r)
-        )
-        .setMarkedArity(2)
-        .setIdentity(Atom(BigInt(1)))
-        .setRangeStart(BigInt(1));
+            )(l, r))
+            .setMarkedArity(2)
+            .setIdentity(Atom(BigInt(1)))
+            .setRangeStart(BigInt(1));
         //TODO: setIdentity per cased function
         
-        // Division
-        verbs[InsName.Divide] = new Verb(
-            "/",
-            (Atom a) => Nil.nilAtom,
-            (Atom l, Atom r) => match!(
+        verbs[InsName.Divide] = new Verb("/")
+            .setMonad((Atom a) => Nil.nilAtom)
+            // Division
+            .setDyad((Atom l, Atom r) => match!(
                 (Atom[] a, BigInt b) =>
                     Atom(a.chunks(to!size_t(b))
                     .map!Atom
@@ -452,184 +459,174 @@ Verb getVerb(InsName name) {
                 (string a, string b) =>
                     Atom(a.split(b).map!Atom.array),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r)
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
-        verbs[InsName.Exponentiate] = new Verb(
-            "^",
+        verbs[InsName.Exponentiate] = new Verb("^")
             // OneRange
-            (Atom a) => a.match!(
+            .setMonad((Atom a) => a.match!(
                 (BigInt a) =>
                     Atom(iota(BigInt(1), a + 1).map!Atom.array),
                 _ => Nil.nilAtom,
-            ),
+            ))
             // Exponentiation
-            (Atom l, Atom r) => match!(
+            .setDyad((Atom l, Atom r) => match!(
                 (BigInt a, BigInt b) => Atom(pow(a, b)),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r)
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
         // Modulus
-        verbs[InsName.Modulus] = new Verb(
-            "%",
-            (Atom a) => Nil.nilAtom,
-            (Atom l, Atom r) => match!(
+        verbs[InsName.Modulus] = new Verb("%")
+            .setMonad((Atom a) => Nil.nilAtom)
+            .setDyad((Atom l, Atom r) => match!(
                 (BigInt a, BigInt b) => Atom(a % b),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r)
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
         // Identity/Reshape
-        verbs[InsName.Identity] = new Verb(
-            "#",
-            _ => _,
-            (a, b) => match!(
+        verbs[InsName.Identity] = new Verb("#")
+            .setMonad(_ => _)
+            .setDyad((a, b) => match!(
                 (Atom[] a, BigInt b) => Atom(reshape(a, b)),
                 (BigInt a, Atom[] b) => Atom(reshape(b, a)),
                 (string a, BigInt b) => Atom(reshape(a.atomChars, b).joinToString),
                 (BigInt a, string b) => Atom(reshape(b.atomChars, a).joinToString),
                 (_1, _2) => Nil.nilAtom,
-            )(a, b),
-        ).setMarkedArity(1);
+            )(a, b))
+            .setMarkedArity(1);
         
         // Range (indices)
-        verbs[InsName.Range] = new Verb(
-            "R",
-            a => a.match!(
+        verbs[InsName.Range] = new Verb("R")
+            .setMonad(a => a.match!(
                 (BigInt n) => Atom(
                     n < 0
                         ? iota(-n).map!(a => Atom(-n - 1 - a)).array
                         : iota(n).map!Atom.array
                 ),
                 _ => Nil.nilAtom
-            ),
-            (l, r) => match!(
+            ))
+            .setDyad((l, r) => match!(
                 (BigInt a, BigInt b) => Atom(iota(a, b + 1).map!Atom.array),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r)
-        ).setMarkedArity(1);
+            )(l, r))
+            .setMarkedArity(1);
         
-        // Pair
-        verbs[InsName.Pair] = new Verb(
-            ";",
-            a => Atom([a]),
-            (a, b) => Atom([a, b])
-        ).setMarkedArity(2);
+        verbs[InsName.Pair] = new Verb(";")
+            // Wrap
+            .setMonad(a => Atom([a]))
+            // Pair
+            .setDyad((a, b) => Atom([a, b]))
+            .setMarkedArity(2);
         
-        // Binomial
-        verbs[InsName.Binomial] = new Verb(
-            "!",
+        verbs[InsName.Binomial] = new Verb("!")
             // Enumerate
-            a => a.match!(
+            .setMonad(a => a.match!(
                 (Atom[] a) =>
                     Atom(a.enumerate()
                     .map!(t => Atom([Atom(BigInt(t[0])), t[1]]))
                     .array),
                 _ => Nil.nilAtom,
-            ),
-            (l, r) => match!(
+            ))
+            // Binomial
+            .setDyad((l, r) => match!(
                 (BigInt a, BigInt b) =>
                     Atom(a > b
                         ? BigInt(0)
                         : productOver(iota(a + 2, b + 1)) / productOver(iota(BigInt(1), a + 1))
                     ),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r),
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
-        // First element
-        verbs[InsName.First] = new Verb(
-            "{",
-            a => a.match!(
+        verbs[InsName.First] = new Verb("{")
+            // First element
+            .setMonad(a => a.match!(
                 (Atom[] a) => a[0],
                 _ => Nil.nilAtom,
-            ),
+            ))
             // Index
-            (l, r) => match!(
+            .setDyad((l, r) => match!(
                 (Atom[] a, BigInt b) => a[to!uint(b) % a.length],
                 (_1, _2) => Nil.nilAtom,
-            )(l, r),
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
-        // Last element
-        verbs[InsName.Last] = new Verb(
-            "}",
-            a => a.match!(
+        verbs[InsName.Last] = new Verb("}")
+            // Last element
+            .setMonad(a => a.match!(
                 (Atom[] a) => a[$-1],
                 _ => Nil.nilAtom,
-            ),
-            (l, r) => match!(
+            ))
+            .setDyad((l, r) => match!(
                 (_1, _2) => Nil.nilAtom,
-            )(l, r),
-        ).setMarkedArity(1);
+            )(l, r))
+            .setMarkedArity(1);
         
-        // Equal to
-        verbs[InsName.Equality] = new Verb(
-            "=",
-            _ => Nil.nilAtom,
-            (l, r) => match!(
+        verbs[InsName.Equality] = new Verb("=")
+            .setMonad(_ => Nil.nilAtom)
+            // Equal to
+            .setDyad((l, r) => match!(
                 (a, b) => Atom(a == b),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r),
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
-        // Less than
-        verbs[InsName.LessThan] = new Verb(
-            "<",
-            _ => Nil.nilAtom,
-            (l, r) => match!(
+        verbs[InsName.LessThan] = new Verb("<")
+            .setMonad(_ => Nil.nilAtom)
+            // Less than
+            .setDyad((l, r) => match!(
                 (BigInt a, BigInt b) => Atom(a < b),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r),
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
-        // Greater than
-        verbs[InsName.GreaterThan] = new Verb(
-            ">",
-            _ => Nil.nilAtom,
-            (l, r) => match!(
+        verbs[InsName.GreaterThan] = new Verb(">")
+            .setMonad(_ => Nil.nilAtom)
+            // Greater than
+            .setDyad((l, r) => match!(
                 (BigInt a, BigInt b) => Atom(a > b),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r),
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
-        // Less than or equal to
-        verbs[InsName.LessEqual] = new Verb(
-            "<:",
-            _ => Nil.nilAtom,
-            (l, r) => match!(
+        verbs[InsName.LessEqual] = new Verb("<:")
+            .setMonad(_ => Nil.nilAtom)
+            // Less than or equal to
+            .setDyad((l, r) => match!(
                 (BigInt a, BigInt b) => Atom(a <= b),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r),
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
-        // Greater than or equal to
-        verbs[InsName.GreaterEqual] = new Verb(
-            ">:",
-            _ => Nil.nilAtom,
-            (l, r) => match!(
+        verbs[InsName.GreaterEqual] = new Verb(">:")
+            .setMonad(_ => Nil.nilAtom)
+            // Greater than or equal to
+            .setDyad((l, r) => match!(
                 (BigInt a, BigInt b) => Atom(a >= b),
                 (_1, _2) => Nil.nilAtom,
-            )(l, r),
-        ).setMarkedArity(2);
+            )(l, r))
+            .setMarkedArity(2);
         
-        // Print
-        verbs[InsName.Print] = new Verb(
-            "p.",
-            (a) { import std.stdio; writeln(a); return a; },
-            (_1, _2) => Nil.nilAtom,
-        );
+        verbs[InsName.Print] = new Verb("p.")
+            // Print
+            .setMonad((a) {
+                import std.stdio;
+                writeln(a);
+                return a;
+            })
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
         
-        // Exit
-        verbs[InsName.Exit] = new Verb(
-            "x:",
-            a => a.match!(
+        verbs[InsName.Exit] = new Verb("x:")
+            // Exit
+            .setMonad(a => a.match!(
                 (BigInt a) => exit(a),
                 _ => exit(),
-            ),
-            (_1, _2) => exit(),
-        ).setMarkedArity(1);
+            ))
+            .setDyad((_1, _2) => exit())
+            .setMarkedArity(1);
     }
     
     Verb* verb = name in verbs;
@@ -638,14 +635,13 @@ Verb getVerb(InsName name) {
 }
 
 Verb filterFor(Verb v) {
-    return new Verb(
-        v.display ~ "₁\\",
-        a => a.match!(
+    return new Verb(v.display ~ "₁\\")
+        .setMonad(a => a.match!(
             (Atom[] a) => Atom(a.filter!(a => v(a).truthiness).array),
             _ => Nil.nilAtom,
-        ),
-        (a, b) => Nil.nilAtom,
-    ).setMarkedArity(1);
+        ))
+        .setDyad((a, b) => Nil.nilAtom)
+        .setMarkedArity(1);
 }
 
 Verb foldFor(Verb v) {
@@ -656,21 +652,20 @@ Verb foldFor(Verb v) {
             ? arr.reduce!v
             : reduce!v(v.identity, arr);
     }
-    return new Verb(
-        v.display ~ "₂\\",
-        a => a.match!(
+    return new Verb(v.display ~ "₂\\")
+        .setMonad(a => a.match!(
             (Atom[] arr) => reduc(arr),
             (BigInt n) => reduc(iota(v.rangeStart, n + 1).map!Atom),
             _ => Nil.nilAtom,
-        ),
-        (a, b) => match!(
+        ))
+        .setDyad((a, b) => match!(
             (BigInt a, BigInt b) => Atom(BigInt("234")),
             // table
             (Atom[] a, Atom[] b) =>
                 Atom(a.map!(l => Atom(b.map!(r => v(l, r)).array)).array),
             (_1, _2) => Nil.nilAtom,
-        )(a, b),
-    ).setMarkedArity(1);
+        )(a, b))
+        .setMarkedArity(1);
 }
 
 Adjective getAdjective(InsName name) {
@@ -699,49 +694,45 @@ Adjective getAdjective(InsName name) {
         
         // Map
         adjectives[InsName.Map] = new Adjective(
-            (Verb v) => new Verb(
-                v.display.enclosed ~ '"',
+            (Verb v) => new Verb(v.display.enclosed ~ '"')
                 // map
-                a => a.match!(
+                .setMonad(a => a.match!(
                     (Atom[] arr) => Atom(arr.map!v.array),
                     _ => Nil.nilAtom,
-                ),
+                ))
                 // zip
-                (a, b) => match!(
+                .setDyad((a, b) => match!(
                     (Atom[] a, Atom[] b) => Atom(zip(a, b).map!(t => v(t[0], t[1])).array),
                     // TODO: maybe don't call Atom every iteration?
                     (Atom[] a, b) => Atom(a.map!(t => v(t, Atom(b))).array),
                     (a, Atom[] b) => Atom(b.map!(t => v(Atom(a), t)).array),
                     (_1, _2) => Nil.nilAtom,
-                )(a, b),
-            ).setMarkedArity(v.markedArity)
+                )(a, b))
+                .setMarkedArity(v.markedArity)
         );
         
         // OnLeft
         adjectives[InsName.OnLeft] = new Adjective(
-            (Verb v) => new Verb(
-                v.display.enclosed ~ '[',
-                a => v(a),
-                (a, b) => v(a),
-            ).setMarkedArity(2)
+            (Verb v) => new Verb(v.display.enclosed ~ '[')
+                .setMonad(a => v(a))
+                .setDyad((a, b) => v(a))
+                .setMarkedArity(2)
         );
         
         // OnRight
         adjectives[InsName.OnRight] = new Adjective(
-            (Verb v) => new Verb(
-                v.display.enclosed ~ ']',
-                a => v(a),
-                (a, b) => v(b),
-            ).setMarkedArity(2)
+            (Verb v) => new Verb(v.display.enclosed ~ ']')
+                .setMonad(a => v(a))
+                .setDyad((a, b) => v(b))
+                .setMarkedArity(2)
         );
         
         // Reflex
         adjectives[InsName.Reflex] = new Adjective(
-            (Verb v) => new Verb(
-                v.display.enclosed ~ '~',
-                a => v(a, a),
-                (x, y) => v(y, x),
-            ).setMarkedArity(2)
+            (Verb v) => new Verb(v.display.enclosed ~ '~')
+                .setMonad(a => v(a, a))
+                .setDyad((x, y) => v(y, x))
+                .setMarkedArity(2)
         );
     }
     
@@ -755,27 +746,27 @@ Conjunction getConjunction(InsName name) {
     
     if(!conjunctions) {
          conjunctions[InsName.Bond] = new Conjunction(
-            (Verb f, Verb g) => new Verb(
-                f.display.enclosed ~ "&" ~ g.display.enclosed,
-                a => 
+            (Verb f, Verb g) => new Verb(f.display.enclosed ~ "&" ~ g.display.enclosed)
+                .setMonad(a => 
                     f.niladic
                         ? g(f(), a)
                         : g.niladic
                             ? f(a, g())
-                            : f(g(a)),
-                // TODO: niladic
-                (a, b) =>
-                    f(g(a), g(b))
-            )
-            .setMarkedArity(f.niladic || g.niladic ? 1 : g.markedArity)
+                            : f(g(a)))
+                // TODO: niladic as per above
+                .setDyad((a, b) =>
+                    f(g(a), g(b)))
+                .setMarkedArity(
+                    f.niladic || g.niladic
+                        ? 1
+                        : g.markedArity)
         );
         
         conjunctions[InsName.Compose] = new Conjunction(
-            (Verb f, Verb g) => new Verb(
-                f.display.enclosed ~ "@" ~ g.display.enclosed,
-                a => f(g(a)),
-                (a, b) => f(g(a, b))
-            ).setMarkedArity(g.markedArity),
+            (Verb f, Verb g) => new Verb(f.display.enclosed ~ "@" ~ g.display.enclosed)
+                .setMonad(a => f(g(a)))
+                .setDyad((a, b) => f(g(a, b)))
+                .setMarkedArity(g.markedArity)
         );
     }
     
@@ -796,12 +787,10 @@ MultiConjunction getMultiConjunction(InsName name) {
                 Verb f = verbs[0];
                 Verb g = verbs[1];
                 Verb h = verbs[2];
-                return new Verb(
-                    "(" ~ verbs.map!(a => a.display.enclosed).join(" ") ~ " O)",
-                    _ => Nil.nilAtom,
-                    (x, y) => g(f(x), h(y)),
-                )
-                .setMarkedArity(f.niladic || h.niladic ? 1 : 2);
+                return new Verb("(" ~ verbs.map!(a => a.display.enclosed).join(" ") ~ " O)")
+                    .setMonad(_ => Nil.nilAtom)
+                    .setDyad((x, y) => g(f(x), h(y)))
+                    .setMarkedArity(f.niladic || h.niladic ? 1 : 2);
             }
          );
     }
