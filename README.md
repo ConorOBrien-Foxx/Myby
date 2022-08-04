@@ -11,7 +11,7 @@ Since this project is still in its early stages, right now, the only way to comp
 dmd -g -w src/*.d -of=myby
 ```
 
-To run a literate program from a file: `myby -l file-name "arg1" "arg2"`. Presently, one must supply at least one argument, which is interpreted as literate Myby code.
+To run a literate program from a file: `myby -l file-name "arg1" "arg2"`. Arguments are interpreted as literate Myby code.
 
 To compile a literate program from a file: `myby -c file-name`. To save the resulting code to a file, `myby -c file-name -o out-file`.
 

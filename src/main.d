@@ -150,11 +150,14 @@ int main(string[] args) {
     Debugger.unsilence();
     Debugger.print("Verb args: ", verbArgs.map!"a.toString()");
     
+    // TODO: custom toString representation
     if(verbArgs.length > 0) {
         writeln(mainVerb(verbArgs).toString());
     }
     else {
-        //TODO
+        //TODO: For now, just call it without arguments.
+        //In the future, probably read from STDIN
+        writeln(mainVerb().toString());
     }
     
     return 0;
