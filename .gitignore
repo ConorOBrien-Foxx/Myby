@@ -22,3 +22,7 @@ docs/
 
 # Code coverage
 *.lst
+
+# Other weird files
+*.ilk
+*.pdb
