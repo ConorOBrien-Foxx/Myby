@@ -10,7 +10,7 @@ import std.conv : to;
 
 import myby.nibble;
 
-enum InstructionName {
+enum InsName {
     Integer,        //0
     String,         //1
     Filter,         //2
@@ -95,48 +95,48 @@ enum Nibble[][string] InstructionMap = [
 ];
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
 
-alias SpeechNamePair = Tuple!(SpeechPart, "speech", InstructionName, "name");
+alias NameInfo = Tuple!(SpeechPart, "speech", InsName, "name");
 
-enum SpeechNamePair[int] NameMap = [
-    0x0:    SpeechNamePair(SpeechPart.Verb,             InstructionName.Integer),
-    0x1:    SpeechNamePair(SpeechPart.Verb,             InstructionName.String),
-    0x2:    SpeechNamePair(SpeechPart.Adjective,        InstructionName.Filter),
-    0x3:    SpeechNamePair(SpeechPart.Adjective,        InstructionName.Map),
-    0x4:    SpeechNamePair(SpeechPart.Verb,             InstructionName.Add),
-    0x5:    SpeechNamePair(SpeechPart.Verb,             InstructionName.Subtract),
-    0x6:    SpeechNamePair(SpeechPart.Verb,             InstructionName.Multiply),
-    0x7:    SpeechNamePair(SpeechPart.Verb,             InstructionName.Divide),
-    0x8:    SpeechNamePair(SpeechPart.Verb,             InstructionName.Exponentiate),
-    0x9:    SpeechNamePair(SpeechPart.Verb,             InstructionName.Identity),
-    0xA:    SpeechNamePair(SpeechPart.Conjunction,      InstructionName.Bond),
-    0xB:    SpeechNamePair(SpeechPart.Syntax,           InstructionName.OpenParen),
-    0xC:    SpeechNamePair(SpeechPart.Syntax,           InstructionName.CloseParen),
-    0xD:    SpeechNamePair(SpeechPart.Conjunction,      InstructionName.Compose),
-    0xE:    SpeechNamePair(SpeechPart.Verb,             InstructionName.Range),
-    0xF0:   SpeechNamePair(SpeechPart.Verb,             InstructionName.Modulus),
-    0xF10:  SpeechNamePair(SpeechPart.Verb,             InstructionName.FirstChain),
-    0xF11:  SpeechNamePair(SpeechPart.Verb,             InstructionName.SecondChain),
-    0xF12:  SpeechNamePair(SpeechPart.Verb,             InstructionName.ThirdChain),
-    0xF13:  SpeechNamePair(SpeechPart.Verb,             InstructionName.FourthChain),
+enum NameInfo[int] NameMap = [
+    0x0:    NameInfo(SpeechPart.Verb,             InsName.Integer),
+    0x1:    NameInfo(SpeechPart.Verb,             InsName.String),
+    0x2:    NameInfo(SpeechPart.Adjective,        InsName.Filter),
+    0x3:    NameInfo(SpeechPart.Adjective,        InsName.Map),
+    0x4:    NameInfo(SpeechPart.Verb,             InsName.Add),
+    0x5:    NameInfo(SpeechPart.Verb,             InsName.Subtract),
+    0x6:    NameInfo(SpeechPart.Verb,             InsName.Multiply),
+    0x7:    NameInfo(SpeechPart.Verb,             InsName.Divide),
+    0x8:    NameInfo(SpeechPart.Verb,             InsName.Exponentiate),
+    0x9:    NameInfo(SpeechPart.Verb,             InsName.Identity),
+    0xA:    NameInfo(SpeechPart.Conjunction,      InsName.Bond),
+    0xB:    NameInfo(SpeechPart.Syntax,           InsName.OpenParen),
+    0xC:    NameInfo(SpeechPart.Syntax,           InsName.CloseParen),
+    0xD:    NameInfo(SpeechPart.Conjunction,      InsName.Compose),
+    0xE:    NameInfo(SpeechPart.Verb,             InsName.Range),
+    0xF0:   NameInfo(SpeechPart.Verb,             InsName.Modulus),
+    0xF10:  NameInfo(SpeechPart.Verb,             InsName.FirstChain),
+    0xF11:  NameInfo(SpeechPart.Verb,             InsName.SecondChain),
+    0xF12:  NameInfo(SpeechPart.Verb,             InsName.ThirdChain),
+    0xF13:  NameInfo(SpeechPart.Verb,             InsName.FourthChain),
     //TODO: should this(v) be a conjunction?
-    0xF14:  SpeechNamePair(SpeechPart.Verb,             InstructionName.NthChain),
-    0xF15:  SpeechNamePair(SpeechPart.Verb,             InstructionName.LessEqual),
-    0xF16:  SpeechNamePair(SpeechPart.Verb,             InstructionName.GreaterEqual),
-    0xF1E:  SpeechNamePair(SpeechPart.Verb,             InstructionName.Print),
-    0xF2:   SpeechNamePair(SpeechPart.Verb,             InstructionName.Pair),
-    0xF3:   SpeechNamePair(SpeechPart.Verb,             InstructionName.Binomial),
-    0xF4:   SpeechNamePair(SpeechPart.Verb,             InstructionName.Equality),
-    0xF5:   SpeechNamePair(SpeechPart.Verb,             InstructionName.LessThan),
-    0xF6:   SpeechNamePair(SpeechPart.Verb,             InstructionName.GreaterThan),
-    0xF7:   SpeechNamePair(SpeechPart.Adjective,        InstructionName.ArityForce),
-    0xF8:   SpeechNamePair(SpeechPart.Verb,             InstructionName.First),
-    0xF9:   SpeechNamePair(SpeechPart.Verb,             InstructionName.Last),
-    0xFA:   SpeechNamePair(SpeechPart.Adjective,        InstructionName.OnLeft),
-    0xFB:   SpeechNamePair(SpeechPart.Adjective,        InstructionName.OnRight),
-    0xFC:   SpeechNamePair(SpeechPart.MultiConjunction, InstructionName.SplitCompose),
-    0xFD:   SpeechNamePair(SpeechPart.Adjective,        InstructionName.Reflex),
-    0xFE00: SpeechNamePair(SpeechPart.Verb,             InstructionName.Exit),
-    0xFF:   SpeechNamePair(SpeechPart.Syntax,           InstructionName.Break),
+    0xF14:  NameInfo(SpeechPart.Verb,             InsName.NthChain),
+    0xF15:  NameInfo(SpeechPart.Verb,             InsName.LessEqual),
+    0xF16:  NameInfo(SpeechPart.Verb,             InsName.GreaterEqual),
+    0xF1E:  NameInfo(SpeechPart.Verb,             InsName.Print),
+    0xF2:   NameInfo(SpeechPart.Verb,             InsName.Pair),
+    0xF3:   NameInfo(SpeechPart.Verb,             InsName.Binomial),
+    0xF4:   NameInfo(SpeechPart.Verb,             InsName.Equality),
+    0xF5:   NameInfo(SpeechPart.Verb,             InsName.LessThan),
+    0xF6:   NameInfo(SpeechPart.Verb,             InsName.GreaterThan),
+    0xF7:   NameInfo(SpeechPart.Adjective,        InsName.ArityForce),
+    0xF8:   NameInfo(SpeechPart.Verb,             InsName.First),
+    0xF9:   NameInfo(SpeechPart.Verb,             InsName.Last),
+    0xFA:   NameInfo(SpeechPart.Adjective,        InsName.OnLeft),
+    0xFB:   NameInfo(SpeechPart.Adjective,        InsName.OnRight),
+    0xFC:   NameInfo(SpeechPart.MultiConjunction, InsName.SplitCompose),
+    0xFD:   NameInfo(SpeechPart.Adjective,        InsName.Reflex),
+    0xFE00: NameInfo(SpeechPart.Verb,             InsName.Exit),
+    0xFF:   NameInfo(SpeechPart.Syntax,           InsName.Break),
 ];
 
 class Nil {
@@ -385,15 +385,15 @@ Atom exit(BigInt code = 0) {
     core.stdc.stdlib.exit(to!uint(code));
 }
 
-Verb getVerb(InstructionName name) {
-    static Verb[InstructionName] verbs;
+Verb getVerb(InsName name) {
+    static Verb[InsName] verbs;
     
     if(!verbs) {
         // TODO: this looks awful. clean it.
         // maybe: setMonad, setDyad?
         
         // Addition
-        verbs[InstructionName.Add] = new Verb(
+        verbs[InsName.Add] = new Verb(
             "+",
             (Atom a) => a.match!(
                 (BigInt b) => Atom(b < 0 ? -b : b),
@@ -409,7 +409,7 @@ Verb getVerb(InstructionName name) {
         .setIdentity(Atom(BigInt(0)));
         
         // Subtraction
-        verbs[InstructionName.Subtract] = new Verb(
+        verbs[InsName.Subtract] = new Verb(
             "-",
             (Atom a) => a.match!(
                 (BigInt n) => Atom(-n),
@@ -423,7 +423,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(2);
         
         // Multiplication
-        verbs[InstructionName.Multiply] = new Verb(
+        verbs[InsName.Multiply] = new Verb(
             "*",
             (Atom a) => a.match!(
                 (Atom[] a) => Atom(flatten(a)),
@@ -440,7 +440,7 @@ Verb getVerb(InstructionName name) {
         //TODO: setIdentity per cased function
         
         // Division
-        verbs[InstructionName.Divide] = new Verb(
+        verbs[InsName.Divide] = new Verb(
             "/",
             (Atom a) => Nil.nilAtom,
             (Atom l, Atom r) => match!(
@@ -455,7 +455,7 @@ Verb getVerb(InstructionName name) {
             )(l, r)
         ).setMarkedArity(2);
         
-        verbs[InstructionName.Exponentiate] = new Verb(
+        verbs[InsName.Exponentiate] = new Verb(
             "^",
             // OneRange
             (Atom a) => a.match!(
@@ -471,7 +471,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(2);
         
         // Modulus
-        verbs[InstructionName.Modulus] = new Verb(
+        verbs[InsName.Modulus] = new Verb(
             "%",
             (Atom a) => Nil.nilAtom,
             (Atom l, Atom r) => match!(
@@ -481,7 +481,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(2);
         
         // Identity/Reshape
-        verbs[InstructionName.Identity] = new Verb(
+        verbs[InsName.Identity] = new Verb(
             "#",
             _ => _,
             (a, b) => match!(
@@ -494,7 +494,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(1);
         
         // Range (indices)
-        verbs[InstructionName.Range] = new Verb(
+        verbs[InsName.Range] = new Verb(
             "R",
             a => a.match!(
                 (BigInt n) => Atom(
@@ -511,14 +511,14 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(1);
         
         // Pair
-        verbs[InstructionName.Pair] = new Verb(
+        verbs[InsName.Pair] = new Verb(
             ";",
             a => Atom([a]),
             (a, b) => Atom([a, b])
         ).setMarkedArity(2);
         
         // Binomial
-        verbs[InstructionName.Binomial] = new Verb(
+        verbs[InsName.Binomial] = new Verb(
             "!",
             // Enumerate
             a => a.match!(
@@ -539,7 +539,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(2);
         
         // First element
-        verbs[InstructionName.First] = new Verb(
+        verbs[InsName.First] = new Verb(
             "{",
             a => a.match!(
                 (Atom[] a) => a[0],
@@ -553,7 +553,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(2);
         
         // Last element
-        verbs[InstructionName.Last] = new Verb(
+        verbs[InsName.Last] = new Verb(
             "}",
             a => a.match!(
                 (Atom[] a) => a[$-1],
@@ -565,7 +565,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(1);
         
         // Equal to
-        verbs[InstructionName.Equality] = new Verb(
+        verbs[InsName.Equality] = new Verb(
             "=",
             _ => Nil.nilAtom,
             (l, r) => match!(
@@ -575,7 +575,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(2);
         
         // Less than
-        verbs[InstructionName.LessThan] = new Verb(
+        verbs[InsName.LessThan] = new Verb(
             "<",
             _ => Nil.nilAtom,
             (l, r) => match!(
@@ -585,7 +585,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(2);
         
         // Greater than
-        verbs[InstructionName.GreaterThan] = new Verb(
+        verbs[InsName.GreaterThan] = new Verb(
             ">",
             _ => Nil.nilAtom,
             (l, r) => match!(
@@ -595,7 +595,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(2);
         
         // Less than or equal to
-        verbs[InstructionName.LessEqual] = new Verb(
+        verbs[InsName.LessEqual] = new Verb(
             "<:",
             _ => Nil.nilAtom,
             (l, r) => match!(
@@ -605,7 +605,7 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(2);
         
         // Greater than or equal to
-        verbs[InstructionName.GreaterEqual] = new Verb(
+        verbs[InsName.GreaterEqual] = new Verb(
             ">:",
             _ => Nil.nilAtom,
             (l, r) => match!(
@@ -615,14 +615,14 @@ Verb getVerb(InstructionName name) {
         ).setMarkedArity(2);
         
         // Print
-        verbs[InstructionName.Print] = new Verb(
+        verbs[InsName.Print] = new Verb(
             "p.",
             (a) { import std.stdio; writeln(a); return a; },
             (_1, _2) => Nil.nilAtom,
         );
         
         // Exit
-        verbs[InstructionName.Exit] = new Verb(
+        verbs[InsName.Exit] = new Verb(
             "x:",
             a => a.match!(
                 (BigInt a) => exit(a),
@@ -673,13 +673,13 @@ Verb foldFor(Verb v) {
     ).setMarkedArity(1);
 }
 
-Adjective getAdjective(InstructionName name) {
-    static Adjective[InstructionName] adjectives;
+Adjective getAdjective(InsName name) {
+    static Adjective[InsName] adjectives;
     
     if(!adjectives) {
         import std.algorithm.iteration : reduce;
         // Filter/Fold
-        adjectives[InstructionName.Filter] = new Adjective(
+        adjectives[InsName.Filter] = new Adjective(
             (Verb v) {
                 import std.stdio;
                 // writeln("Verb v: ", v);
@@ -698,7 +698,7 @@ Adjective getAdjective(InstructionName name) {
         );
         
         // Map
-        adjectives[InstructionName.Map] = new Adjective(
+        adjectives[InsName.Map] = new Adjective(
             (Verb v) => new Verb(
                 v.display.enclosed ~ '"',
                 // map
@@ -718,7 +718,7 @@ Adjective getAdjective(InstructionName name) {
         );
         
         // OnLeft
-        adjectives[InstructionName.OnLeft] = new Adjective(
+        adjectives[InsName.OnLeft] = new Adjective(
             (Verb v) => new Verb(
                 v.display.enclosed ~ '[',
                 a => v(a),
@@ -727,7 +727,7 @@ Adjective getAdjective(InstructionName name) {
         );
         
         // OnRight
-        adjectives[InstructionName.OnRight] = new Adjective(
+        adjectives[InsName.OnRight] = new Adjective(
             (Verb v) => new Verb(
                 v.display.enclosed ~ ']',
                 a => v(a),
@@ -736,7 +736,7 @@ Adjective getAdjective(InstructionName name) {
         );
         
         // Reflex
-        adjectives[InstructionName.Reflex] = new Adjective(
+        adjectives[InsName.Reflex] = new Adjective(
             (Verb v) => new Verb(
                 v.display.enclosed ~ '~',
                 a => v(a, a),
@@ -750,11 +750,11 @@ Adjective getAdjective(InstructionName name) {
     return *adjective;
 }
 
-Conjunction getConjunction(InstructionName name) {
-    static Conjunction[InstructionName] conjunctions;
+Conjunction getConjunction(InsName name) {
+    static Conjunction[InsName] conjunctions;
     
     if(!conjunctions) {
-         conjunctions[InstructionName.Bond] = new Conjunction(
+         conjunctions[InsName.Bond] = new Conjunction(
             (Verb f, Verb g) => new Verb(
                 f.display.enclosed ~ "&" ~ g.display.enclosed,
                 a => 
@@ -770,7 +770,7 @@ Conjunction getConjunction(InstructionName name) {
             .setMarkedArity(f.niladic || g.niladic ? 1 : g.markedArity)
         );
         
-        conjunctions[InstructionName.Compose] = new Conjunction(
+        conjunctions[InsName.Compose] = new Conjunction(
             (Verb f, Verb g) => new Verb(
                 f.display.enclosed ~ "@" ~ g.display.enclosed,
                 a => f(g(a)),
@@ -784,13 +784,13 @@ Conjunction getConjunction(InstructionName name) {
     return *conjunction;
 }
 
-MultiConjunction getMultiConjunction(InstructionName name) {
-    static MultiConjunction[InstructionName] multiConjunctions;
+MultiConjunction getMultiConjunction(InsName name) {
+    static MultiConjunction[InsName] multiConjunctions;
     
     if(!multiConjunctions) {
         // https://aplwiki.com/wiki/Split-compose
         // x (f g h O) y <-> (f x) g (h y)
-        multiConjunctions[InstructionName.SplitCompose] = new MultiConjunction(
+        multiConjunctions[InsName.SplitCompose] = new MultiConjunction(
             3,
             (Verb[] verbs) {
                 Verb f = verbs[0];
@@ -812,6 +812,6 @@ MultiConjunction getMultiConjunction(InstructionName name) {
 }
 
 Verb compose(Verb f, Verb g) {
-    return getConjunction(InstructionName.Compose)
+    return getConjunction(InsName.Compose)
         .transform(f, g);
 }

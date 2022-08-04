@@ -13,7 +13,7 @@ import myby.literate : NiladParseState;
 
 struct Token {
     SpeechPart speech;
-    InstructionName name;
+    InsName name;
     union {
         BigInt big;
         string str;
@@ -22,9 +22,9 @@ struct Token {
     string toString() {
         return "Token(" ~ to!string(speech)
             ~ " `" ~ to!string(name) ~ "`" ~ (
-                name == InstructionName.Integer || name == InstructionName.CloseParen
+                name == InsName.Integer || name == InsName.CloseParen
                     ? ' ' ~ to!string(big)
-                    : name == InstructionName.String
+                    : name == InsName.String
                         ? ' ' ~ str
                         : ""
             )
@@ -37,7 +37,7 @@ struct Token {
         );
     }
     
-    static Token Break = Token(SpeechPart.Syntax, InstructionName.Break);
+    static Token Break = Token(SpeechPart.Syntax, InsName.Break);
 }
 
 Token[] tokenize(Nibble[] code) {
@@ -52,12 +52,12 @@ Token[] tokenize(Nibble[] code) {
         if(nib == 0x0) {
             // reminder that nouns are just niladic verbs 
             token.speech = SpeechPart.Verb;
-            token.name = InstructionName.Integer;
+            token.name = InsName.Integer;
             token.big = nibblesToInteger(code, i);
         }
         else if(nib == 0x1) {
             token.speech = SpeechPart.Verb;
-            token.name = InstructionName.String;
+            token.name = InsName.String;
             token.str = nibblesToString(code, i);
         }
         else {
@@ -100,15 +100,15 @@ Token[] autoCompleteParentheses(Token[] tokens) {
     int balance = 0;
     int openMatch = 0;
     foreach(token; tokens) {
-        if(token.name == InstructionName.OpenParen) {
+        if(token.name == InsName.OpenParen) {
             balance++;
         }
-        else if(token.name == InstructionName.CloseParen) {
+        else if(token.name == InsName.CloseParen) {
             balance--;
         }
         if(balance == -1) {
             Token open;
-            open.name = InstructionName.OpenParen;
+            open.name = InsName.OpenParen;
             open.speech = SpeechPart.Syntax;
             balance++;
             openMatch++;
@@ -118,7 +118,7 @@ Token[] autoCompleteParentheses(Token[] tokens) {
     if(openMatch > 0) {
         head = new Token[openMatch];
         foreach(ref tok; head) {
-            tok.name = InstructionName.OpenParen;
+            tok.name = InsName.OpenParen;
             tok.speech = SpeechPart.Syntax;
         }
     }
@@ -126,7 +126,7 @@ Token[] autoCompleteParentheses(Token[] tokens) {
     if(balance > 0) {
         tail = new Token[balance];
         foreach(ref tok; tail) {
-            tok.name = InstructionName.CloseParen;
+            tok.name = InsName.CloseParen;
             tok.speech = SpeechPart.Syntax;
         }
     }
@@ -153,7 +153,7 @@ class Interpreter {
         SpeechPart previous = SpeechPart.Syntax;
         
         void flushOpStack() {
-            while(opStack.length && opStack[$-1].name != InstructionName.OpenParen) {
+            while(opStack.length && opStack[$-1].name != InsName.OpenParen) {
                 stack ~= opStack.back;
                 opStack.popBack;
             }
@@ -195,12 +195,12 @@ class Interpreter {
                     break;
                 case SpeechPart.Syntax:
                     switch(token.name) {
-                        case InstructionName.OpenParen:
+                        case InsName.OpenParen:
                             opStack ~= token;
                             parenStackArity ~= 0;
                             break;
                             
-                        case InstructionName.CloseParen:
+                        case InsName.CloseParen:
                             // TODO: exploit behavior?
                             assert(parenStackArity.length, "Close parenthesis without open parenthesis");
                             uint count = parenStackArity.back;
@@ -209,12 +209,12 @@ class Interpreter {
                             opStack.popBack; // pop `(`
                             stack ~= Token(
                                 SpeechPart.Syntax,
-                                InstructionName.CloseParen,
+                                InsName.CloseParen,
                                 BigInt(count)
                             );
                             break;
                             
-                        case InstructionName.Break:
+                        case InsName.Break:
                             stack ~= token;
                             break;
                         
@@ -296,11 +296,11 @@ class Interpreter {
             Debugger.print("token: ", token);
             final switch(token.speech) {
                 case SpeechPart.Verb:
-                    if(token.name == InstructionName.Integer) {
+                    if(token.name == InsName.Integer) {
                         addNilad(token.big);
                         nextState = NiladParseState.LastWasNilad;
                     }
-                    else if(token.name == InstructionName.String) {
+                    else if(token.name == InsName.String) {
                         addNilad(token.str);
                         nextState = NiladParseState.LastWasNilad;
                     }
@@ -311,7 +311,7 @@ class Interpreter {
                     break;
                     
                 case SpeechPart.Adjective:
-                    if(state == NiladParseState.LastWasNilad && token.name == InstructionName.Filter) {
+                    if(state == NiladParseState.LastWasNilad && token.name == InsName.Filter) {
                         Debugger.print("Nilad separator!");
                         if(listBuild.length == 0) {
                             Debugger.print("Initializing with top (niladic) verb");
@@ -362,7 +362,7 @@ class Interpreter {
                     
                 case SpeechPart.Syntax:
                     // writeln("Unhandled: ", token);
-                    assert(token.name == InstructionName.CloseParen);
+                    assert(token.name == InsName.CloseParen);
                     // TODO: handle more syntax?
                     auto amount = to!int(token.big);
                     finishListBuild;
