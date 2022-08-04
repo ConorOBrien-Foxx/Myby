@@ -3,7 +3,21 @@
 
 See [the Quick Reference](./QUICKREF.md) for a description of the commands. May be slightly out of date. See also some [example programs](./example).
 
-## Parse behavior
+## Compiling and Running
+
+Since this project is still in its early stages, right now, the only way to compile consistently (that is tested) is using the corresponding [Batchfile](./compile.bat). However, the following command should work and be equivalent for Bash:
+
+```sh
+dmd -g -w src/*.d -of=myby
+```
+
+To run a literate program from a file: `myby -l file-name "arg1" "arg2"`. Presently, one must supply at least one argument, which is interpreted as literate Myby code.
+
+To compile a literate program from a file: `myby -c file-name`. To save the resulting code to a file, `myby -c file-name -o out-file`.
+
+## Language
+
+### Parse behavior
 A program consists of a series of:
  - Verbs (V), the actions of a program
  - Nouns (N), the data of a program
@@ -22,13 +36,13 @@ V* -> V, a train of Verbs is a Verb
 
 Example: `VACVAA -> (VA)C((VA)A)`
 
-## Trains
+### Trains
  - 2-train is an Atop (as in APL)
  - 3-train is a Fork (as in J/APL)
  - A noun present in a Train is treated as a constant function returning itself, hence all nouns are really just niladic verbs
 
-## Instruction Encoding
-When specified, X/Y refers to the Unary/Binary behavior, respectively. X will indicate an unassigned behavior.
+### Instruction Encoding
+When specified, X/Y refers to the Unary/Binary behavior, respectively. A variable will indicate an unassigned behavior.
 
 | Hex code | Meaning |
 |----------|---------|
@@ -64,7 +78,7 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. X will in
 | `0xF1B` |  |
 | `0xF1C` |  |
 | `0xF1D` |  |
-| `0xF1E` |  |
+| `0xF1E` | Print |
 | `0xF1F` |  |
 | `0xF2` | Wrap/Pair |
 | `0xF3` | Enumerate/Binomial |
@@ -78,5 +92,6 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. X will in
 | `0xFB` | OnRight |
 | `0xFC` | Split-Compose |
 | `0xFD` | Reflex |
-| `0xFEZZ` | Two-Byte extensions |
+| `0xFEZZ` | [Two-Byte extensions] |
+| `0xFE00` | Exit/Y |
 | `0xFF` | Section break |

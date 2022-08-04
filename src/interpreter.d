@@ -63,15 +63,20 @@ Token[] tokenize(Nibble[] code) {
         else {
             // get name identifier using 1 or more nibbles
             int name = nib;
-            if(nib == 0xF) {
-                // extended characters
+            void appendNibble() {
                 name *= 16;
                 nib = code[++i];
                 name += nib;
+            }
+            if(nib == 0xF) {
+                appendNibble;
+                // extended characters
                 if(nib == 0x1) {
-                    name *= 16;
-                    nib = code[++i];
-                    name += nib;
+                    appendNibble;
+                }
+                else if(nib == 0xE) {
+                    appendNibble;
+                    appendNibble;
                 }
             }
             Debugger.print("Parsing instruction ", name.toBase16.nibbleFmt);

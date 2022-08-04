@@ -34,6 +34,7 @@ enum InstructionName {
     NthChain,       //F14
     GreaterEqual,   //F15
     LessEqual,      //F16
+    Print,          //F1E
     Pair,           //F2
     Binomial,       //F3
     Equality,       //F4
@@ -46,6 +47,7 @@ enum InstructionName {
     OnRight,        //FB
     SplitCompose,   //FC
     Reflex,         //FD
+    Exit,           //FE00
     Break,          //FF
 }
 
@@ -74,6 +76,8 @@ enum Nibble[][string] InstructionMap = [
     "$N": [0xF, 0x1, 0x4],
     "<:": [0xF, 0x1, 0x5],
     ">:": [0xF, 0x1, 0x6],
+    //...
+    "p.": [0xF, 0x1, 0xE],
     ";": [0xF, 0x2],
     "!": [0xF, 0x3],
     "=": [0xF, 0x4],
@@ -86,6 +90,7 @@ enum Nibble[][string] InstructionMap = [
     "]": [0xF, 0xB],
     "O": [0xF, 0xC],
     "~": [0xF, 0xD],
+    "x:": [0xF, 0xE, 0x0, 0x0],
     "\n": [0xF, 0xF],
 ];
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -117,6 +122,7 @@ enum SpeechNamePair[int] NameMap = [
     0xF14:  SpeechNamePair(SpeechPart.Verb,             InstructionName.NthChain),
     0xF15:  SpeechNamePair(SpeechPart.Verb,             InstructionName.LessEqual),
     0xF16:  SpeechNamePair(SpeechPart.Verb,             InstructionName.GreaterEqual),
+    0xF1E:  SpeechNamePair(SpeechPart.Verb,             InstructionName.Print),
     0xF2:   SpeechNamePair(SpeechPart.Verb,             InstructionName.Pair),
     0xF3:   SpeechNamePair(SpeechPart.Verb,             InstructionName.Binomial),
     0xF4:   SpeechNamePair(SpeechPart.Verb,             InstructionName.Equality),
@@ -129,6 +135,7 @@ enum SpeechNamePair[int] NameMap = [
     0xFB:   SpeechNamePair(SpeechPart.Adjective,        InstructionName.OnRight),
     0xFC:   SpeechNamePair(SpeechPart.MultiConjunction, InstructionName.SplitCompose),
     0xFD:   SpeechNamePair(SpeechPart.Adjective,        InstructionName.Reflex),
+    0xFE00: SpeechNamePair(SpeechPart.Verb,             InstructionName.Exit),
     0xFF:   SpeechNamePair(SpeechPart.Syntax,           InstructionName.Break),
 ];
 
@@ -373,12 +380,19 @@ BigInt pow(BigInt a, BigInt b) {
     return a;
 }
 
+Atom exit(BigInt code = 0) {
+    import core.stdc.stdlib;
+    core.stdc.stdlib.exit(to!uint(code));
+}
+
 Verb getVerb(InstructionName name) {
     static Verb[InstructionName] verbs;
     
     if(!verbs) {
         // TODO: this looks awful. clean it.
         // maybe: setMonad, setDyad?
+        
+        // Addition
         verbs[InstructionName.Add] = new Verb(
             "+",
             (Atom a) => a.match!(
@@ -394,6 +408,7 @@ Verb getVerb(InstructionName name) {
         .setMarkedArity(2)
         .setIdentity(Atom(BigInt(0)));
         
+        // Subtraction
         verbs[InstructionName.Subtract] = new Verb(
             "-",
             (Atom a) => a.match!(
@@ -407,6 +422,7 @@ Verb getVerb(InstructionName name) {
             )(l, r)
         ).setMarkedArity(2);
         
+        // Multiplication
         verbs[InstructionName.Multiply] = new Verb(
             "*",
             (Atom a) => a.match!(
@@ -423,6 +439,7 @@ Verb getVerb(InstructionName name) {
         .setRangeStart(BigInt(1));
         //TODO: setIdentity per cased function
         
+        // Division
         verbs[InstructionName.Divide] = new Verb(
             "/",
             (Atom a) => Nil.nilAtom,
@@ -440,17 +457,20 @@ Verb getVerb(InstructionName name) {
         
         verbs[InstructionName.Exponentiate] = new Verb(
             "^",
+            // OneRange
             (Atom a) => a.match!(
                 (BigInt a) =>
                     Atom(iota(BigInt(1), a + 1).map!Atom.array),
                 _ => Nil.nilAtom,
             ),
+            // Exponentiation
             (Atom l, Atom r) => match!(
                 (BigInt a, BigInt b) => Atom(pow(a, b)),
                 (_1, _2) => Nil.nilAtom,
             )(l, r)
         ).setMarkedArity(2);
         
+        // Modulus
         verbs[InstructionName.Modulus] = new Verb(
             "%",
             (Atom a) => Nil.nilAtom,
@@ -460,6 +480,7 @@ Verb getVerb(InstructionName name) {
             )(l, r)
         ).setMarkedArity(2);
         
+        // Identity/Reshape
         verbs[InstructionName.Identity] = new Verb(
             "#",
             _ => _,
@@ -472,6 +493,7 @@ Verb getVerb(InstructionName name) {
             )(a, b),
         ).setMarkedArity(1);
         
+        // Range (indices)
         verbs[InstructionName.Range] = new Verb(
             "R",
             a => a.match!(
@@ -488,14 +510,17 @@ Verb getVerb(InstructionName name) {
             )(l, r)
         ).setMarkedArity(1);
         
+        // Pair
         verbs[InstructionName.Pair] = new Verb(
             ";",
             a => Atom([a]),
             (a, b) => Atom([a, b])
         ).setMarkedArity(2);
         
+        // Binomial
         verbs[InstructionName.Binomial] = new Verb(
             "!",
+            // Enumerate
             a => a.match!(
                 (Atom[] a) =>
                     Atom(a.enumerate()
@@ -513,18 +538,21 @@ Verb getVerb(InstructionName name) {
             )(l, r),
         ).setMarkedArity(2);
         
+        // First element
         verbs[InstructionName.First] = new Verb(
             "{",
             a => a.match!(
                 (Atom[] a) => a[0],
                 _ => Nil.nilAtom,
             ),
+            // Index
             (l, r) => match!(
                 (Atom[] a, BigInt b) => a[to!uint(b) % a.length],
                 (_1, _2) => Nil.nilAtom,
             )(l, r),
         ).setMarkedArity(2);
         
+        // Last element
         verbs[InstructionName.Last] = new Verb(
             "}",
             a => a.match!(
@@ -536,6 +564,7 @@ Verb getVerb(InstructionName name) {
             )(l, r),
         ).setMarkedArity(1);
         
+        // Equal to
         verbs[InstructionName.Equality] = new Verb(
             "=",
             _ => Nil.nilAtom,
@@ -545,6 +574,7 @@ Verb getVerb(InstructionName name) {
             )(l, r),
         ).setMarkedArity(2);
         
+        // Less than
         verbs[InstructionName.LessThan] = new Verb(
             "<",
             _ => Nil.nilAtom,
@@ -554,6 +584,7 @@ Verb getVerb(InstructionName name) {
             )(l, r),
         ).setMarkedArity(2);
         
+        // Greater than
         verbs[InstructionName.GreaterThan] = new Verb(
             ">",
             _ => Nil.nilAtom,
@@ -563,8 +594,9 @@ Verb getVerb(InstructionName name) {
             )(l, r),
         ).setMarkedArity(2);
         
+        // Less than or equal to
         verbs[InstructionName.LessEqual] = new Verb(
-            "<",
+            "<:",
             _ => Nil.nilAtom,
             (l, r) => match!(
                 (BigInt a, BigInt b) => Atom(a <= b),
@@ -572,14 +604,32 @@ Verb getVerb(InstructionName name) {
             )(l, r),
         ).setMarkedArity(2);
         
+        // Greater than or equal to
         verbs[InstructionName.GreaterEqual] = new Verb(
-            ">",
+            ">:",
             _ => Nil.nilAtom,
             (l, r) => match!(
                 (BigInt a, BigInt b) => Atom(a >= b),
                 (_1, _2) => Nil.nilAtom,
             )(l, r),
         ).setMarkedArity(2);
+        
+        // Print
+        verbs[InstructionName.Print] = new Verb(
+            "p.",
+            (a) { import std.stdio; writeln(a); return a; },
+            (_1, _2) => Nil.nilAtom,
+        );
+        
+        // Exit
+        verbs[InstructionName.Exit] = new Verb(
+            "x:",
+            a => a.match!(
+                (BigInt a) => exit(a),
+                _ => exit(),
+            ),
+            (_1, _2) => exit(),
+        ).setMarkedArity(1);
     }
     
     Verb* verb = name in verbs;
