@@ -1,116 +1,82 @@
-# Quick reference
+# Myby
+***A language inspired by J and Nibbles.***
 
-"MA" is short for "Marked Arity".
+See [the Quick Reference](./QUICKREF.md) for a description of the commands. May be slightly out of date. See also some [example programs](./example).
 
-| Command | Hex | Marked | Speech | Arguments | Returns | Explanation |
-|----|----|----|----|----|----|----|
-| `\` | `2`  | | adjective | verb(1) | verb(1)(list), MA=1 | Filter from |
-| `\` | `2`  | | adjective | verb(2) | verb(1)(list), MA=1 | Fold over |
-| `"` | `3`  | | adjective | verb(1) | verb(1)(list) | Map over |
-| `"` | `3`  | | adjective | verb(2) | verb(2)(list,list) | Zip with |
-| `+` | `4`  | | verb(1) | int | int | Absolute value |
-| `+` | `4`  | | verb(1) | list | int | Length |
-| `+` | `4`  | ✔️ | verb(2) | int, int | int | Addition |
-| `-` | `5`  | | verb(1) | int | int | Negate argument |
-| `-` | `5`  | | verb(1) | list | list | Reverse argument |
-| `-` | `5`  | ✔️ | verb(2) | int, int | int | Subtraction |
-| `*` | `6`  | | verb(1) | int | Sign |
-| `*` | `6`  | | verb(1) | list | Flatten |
-| `*` | `6`  | ✔️ | verb(2) | int, int | Multiplication |
-| `/` | `7`  | ✔️ | verb(2) | int, int | Division |
-| `/` | `7`  | ✔️ | verb(2) | list, int | Chunk list |
-| `^` | `8`  | ✔️ | verb(2) | int, int | Exponentiation |
-| `#` | `9`  | ✔️ | verb(1) | any | any | Identity |
-| `#` | `9`  | | verb(2) | any, any | Reshape |
-| `&` | `A`  | | conjunction | any,any | verb | Bond. MA=1 if either operand is niladic, 2 otherwise. |
-| `(` | `B`  | | syntax | | | Open parentheses |
-| `)` | `C`  | | syntax | | | Close parentheses |
-| `%` | `D`  | ✔️ | verb(2) | int, int | Modulus |
-| `R` | `E`  | | verb(1) | int | list | Range (0, exclusive) |
-| `$` | `F0` | | verb(N) | any | any | First chain |
-| `;` | `F2` | | verb(1) | any | list | Wrap (singleton list) |
-| `;` | `F2` | ✔️ | verb(2) | any, any | list | Pair |
-| `!` | `F3` | | verb(1) | list | Enumerate |
-| `!` | `F3` | | verb(2) | int, int | Binomial |
-| `=` | `F4` | ✔️ | verb(2) | any, any | Equality |
-| `<` | `F5` | ✔️ | verb(2) | any, any | Less than |
-| `>` | `F6` | ✔️ | verb(2) | any, any | Greater than |
-| \`  | `F7`  | | adjective | verb(N) | verb(2-N) | Forces the non-marked arity |
-| `{` | `F8` | | verb(1) | list | First element |
-| `{` | `F8` | | verb(2) | list, int | Index element |
-| `}` | `F9` | | verb(1) | list | Last element |
-| `[` | `FA` | | adjective | verb(1) | verb(2) | Applies verb on left argument |
-| `]` | `FB` | | adjective | verb(1) | verb(2) | Applies verb on right argument |
-| `O` | `FC` | | multi-conjunction | verb(1),verb(2),verb(1) | verb(2) | Split-Compose/directional fork, i.e. `(f x) g (h y)` |
-| `~` | `FD` | | adjective | verb(2) | verb(1) | Reflex, makes a verb take the same argument twice, i.e. `x f x` |
-| `~` | `FD` | | adjective | verb(2) | verb(2) | Commute, makes a verb take the arguments in reverse order, i.e. `y f x` |
+## Parse behavior
+A program consists of a series of:
+ - Verbs (V), the actions of a program
+ - Nouns (N), the data of a program
+ - Adjectives (A), the unary modifiers of actions
+ - Conjunctions (C), the binary modifiers of actions
+ - Multi-Conjunction (M), the k-ary modifiers of actions (applied postfix)
 
-Trailing open parentheses are stripped and used as byte padding. Leading close parentheses can be used as pseudo flags within the program.
-
-# Example programs
-
-## 1 byte, "sum array" or "sum ints 1 to n"
-
+Program sentences are then condensed according to these rules:
 ```
-+\
- \      fold
-+       addition
+VA -> V, an Adjective modifying a Verb is a Verb
+[NOT CURRENTLY IMPLEMENTED/USED:] NA -> A, an Adjective modifying a Noun is an Adjective
+VCV -> V, a Conjunction modifying two Verbs is a Verb
+V*M -> V, a Multi-Conjunction modifying k Verbs is a Verb
+V* -> V, a train of Verbs is a Verb
 ```
 
-## 1.5 bytes, "zero array"
+Example: `VACVAA -> (VA)C((VA)A)`
 
-```
-0"
+## Trains
+ - 2-train is an Atop (as in APL)
+ - 3-train is a Fork (as in J/APL)
+ - A noun present in a Train is treated as a constant function returning itself, hence all nouns are really just niladic verbs
 
-003B
-  3     map
-00      zero
-   B    padding (open paren)
-```
+## Instruction Encoding
+When specified, X/Y refers to the Unary/Binary behavior, respectively. X will indicate an unassigned behavior.
 
-(trailing parens are pruned)
-
-## 2 bytes, "average"
-```
-+\ / +
-
-4274    
-4       addition
- 2      folded
-  7     divided by
-   4    the length
-```
-
-## 4 bytes, "swap every two elements in a list"
-
-```
-* (-" #/2)
-
-6B539702
-    9       the input array
-     7      sliced into slices of
-      02    2
-   3        map
-  5         reverse
- B          and then
-6           flatten
-```
-
-## "fibonacci"
-
-TODO
-
-Direct:
-```
-!"&R
-```
-
-Recursive:
-```
-$:
--&1 +&$ -&2
-
-
-5A 01 4A F0 5A 02
-```
-
+| Hex code | Meaning |
+|----------|---------|
+| `0x0` | Raw Noun (Integer) |
+| `0x1` | Raw Noun (String) |
+| `0x2` | Filter/Fold Adjective |
+| `0x3` | Map/ZipWith Adjective |
+| `0x4` | Absolute Value/Add |
+| `0x5` | Negate/Subtract |
+| `0x6` | X/Multiply |
+| `0x7` | X/Divide |
+| `0x8` | OneRange/Exponentiate |
+| `0x9` | Identity/Pair |
+| `0xA` | Bond Conjunction |
+| `0xB` | Open paren |
+| `0xC` | Close paren |
+| `0xD` | Compose Conjunction |
+| `0xE` | Range/Range |
+| `0xFZ` | [Multinibble instructions, as follows] |
+| `0xF0` | X/Modulus |
+| `0xF1Z` | [More multinible instructions, as follows] |
+| `0xF10` | 1st Chain |
+| `0xF11` | 2nd Chain |
+| `0xF12` | 3rd Chain |
+| `0xF13` | 4th Chain |
+| `0xF14` | Nth Chain after first |
+| `0xF15` | X/Less than or equal |
+| `0xF16` | X/Greater than or equal |
+| `0xF17` |  |
+| `0xF18` |  |
+| `0xF19` |  |
+| `0xF1A` |  |
+| `0xF1B` |  |
+| `0xF1C` |  |
+| `0xF1D` |  |
+| `0xF1E` |  |
+| `0xF1F` |  |
+| `0xF2` | Wrap/Pair |
+| `0xF3` | Enumerate/Binomial |
+| `0xF4` | X/Equality |
+| `0xF5` | X/Less than |
+| `0xF6` | X/Greater than |
+| `0xF7` | Force opposite implicit Adjective |
+| `0xF8` | First/Index |
+| `0xF9` | Last/X |
+| `0xFA` | OnLeft |
+| `0xFB` | OnRight |
+| `0xFC` | Split-Compose |
+| `0xFD` | Reflex |
+| `0xFEZZ` | Two-Byte extensions |
+| `0xFF` | Section break |
