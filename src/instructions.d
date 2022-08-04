@@ -175,6 +175,60 @@ alias AdjectiveMonad = Verb delegate(Verb);
 alias ConjunctionDyad = Verb delegate(Verb, Verb);
 alias MultiConjunctionFunction = Verb delegate(Verb[]);
 
+bool isArray(Atom a) {
+    return a.match!(
+        (Atom[] x) => true,
+        _ => false
+    );
+}
+bool is2DArray(Atom[] x) {
+    return x.all!isArray;
+}
+
+string arrayToString(Atom[] x, bool forceLinear=false) {
+    if(forceLinear || !x.is2DArray) {
+        return '[' ~ x.map!atomToString.join(", ") ~ ']';
+    }
+    
+    // else, handle 2D arrays
+    import std.algorithm.comparison : max;
+    string[][] prepad;
+    uint[] columnWidths;
+    foreach(row; x) {
+        row.tryMatch!((Atom[] row) {
+            string[] prepadRow;
+            foreach(i, atom; row) {
+                // TODO: reject 2D array with multiline repr
+                string repr = atomToString(atom);
+                prepadRow ~= repr;
+                if(i == columnWidths.length) {
+                    columnWidths ~= repr.length;
+                }
+                else {
+                    columnWidths[i] = max(columnWidths[i], repr.length);
+                }
+            }
+            prepad ~= prepadRow;
+        });
+    }
+    foreach(row; prepad) {
+        foreach(i, ref cell; row) {
+            cell = to!string(cell.padLeft(' ', columnWidths[i]));
+        }
+    }
+    return prepad.map!(a => a.join(" ")).join("\n");
+}
+
+string atomToString(Atom a) {
+    return a.match!(
+        (Nil x) => x.toString(),
+        (BigInt x) => to!string(x),
+        (string x) => x,
+        (bool x) => x ? "1b" : "0b",
+        (Atom[] x) => arrayToString(x),
+    );
+}
+
 bool isNil(T)(T a) {
     return a == Nil.nilAtom;
 }
@@ -613,7 +667,7 @@ Verb getVerb(InsName name) {
             // Print
             .setMonad((a) {
                 import std.stdio;
-                writeln(a);
+                writeln(a.atomToString());
                 return a;
             })
             .setDyad((_1, _2) => Nil.nilAtom)
