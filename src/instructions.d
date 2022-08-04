@@ -187,7 +187,9 @@ bool is2DArray(Atom[] x) {
 
 string arrayToString(Atom[] x, bool forceLinear=false) {
     if(forceLinear || !x.is2DArray) {
-        return '[' ~ x.map!atomToString.join(", ") ~ ']';
+        string inner = x.map!(a => a.atomToString(forceLinear))
+            .join(", ");
+        return '[' ~ inner ~ ']';
     }
     
     // else, handle 2D arrays
@@ -195,11 +197,14 @@ string arrayToString(Atom[] x, bool forceLinear=false) {
     string[][] prepad;
     uint[] columnWidths;
     foreach(row; x) {
-        row.tryMatch!((Atom[] row) {
+        bool success = row.tryMatch!((Atom[] row) {
             string[] prepadRow;
             foreach(i, atom; row) {
                 // TODO: reject 2D array with multiline repr
                 string repr = atomToString(atom);
+                if(repr.canFind('\n')) {
+                    return false;
+                }
                 prepadRow ~= repr;
                 if(i == columnWidths.length) {
                     columnWidths ~= repr.length;
@@ -209,7 +214,11 @@ string arrayToString(Atom[] x, bool forceLinear=false) {
                 }
             }
             prepad ~= prepadRow;
+            return true;
         });
+        if(!success) {
+            return arrayToString(x, true);
+        }
     }
     foreach(row; prepad) {
         foreach(i, ref cell; row) {
@@ -219,13 +228,13 @@ string arrayToString(Atom[] x, bool forceLinear=false) {
     return prepad.map!(a => a.join(" ")).join("\n");
 }
 
-string atomToString(Atom a) {
+string atomToString(Atom a, bool forceLinear=false) {
     return a.match!(
         (Nil x) => x.toString(),
         (BigInt x) => to!string(x),
         (string x) => x,
         (bool x) => x ? "1b" : "0b",
-        (Atom[] x) => arrayToString(x),
+        (Atom[] x) => arrayToString(x, forceLinear),
     );
 }
 
