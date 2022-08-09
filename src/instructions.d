@@ -620,6 +620,7 @@ Verb getVerb(InsName name) {
                 (BigInt a, Atom[] b) => Atom(reshape(b, a)),
                 (string a, BigInt b) => Atom(reshape(a.atomChars, b).joinToString),
                 (BigInt a, string b) => Atom(reshape(b.atomChars, a).joinToString),
+                // TODO: Atom[], Atom[] to filter by
                 (_1, _2) => Nil.nilAtom,
             )(a, b))
             .setMarkedArity(1);
