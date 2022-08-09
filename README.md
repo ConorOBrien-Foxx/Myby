@@ -71,8 +71,8 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. A variabl
 | `0xF14` | Nth Chain after first |
 | `0xF15` | X/Less than or equal |
 | `0xF16` | X/Greater than or equal |
-| `0xF17` |  |
-| `0xF18` |  |
+| `0xF17` | Minimum/Lesser of 2 |
+| `0xF18` | Maximum/Greater of 2 |
 | `0xF19` |  |
 | `0xF1A` |  |
 | `0xF1B` |  |
@@ -94,4 +94,12 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. A variabl
 | `0xFD` | Reflex |
 | `0xFEZZ` | [Two-Byte extensions] |
 | `0xFE00` | Exit/Y |
+| `0xFE70` | N-th prime/Y |
+| `0xFE71` | Prime/Coprime test |
+| `0xFE72` | Prime factors/Y |
+| `0xFE73` | Number of prime factors/Y |
+| `0xFE74` | Distinct prime factors/Y |
+| `0xFE75` | Number of distinct prime factors/Y |
+| `0xFE76` | Prime before/Y |
+| `0xFE77` | Prime after/Y |
 | `0xFF` | Section break |

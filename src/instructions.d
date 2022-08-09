@@ -6,49 +6,61 @@ import std.bigint;
 import std.range;
 import std.algorithm.iteration;
 import std.algorithm.searching;
+import std.algorithm.comparison;
 import std.conv : to;
 
 import myby.nibble;
+import myby.prime;
 
 enum InsName {
-    Integer,        //0
-    String,         //1
-    Filter,         //2
-    Map,            //3
-    Add,            //4
-    Subtract,       //5
-    Multiply,       //6
-    Divide,         //7
-    Exponentiate,   //8
-    Identity,       //9
-    Bond,           //A
-    OpenParen,      //B
-    CloseParen,     //C
-    Compose,        //D
-    Range,          //E
-    Modulus,        //F0
-    FirstChain,     //F10
-    SecondChain,    //F11
-    ThirdChain,     //F12
-    FourthChain,    //F13
-    NthChain,       //F14
-    GreaterEqual,   //F15
-    LessEqual,      //F16
-    Print,          //F1E
-    Pair,           //F2
-    Binomial,       //F3
-    Equality,       //F4
-    LessThan,       //F5
-    GreaterThan,    //F6
-    ArityForce,     //F7
-    First,          //F8
-    Last,           //F9
-    OnLeft,         //FA
-    OnRight,        //FB
-    SplitCompose,   //FC
-    Reflex,         //FD
-    Exit,           //FE00
-    Break,          //FF
+    Integer,                //0
+    String,                 //1
+    Filter,                 //2
+    Map,                    //3
+    Add,                    //4
+    Subtract,               //5
+    Multiply,               //6
+    Divide,                 //7
+    Exponentiate,           //8
+    Identity,               //9
+    Bond,                   //A
+    OpenParen,              //B
+    CloseParen,             //C
+    Compose,                //D
+    Range,                  //E
+    Modulus,                //F0
+    FirstChain,             //F10
+    SecondChain,            //F11
+    ThirdChain,             //F12
+    FourthChain,            //F13
+    NthChain,               //F14
+    GreaterEqual,           //F15
+    LessEqual,              //F16
+    Minimum,                //F17
+    Maximum,                //F18
+    Print,                  //F1E
+    Pair,                   //F2
+    Binomial,               //F3
+    Equality,               //F4
+    LessThan,               //F5
+    GreaterThan,            //F6
+    ArityForce,             //F7
+    First,                  //F8
+    Last,                   //F9
+    OnLeft,                 //FA
+    OnRight,                //FB
+    SplitCompose,           //FC
+    Reflex,                 //FD
+    Exit,                   //FE00
+    NthPrime,               //FE70
+    IsPrime,                //FE71
+    PrimeFactors,           //FE72
+    PrimeFactorsCount,      //FE73
+    UniqPrimeFactors,       //FE74
+    UniqPrimeFactorsCount,  //FE75
+    PreviousPrime,          //FE76
+    NextPrime,              //FE77
+    Break,                  //FF
 }
 
 // + -> [4] -> Add
@@ -76,8 +88,20 @@ enum Nibble[][string] InstructionMap = [
     "$N": [0xF, 0x1, 0x4],
     "<:": [0xF, 0x1, 0x5],
     ">:": [0xF, 0x1, 0x6],
+    "<.": [0xF, 0x1, 0x7],
+    ">.": [0xF, 0x1, 0x8],
     //...
-    "p.": [0xF, 0x1, 0xE],
+    "echo": [0xF, 0x1, 0xE],
+    "primn": [0xF, 0xE, 0x7, 0x0],
+    "primq": [0xF, 0xE, 0x7, 0x1],
+    "primf": [0xF, 0xE, 0x7, 0x2],
+    "primo": [0xF, 0xE, 0x7, 0x3],
+    "primfd": [0xF, 0xE, 0x7, 0x4],
+    "primod": [0xF, 0xE, 0x7, 0x5],
+    "prevp": [0xF, 0xE, 0x7, 0x6],
+    "nextp": [0xF, 0xE, 0x7, 0x7],
+    "q.": [0xF, 0xE, 0x7, 0x4],
+    "q..": [0xF, 0xE, 0x7, 0x5],
     ";": [0xF, 0x2],
     "!": [0xF, 0x3],
     "=": [0xF, 0x4],
@@ -90,7 +114,7 @@ enum Nibble[][string] InstructionMap = [
     "]": [0xF, 0xB],
     "O": [0xF, 0xC],
     "~": [0xF, 0xD],
-    "x:": [0xF, 0xE, 0x0, 0x0],
+    "exit": [0xF, 0xE, 0x0, 0x0],
     "\n": [0xF, 0xF],
 ];
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -122,6 +146,8 @@ enum NameInfo[int] NameMap = [
     0xF14:  NameInfo(SpeechPart.Verb,             InsName.NthChain),
     0xF15:  NameInfo(SpeechPart.Verb,             InsName.LessEqual),
     0xF16:  NameInfo(SpeechPart.Verb,             InsName.GreaterEqual),
+    0xF17:  NameInfo(SpeechPart.Verb,             InsName.Minimum),
+    0xF18:  NameInfo(SpeechPart.Verb,             InsName.Maximum),
     0xF1E:  NameInfo(SpeechPart.Verb,             InsName.Print),
     0xF2:   NameInfo(SpeechPart.Verb,             InsName.Pair),
     0xF3:   NameInfo(SpeechPart.Verb,             InsName.Binomial),
@@ -136,6 +162,14 @@ enum NameInfo[int] NameMap = [
     0xFC:   NameInfo(SpeechPart.MultiConjunction, InsName.SplitCompose),
     0xFD:   NameInfo(SpeechPart.Adjective,        InsName.Reflex),
     0xFE00: NameInfo(SpeechPart.Verb,             InsName.Exit),
+    0xFE70: NameInfo(SpeechPart.Verb,             InsName.NthPrime),
+    0xFE71: NameInfo(SpeechPart.Verb,             InsName.IsPrime),
+    0xFE72: NameInfo(SpeechPart.Verb,             InsName.PrimeFactors),
+    0xFE73: NameInfo(SpeechPart.Verb,             InsName.PrimeFactorsCount),
+    0xFE74: NameInfo(SpeechPart.Verb,             InsName.UniqPrimeFactors),
+    0xFE75: NameInfo(SpeechPart.Verb,             InsName.UniqPrimeFactorsCount),
+    0xFE76: NameInfo(SpeechPart.Verb,             InsName.PreviousPrime),
+    0xFE77: NameInfo(SpeechPart.Verb,             InsName.NextPrime),
     0xFF:   NameInfo(SpeechPart.Syntax,           InsName.Break),
 ];
 
@@ -175,6 +209,15 @@ alias AdjectiveMonad = Verb delegate(Verb);
 alias ConjunctionDyad = Verb delegate(Verb, Verb);
 alias MultiConjunctionFunction = Verb delegate(Verb[]);
 
+Atom atomFor(T)(T a) {
+    static if(is(T == Atom)) {
+        return a;
+    }
+    else {
+        return Atom(a);
+    }
+}
+
 bool isArray(Atom a) {
     return a.match!(
         (Atom[] x) => true,
@@ -193,7 +236,6 @@ string arrayToString(Atom[] x, bool forceLinear=false) {
     }
     
     // else, handle 2D arrays
-    import std.algorithm.comparison : max;
     string[][] prepad;
     uint[] columnWidths;
     foreach(row; x) {
@@ -295,10 +337,18 @@ class Verb {
         assert(initialized, "Cannot call uninitialized Verb " ~ display);
         return monad(a);
     }
+    Atom evaluate(T)(T a)
+    if(!is(T == Atom)) {
+        return evaluate(Atom(a));
+    }
     
     Atom evaluate(Atom l, Atom r) {
         assert(initialized, "Cannot call uninitialized Verb " ~ display);
         return dyad(l, r);
+    }
+    Atom evaluate(T, S)(T l, S r)
+    if(!is(T == Atom) || !is(S == Atom)) {
+        return evaluate(atomFor(l), atomFor(r));
     }
     
     Atom evaluate(Atom[] arguments) {
@@ -482,10 +532,13 @@ Verb getVerb(InsName name) {
             .setIdentity(Atom(BigInt(0)));
         
         verbs[InsName.Subtract] = new Verb("-")
-            // Negate/Reverse
             .setMonad((Atom a) => a.match!(
+                // Negate
                 (BigInt n) => Atom(-n),
+                // Reverse
                 (Atom[] a) => Atom(a.retro.array),
+                // Negate
+                (bool b) => Atom(!b),
                 _ => Nil.nilAtom,
             ))
             // Subtraction
@@ -497,7 +550,10 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.Multiply] = new Verb("*")
             .setMonad((Atom a) => a.match!(
+                // Flatten
                 (Atom[] a) => Atom(flatten(a)),
+                // Sign
+                (BigInt b) => Atom(BigInt(b < 0 ? -1 : b == 0 ? 0 : 1)),
                 _ => Nil.nilAtom,
             ))
             // Multiplication
@@ -511,14 +567,22 @@ Verb getVerb(InsName name) {
         //TODO: setIdentity per cased function
         
         verbs[InsName.Divide] = new Verb("/")
-            .setMonad((Atom a) => Nil.nilAtom)
-            // Division
+            .setMonad((Atom a) => a.match!(
+                // Characters
+                (string a) => Atom(a.map!(c => Atom(to!string(c))).array),
+                _ => Nil.nilAtom,
+            ))
             .setDyad((Atom l, Atom r) => match!(
+                // Chunk
                 (Atom[] a, BigInt b) =>
                     Atom(a.chunks(to!size_t(b))
                     .map!Atom
                     .array),
+                (string a, BigInt b) =>
+                    verbs[InsName.Divide](verbs[InsName.Divide](a), b),
+                // Division
                 (BigInt a, BigInt b) => Atom(a / b),
+                // Split on
                 (string a, string b) =>
                     Atom(a.split(b).map!Atom.array),
                 (_1, _2) => Nil.nilAtom,
@@ -529,7 +593,7 @@ Verb getVerb(InsName name) {
             // OneRange
             .setMonad((Atom a) => a.match!(
                 (BigInt a) =>
-                    Atom(iota(BigInt(1), a + 1).map!Atom.array),
+                    verbs[InsName.Range](BigInt(1), a),
                 _ => Nil.nilAtom,
             ))
             // Exponentiation
@@ -672,7 +736,28 @@ Verb getVerb(InsName name) {
             )(l, r))
             .setMarkedArity(2);
         
-        verbs[InsName.Print] = new Verb("p.")
+        verbs[InsName.Minimum] = new Verb("<.")
+            .setMonad(a => a.match!(
+                (Atom[] a) => a.reduce!((x, y) => verbs[InsName.Minimum](x, y)),
+                _ => Nil.nilAtom,
+            ))
+            // Lesser of 2
+            .setDyad((l, r) => match!(
+                (BigInt a, BigInt b) => Atom(min(a, b)),
+                (_1, _2) => Nil.nilAtom,
+            )(l, r))
+            .setMarkedArity(2);
+        
+        verbs[InsName.Maximum] = new Verb(">.")
+            .setMonad(_ => Nil.nilAtom)
+            // Greater than or equal to
+            .setDyad((l, r) => match!(
+                (BigInt a, BigInt b) => Atom(max(a, b)),
+                (_1, _2) => Nil.nilAtom,
+            )(l, r))
+            .setMarkedArity(2);
+        
+        verbs[InsName.Print] = new Verb("echo")
             // Print
             .setMonad((a) {
                 import std.stdio;
@@ -682,13 +767,40 @@ Verb getVerb(InsName name) {
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
-        verbs[InsName.Exit] = new Verb("x:")
+        verbs[InsName.Exit] = new Verb("exit")
             // Exit
             .setMonad(a => a.match!(
                 (BigInt a) => exit(a),
                 _ => exit(),
             ))
             .setDyad((_1, _2) => exit())
+            .setMarkedArity(1);
+        
+        verbs[InsName.IsPrime] = new Verb("primq")
+            // Is Prime
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(isPrime(a)),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.PrimeFactors] = new Verb("primf")
+            // Prime Factorization
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(primeFactors(a).map!Atom.array),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.PrimeFactorsCount] = new Verb("primo")
+            // Big Omega (prime factor count)
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(BigInt(primeFactors(a).length)),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
     }
     
@@ -698,7 +810,7 @@ Verb getVerb(InsName name) {
 }
 
 Verb filterFor(Verb v) {
-    return new Verb(v.display ~ "₁\\")
+    return new Verb(v.display.enclosed ~ "₁\\")
         .setMonad(a => a.match!(
             (Atom[] a) => Atom(a.filter!(a => v(a).truthiness).array),
             _ => Nil.nilAtom,
@@ -715,7 +827,7 @@ Verb foldFor(Verb v) {
             ? arr.reduce!v
             : reduce!v(v.identity, arr);
     }
-    return new Verb(v.display ~ "₂\\")
+    return new Verb(v.display.enclosed ~ "₂\\")
         .setMonad(a => a.match!(
             (Atom[] arr) => reduc(arr),
             (BigInt n) => reduc(iota(v.rangeStart, n + 1).map!Atom),
@@ -861,6 +973,11 @@ MultiConjunction getMultiConjunction(InsName name) {
     MultiConjunction* multiConjunction = name in multiConjunctions;
     assert(multiConjunction, "No such multi-conjunction: " ~ to!string(name));
     return *multiConjunction;
+}
+
+Verb bind(Verb f, Verb g) {
+    return getConjunction(InsName.Bond)
+        .transform(f, g);
 }
 
 Verb compose(Verb f, Verb g) {

@@ -3,7 +3,7 @@ module myby.literate;
 import std.stdio : writeln;
 import std.ascii : isDigit;
 import std.conv : to;
-import std.string : stripRight;
+import std.string : strip;
 import std.range : popFrontN, popBackN;
 import std.bigint;
 
@@ -27,22 +27,32 @@ int toHexDigit(char c) {
 }
 
 Nibble[] parseLiterate(T)(T str) {
-    str = str.stripRight;
+    str = str.strip;
     Nibble[] code;
     uint finalParenCount = 0;
     uint initialParenCount = 0;
     uint i = 0;
+    
     Debugger.print("Parsing input literate code: <", str, ">");
     NiladParseState state = NiladParseState.None;
     while(i < str.length) {
         Debugger.print("i=", i, ": ", str[i]);
         Debugger.print("code: ", code);
         NiladParseState nextState = NiladParseState.None;
+        
+        bool isComment = i + 3 < str.length && str[i..i+3] == "NB.";
+        
         bool isNumber = str[i].isDigit;
         if(str[i] == '_' && i + 1 < str.length && str[i+1].isDigit) {
             isNumber = true;
         }
-        if(isNumber) {
+        
+        if(isComment) {
+            while(i < str.length && str[i] != '\n') {
+                i++;
+            }
+        }
+        else if(isNumber) {
             Debugger.print("---> Number");
             if(state == NiladParseState.LastWasNiladSeparator) {
                 code ~= 0x2;
@@ -98,18 +108,35 @@ Nibble[] parseLiterate(T)(T str) {
         }
         else {
             char head = str[i];
-            string name = "" ~ head;
+            string name;
+            while(i < str.length && 'a' <= str[i] && str[i] <= 'z') {
+                name ~= str[i++];
+            }
+            if(name.length == 0) {
+                name ~= str[i];
+            }
+            else {
+                i--;
+            }
             bool hasNext = i + 1 < str.length;
             if(hasNext) {
-                char next = str[i + 1];
-                bool isDollarCompound = head == '$' && '1' <= next && next <= '4';
-                bool isPartial = next == '.' || next == ':';
-                
-                if(isDollarCompound || isPartial) {
-                    name ~= next;
-                    i++;
+                i++;
+                bool isDollarCompound =
+                    head == '$' && '1' <= str[i] && str[i] <= '4';
+                if(isDollarCompound) {
+                    name ~= str[i]; 
+                }
+                else if(str[i] == '.' || str[i] == ':') {
+                    while(i < str.length && (str[i] == '.' || str[i] == ':')) {
+                        name ~= str[i++];
+                    }
+                    i--;
+                }
+                else {
+                    i--;
                 }
             }
+            Debugger.print("Parsed name: ", name);
             auto r = name in InstructionMap;
             if(r !is null) {
                 Debugger.print("---> Operator");
@@ -126,7 +153,7 @@ Nibble[] parseLiterate(T)(T str) {
                     // ignore
                     break;
                 default:
-                    writeln("Unhandled instruction: " ~ str[i]);
+                    writeln("Unhandled instruction: " ~ name);
                     break;
             }
             if(head == ')') {

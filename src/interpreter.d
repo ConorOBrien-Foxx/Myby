@@ -253,7 +253,13 @@ class Interpreter {
                 f = verbs[$-2];
                 g = verbs[$-1];
                 verbs.popBack;
-                verbs[$-1] = compose(f, g);
+                if(g.niladic && f.markedArity == 2) {
+                    Debugger.print("Atop redirected to Bind");
+                    verbs[$-1] = bind(f, g);
+                }
+                else {
+                    verbs[$-1] = compose(f, g);
+                }
             }
             else {
                 // i don't know how we got here
@@ -392,6 +398,7 @@ class Interpreter {
         Debugger.print(stack);
         Verb[] chains;
         foreach(chain; stack.split(Token.Break)) {
+            if(chain.length == 0) continue;
             Debugger.print("CHAIN:");
             Debugger.print("   ",chain);
             Verb chainVerb = condenseTokenChain(chain);

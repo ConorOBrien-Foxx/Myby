@@ -7,7 +7,7 @@ IF "%1"=="clean" GOTO :CLEAN
 :COMPILE
     SET FLAGS=-g -w
     SET FILES=src/main.d src/integer.d src/nibble.d src/literate.d src/interpreter.d
-    SET FILES=%FILES% src/instructions.d src/string.d src/debugger.d
+    SET FILES=%FILES% src/instructions.d src/string.d src/debugger.d src/prime.d
     dmd %FLAGS% %FILES% -of=myby.exe
     SET Error=%ERRORLEVEL%
     GOTO :End
