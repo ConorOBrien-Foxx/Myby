@@ -887,6 +887,14 @@ Adjective getAdjective(InsName name) {
                 .setMarkedArity(v.markedArity)
         );
         
+        // ArityForce
+        adjectives[InsName.ArityForce] = new Adjective(
+            (Verb v) => new Verb(v.display.enclosed ~ '`')
+                .setMonad(a => v(a))
+                .setDyad((a, b) => v(a, b))
+                .setMarkedArity(v.markedArity == 2 ? 1 : 2)
+        );
+        
         // OnLeft
         adjectives[InsName.OnLeft] = new Adjective(
             (Verb v) => new Verb(v.display.enclosed ~ '[')
