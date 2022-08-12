@@ -15,12 +15,14 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `+` | `4`    | | verb(1) | int | int | Absolute value |
 | `+` | `4`    | | verb(1) | list | int | Length |
 | `+` | `4`    | ✔️ | verb(2) | int, int | int | Addition |
+| `+` | `4`    | ✔️ | verb(2) | string, string | string | Concatenation |
 | `-` | `5`    | | verb(1) | int | int | Negate argument |
 | `-` | `5`    | | verb(1) | bool | bool | Boolean negation |
 | `-` | `5`    | | verb(1) | list | list | Reverse argument |
 | `-` | `5`    | ✔️ | verb(2) | int, int | int | Subtraction |
 | `*` | `6`    | | verb(1) | int | int | Sign |
 | `*` | `6`    | | verb(1) | list | list | Flatten |
+| `*` | `6`    | ✔️ | verb(2) | list, string | Join |
 | `*` | `6`    | ✔️ | verb(2) | int, int | int | Multiplication. `RS`=1. |
 | `/` | `7`    | | verb(1) | string | list | List of character strings |
 | `/` | `7`    | ✔️ | verb(2) | int, int | int | Division |
@@ -33,9 +35,10 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `&` | `A`    | | conjunction | any, any | verb | Bond. `MA`=1 if either operand is niladic, 2 otherwise. |
 | `(` | `B`    | | syntax | | | Open parentheses |
 | `)` | `C`    | | syntax | | | Close parentheses |
-| `%` | `D`    | ✔️ | verb(2) | int, int | int | Modulus |
+| `@` | `D`    | | conjunction | any, any | verb | Compose. |
 | `R` | `E`    | ✔️ | verb(1) | int | list | Range (0, exclusive) |
 | `R` | `E`    | | verb(2) | int, int | list | Range [a,b] (inclusive) |
+| `%` | `F0`   | ✔️ | verb(2) | int, int | int | Modulus |
 | `$` | `F10`  | | verb(N) | any | any | First chain |
 | `$1`| `F11`  | | verb(N) | any | any | Second chain |
 | `$2`| `F12`  | | verb(N) | any | any | Third chain |
@@ -48,6 +51,7 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `<.`| `F18`  | | verb(1) | list | any | Maximum |
 | `<.`| `F18`  | ✔️ | verb(2) | any, any | bool | Greater of |
 | `echo`| `F1E`| ✔️ | verb(1) | any | any | Print |
+| `@.`| `F1F`  | | multi-conjunction | verbs(\*) | verb(1) | Monad Chain, i.e. `f1@f2@f3@...@fN y` |
 | `;` | `F2`   | | verb(1) | any | list | Wrap (singleton list) |
 | `;` | `F2`   | ✔️ | verb(2) | any, any | list | Pair |
 | `!` | `F3`   | | verb(1) | list | list(list) | Enumerate |

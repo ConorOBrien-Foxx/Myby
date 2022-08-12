@@ -39,6 +39,7 @@ enum InsName {
     Minimum,                //F17
     Maximum,                //F18
     Print,                  //F1E
+    MonadChain,             //F1F
     Pair,                   //F2
     Binomial,               //F3
     Equality,               //F4
@@ -92,6 +93,7 @@ enum Nibble[][string] InstructionMap = [
     ">.": [0xF, 0x1, 0x8],
     //...
     "echo": [0xF, 0x1, 0xE],
+    "@.": [0xF, 0x1, 0xF],
     "primn": [0xF, 0xE, 0x7, 0x0],
     "primq": [0xF, 0xE, 0x7, 0x1],
     "primf": [0xF, 0xE, 0x7, 0x2],
@@ -149,6 +151,7 @@ enum NameInfo[int] NameMap = [
     0xF17:  NameInfo(SpeechPart.Verb,             InsName.Minimum),
     0xF18:  NameInfo(SpeechPart.Verb,             InsName.Maximum),
     0xF1E:  NameInfo(SpeechPart.Verb,             InsName.Print),
+    0xF1F:  NameInfo(SpeechPart.MultiConjunction, InsName.MonadChain),
     0xF2:   NameInfo(SpeechPart.Verb,             InsName.Pair),
     0xF3:   NameInfo(SpeechPart.Verb,             InsName.Binomial),
     0xF4:   NameInfo(SpeechPart.Verb,             InsName.Equality),
@@ -286,6 +289,7 @@ bool isNil(T)(T a) {
 
 class Verb {
     string display;
+    // TODO: display niladic as repr (e.g. "asdf" not asdf)
     VerbMonad monad;
     VerbDyad dyad;
     
@@ -486,6 +490,7 @@ bool truthiness(Atom a) {
     );
 }
 
+// TODO: enclose stuff that wouldn't parse (like f@(g@h))
 string enclosed(string a) {
     if(a.canFind(' ')) {
         return '(' ~ a ~ ')';
@@ -526,6 +531,7 @@ Verb getVerb(InsName name) {
             // Addition
             .setDyad((Atom l, Atom r) => match!(
                 (BigInt a, BigInt b) => Atom(a + b),
+                (string a, string b) => Atom(a ~ b),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(2)
@@ -559,6 +565,7 @@ Verb getVerb(InsName name) {
             // Multiplication
             .setDyad((Atom l, Atom r) => match!(
                 (BigInt a, BigInt b) => Atom(a * b),
+                (Atom[] a, string b) => Atom(a.map!(to!string).join(b)),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(2)
@@ -975,6 +982,23 @@ MultiConjunction getMultiConjunction(InsName name) {
                     .setMonad(_ => Nil.nilAtom)
                     .setDyad((x, y) => g(f(x), h(y)))
                     .setMarkedArity(f.niladic || h.niladic ? 1 : 2);
+            }
+         );
+         
+         multiConjunctions[InsName.MonadChain] = new MultiConjunction(
+            0, // greedy
+            (Verb[] verbs) {
+                if(verbs.length == 1) {
+                    return verbs[0];
+                }
+                assert(verbs.length > 1, "Cannot multi-compose with this many verbs");
+                // so that we fold from right to left
+                import std.algorithm.mutation : reverse;
+                verbs.reverse;
+                return new Verb("(" ~ verbs.map!(a => a.display.enclosed).join(" ") ~ " @.)")
+                    .setMonad(y => reduce!((atom, v) => v(atom))(y, verbs))
+                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setMarkedArity(1);
             }
          );
     }

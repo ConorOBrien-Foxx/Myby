@@ -196,6 +196,10 @@ class Interpreter {
                 case SpeechPart.Syntax:
                     switch(token.name) {
                         case InsName.OpenParen:
+                            // flush if at barrier
+                            if(previous == SpeechPart.Verb) {
+                                flushOpStack();
+                            }
                             opStack ~= token;
                             parenStackArity ~= 0;
                             break;
@@ -362,8 +366,11 @@ class Interpreter {
                         ~ to!string(token.name));
                     
                     args = verbs[$-valence..$];
-                    verbs.popBackN(valence-1);
-                    verbs[$-1] = mc.transform(args);
+                    verbs.popBackN(valence);
+                    // we cannot replace the back of the array,
+                    // since this would replace the front of args,
+                    // causing circular referencing
+                    verbs ~= mc.transform(args);
                     break;
                     
                 case SpeechPart.Syntax:
@@ -404,6 +411,7 @@ class Interpreter {
             Verb chainVerb = condenseTokenChain(chain);
             chains ~= chainVerb;
         }
+        // TODO: empty program
         return chains[0];
     }
 }

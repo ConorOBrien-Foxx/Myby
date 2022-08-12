@@ -79,7 +79,7 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. A variabl
 | `0xF1C` |  |
 | `0xF1D` |  |
 | `0xF1E` | Print |
-| `0xF1F` |  |
+| `0xF1F` | Monad Chain |
 | `0xF2` | Wrap/Pair |
 | `0xF3` | Enumerate/Binomial |
 | `0xF4` | X/Equality |
