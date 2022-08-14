@@ -77,7 +77,7 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. A variabl
 | `0xF1A` |  |
 | `0xF1B` |  |
 | `0xF1C` |  |
-| `0xF1D` |  |
+| `0xF1D` | Power |
 | `0xF1E` | Print |
 | `0xF1F` | Monad Chain |
 | `0xF2` | Wrap/Pair |

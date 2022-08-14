@@ -6,8 +6,12 @@ struct DebuggerContainer {
     bool enabled = false;
     bool silenced = false;
     
+    bool printing() {
+        return enabled && !silenced;
+    }
+    
     void print(T...)(T args) {
-        if(!enabled || silenced) return;
+        if(!printing) return;
         writeln("\x1B[90mDebug:\x1B[0m ", args);
     }
     void enable() {

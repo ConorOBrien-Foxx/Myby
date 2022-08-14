@@ -38,6 +38,7 @@ enum InsName {
     LessEqual,              //F16
     Minimum,                //F17
     Maximum,                //F18
+    Power,                  //F1D
     Print,                  //F1E
     MonadChain,             //F1F
     Pair,                   //F2
@@ -92,6 +93,7 @@ enum Nibble[][string] InstructionMap = [
     "<.": [0xF, 0x1, 0x7],
     ">.": [0xF, 0x1, 0x8],
     //...
+    "^:": [0xF, 0x1, 0xD],
     "echo": [0xF, 0x1, 0xE],
     "@.": [0xF, 0x1, 0xF],
     "primn": [0xF, 0xE, 0x7, 0x0],
@@ -150,6 +152,7 @@ enum NameInfo[int] NameMap = [
     0xF16:  NameInfo(SpeechPart.Verb,             InsName.GreaterEqual),
     0xF17:  NameInfo(SpeechPart.Verb,             InsName.Minimum),
     0xF18:  NameInfo(SpeechPart.Verb,             InsName.Maximum),
+    0xF1D:  NameInfo(SpeechPart.Conjunction,      InsName.Power),
     0xF1E:  NameInfo(SpeechPart.Verb,             InsName.Print),
     0xF1F:  NameInfo(SpeechPart.MultiConjunction, InsName.MonadChain),
     0xF2:   NameInfo(SpeechPart.Verb,             InsName.Pair),
@@ -297,10 +300,15 @@ class Verb {
     bool niladic = false;
     BigInt rangeStart = BigInt(0);
     Atom identity;
+    Verb[] children;
     
     this(string di) {
         display = di;
         identity = Nil.nilAtom;
+    }
+    
+    string head() {
+        return display;
     }
     
     Verb setMonad(VerbMonad m) {
@@ -310,6 +318,11 @@ class Verb {
     
     Verb setDyad(VerbDyad d) {
         dyad = d;
+        return this;
+    }
+    
+    Verb setChildren(Verb[] c) {
+        children = c;
         return this;
     }
     
@@ -391,10 +404,11 @@ class Verb {
     }
     
     static Verb fork(Verb f, Verb g, Verb h) {
-        return new Verb(f.display ~ " " ~ g.display ~ " " ~ h.display)
+        return new Verb("Ψ")
             .setMonad(a => g(f(a), h(a)))
             .setDyad((a, b) => g(f(a, b), h(a, b)))
-            .setMarkedArity(f.niladic || h.niladic ? 1 : 2);
+            .setMarkedArity(f.niladic || h.niladic ? 1 : 2)
+            .setChildren([f, g, h]);
     }
     
     static Verb nilad(T)(T t) {
@@ -492,7 +506,8 @@ bool truthiness(Atom a) {
 
 // TODO: enclose stuff that wouldn't parse (like f@(g@h))
 string enclosed(string a) {
-    if(a.canFind(' ')) {
+    // if(a.canFind(' ')) {
+    if(a.length > 1) {
         return '(' ~ a ~ ')';
     }
     else {
@@ -818,13 +833,14 @@ Verb getVerb(InsName name) {
 }
 
 Verb filterFor(Verb v) {
-    return new Verb(v.display.enclosed ~ "₁\\")
+    return new Verb("₁\\")
         .setMonad(a => a.match!(
             (Atom[] a) => Atom(a.filter!(a => v(a).truthiness).array),
             _ => Nil.nilAtom,
         ))
         .setDyad((a, b) => Nil.nilAtom)
-        .setMarkedArity(1);
+        .setMarkedArity(1)
+        .setChildren([v]);
 }
 
 Verb foldFor(Verb v) {
@@ -835,7 +851,7 @@ Verb foldFor(Verb v) {
             ? arr.reduce!v
             : reduce!v(v.identity, arr);
     }
-    return new Verb(v.display.enclosed ~ "₂\\")
+    return new Verb("₂\\")
         .setMonad(a => a.match!(
             (Atom[] arr) => reduc(arr),
             (BigInt n) => reduc(iota(v.rangeStart, n + 1).map!Atom),
@@ -848,7 +864,8 @@ Verb foldFor(Verb v) {
                 Atom(a.map!(l => Atom(b.map!(r => v(l, r)).array)).array),
             (_1, _2) => Nil.nilAtom,
         )(a, b))
-        .setMarkedArity(1);
+        .setMarkedArity(1)
+        .setChildren([v]);
 }
 
 Adjective getAdjective(InsName name) {
@@ -877,7 +894,7 @@ Adjective getAdjective(InsName name) {
         
         // Map
         adjectives[InsName.Map] = new Adjective(
-            (Verb v) => new Verb(v.display.enclosed ~ '"')
+            (Verb v) => new Verb("\"")
                 // map
                 .setMonad(a => a.match!(
                     (Atom[] arr) => Atom(arr.map!v.array),
@@ -892,38 +909,43 @@ Adjective getAdjective(InsName name) {
                     (_1, _2) => Nil.nilAtom,
                 )(a, b))
                 .setMarkedArity(v.markedArity)
+                .setChildren([v])
         );
         
         // ArityForce
         adjectives[InsName.ArityForce] = new Adjective(
-            (Verb v) => new Verb(v.display.enclosed ~ '`')
+            (Verb v) => new Verb("`")
                 .setMonad(a => v(a))
                 .setDyad((a, b) => v(a, b))
                 .setMarkedArity(v.markedArity == 2 ? 1 : 2)
+                .setChildren([v])
         );
         
         // OnLeft
         adjectives[InsName.OnLeft] = new Adjective(
-            (Verb v) => new Verb(v.display.enclosed ~ '[')
+            (Verb v) => new Verb("[")
                 .setMonad(a => v(a))
                 .setDyad((a, b) => v(a))
                 .setMarkedArity(2)
+                .setChildren([v])
         );
         
         // OnRight
         adjectives[InsName.OnRight] = new Adjective(
-            (Verb v) => new Verb(v.display.enclosed ~ ']')
+            (Verb v) => new Verb("]")
                 .setMonad(a => v(a))
                 .setDyad((a, b) => v(b))
                 .setMarkedArity(2)
+                .setChildren([v])
         );
         
         // Reflex
         adjectives[InsName.Reflex] = new Adjective(
-            (Verb v) => new Verb(v.display.enclosed ~ '~')
+            (Verb v) => new Verb("~")
                 .setMonad(a => v(a, a))
                 .setDyad((x, y) => v(y, x))
                 .setMarkedArity(2)
+                .setChildren([v])
         );
     }
     
@@ -937,7 +959,7 @@ Conjunction getConjunction(InsName name) {
     
     if(!conjunctions) {
          conjunctions[InsName.Bond] = new Conjunction(
-            (Verb f, Verb g) => new Verb(f.display.enclosed ~ "&" ~ g.display.enclosed)
+            (Verb f, Verb g) => new Verb("&")
                 .setMonad(a => 
                     f.niladic
                         ? g(f(), a)
@@ -951,13 +973,23 @@ Conjunction getConjunction(InsName name) {
                     f.niladic || g.niladic
                         ? 1
                         : g.markedArity)
+                .setChildren([f, g])
         );
         
         conjunctions[InsName.Compose] = new Conjunction(
-            (Verb f, Verb g) => new Verb(f.display.enclosed ~ "@" ~ g.display.enclosed)
+            (Verb f, Verb g) => new Verb("@")
                 .setMonad(a => f(g(a)))
                 .setDyad((a, b) => f(g(a, b)))
                 .setMarkedArity(g.markedArity)
+                .setChildren([f, g])
+        );
+        
+        conjunctions[InsName.Power] = new Conjunction(
+            (Verb f, Verb g) => new Verb("^:")
+                .setMonad(_ => Nil.nilAtom)
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(f.markedArity)
+                .setChildren([f, g])
         );
     }
     
@@ -978,10 +1010,11 @@ MultiConjunction getMultiConjunction(InsName name) {
                 Verb f = verbs[0];
                 Verb g = verbs[1];
                 Verb h = verbs[2];
-                return new Verb("(" ~ verbs.map!(a => a.display.enclosed).join(" ") ~ " O)")
+                return new Verb("O")
                     .setMonad(_ => Nil.nilAtom)
                     .setDyad((x, y) => g(f(x), h(y)))
-                    .setMarkedArity(f.niladic || h.niladic ? 1 : 2);
+                    .setMarkedArity(f.niladic || h.niladic ? 1 : 2)
+                    .setChildren([f, g, h]);
             }
          );
          
@@ -995,10 +1028,11 @@ MultiConjunction getMultiConjunction(InsName name) {
                 // so that we fold from right to left
                 import std.algorithm.mutation : reverse;
                 verbs.reverse;
-                return new Verb("(" ~ verbs.map!(a => a.display.enclosed).join(" ") ~ " @.)")
+                return new Verb("@.")
                     .setMonad(y => reduce!((atom, v) => v(atom))(y, verbs))
                     .setDyad((_1, _2) => Nil.nilAtom)
-                    .setMarkedArity(1);
+                    .setMarkedArity(1)
+                    .setChildren(verbs);
             }
          );
     }

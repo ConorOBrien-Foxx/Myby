@@ -14,6 +14,7 @@ import myby.literate;
 import myby.interpreter;
 import myby.instructions;
 import myby.debugger;
+import myby.format;
 
 auto getoptSafeError(T...)(ref string[] args, T opts) {
     try {
@@ -138,6 +139,10 @@ int main(string[] args) {
     }
     i.shunt;
     Verb mainVerb = i.condense;
+    
+    if(Debugger.printing) {
+        writeln(treeToBoxedString(mainVerb));
+    }
     
     Debugger.silence();
     Atom[] verbArgs = args[fileName ? 2 : 1..$]

@@ -203,9 +203,11 @@ string nibblesToString(Nibble[] nibbles, ref uint i) {
     // if z == 0
     uint half = nibbles[i] % 8;
     uint z = nibbles[i] >> 3;
+    import std.stdio;
+    
     if(z == 0) {
         if(half == 7) {
-            result ~= nibbles[++i];
+            result ~= nibbles[++i] * 16 + nibbles[++i];
         }
         else {
             result ~= StringConstants[half];
@@ -315,8 +317,10 @@ Nibble[] stringToNibbles(string str) {
             return [ 0b0001, cast(Nibble)(index) ];
         }
         else {
+            // TODO: we don't actually ever need to encode ASCII
+            // characters using this scheme.
             auto ch = str[0];
-            return [ 0b0001, 0b1111, ch / 16, ch % 16 ];
+            return [ 0b0001, 0b0111, ch / 16, ch % 16 ];
         }
     }
 

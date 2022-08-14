@@ -35,7 +35,7 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `&` | `A`    | | conjunction | any, any | verb | Bond. `MA`=1 if either operand is niladic, 2 otherwise. |
 | `(` | `B`    | | syntax | | | Open parentheses |
 | `)` | `C`    | | syntax | | | Close parentheses |
-| `@` | `D`    | | conjunction | any, any | verb | Compose. |
+| `@` | `D`    | | conjunction | any, any | verb | Compose |
 | `R` | `E`    | ✔️ | verb(1) | int | list | Range (0, exclusive) |
 | `R` | `E`    | | verb(2) | int, int | list | Range [a,b] (inclusive) |
 | `%` | `F0`   | ✔️ | verb(2) | int, int | int | Modulus |
@@ -50,6 +50,7 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `>.`| `F17`  | ✔️ | verb(2) | any, any | bool | Lesser of |
 | `<.`| `F18`  | | verb(1) | list | any | Maximum |
 | `<.`| `F18`  | ✔️ | verb(2) | any, any | bool | Greater of |
+| `^:`| `F1D`  | ✔️ | conjunction | any, any | verb | Power |
 | `echo`| `F1E`| ✔️ | verb(1) | any | any | Print |
 | `@.`| `F1F`  | | multi-conjunction | verbs(\*) | verb(1) | Monad Chain, i.e. `f1@f2@f3@...@fN y` |
 | `;` | `F2`   | | verb(1) | any | list | Wrap (singleton list) |

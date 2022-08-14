@@ -18,6 +18,7 @@ struct Token {
         BigInt big;
         string str;
     };
+    int index = -1;
     
     string toString() {
         return "Token(" ~ to!string(speech)
@@ -28,6 +29,7 @@ struct Token {
                         ? ' ' ~ str
                         : ""
             )
+            ~ " @" ~ to!string(index)
             ~ ")";
     }
     
@@ -48,6 +50,7 @@ Token[] tokenize(Nibble[] code) {
     Token[] tokens;
     while(i < code.length) {
         Token token;
+        token.index = i;
         Nibble nib = code[i];
         if(nib == 0x0) {
             // reminder that nouns are just niladic verbs 
@@ -162,6 +165,10 @@ class Interpreter {
         foreach(i, token; code.tokenize.autoCompleteParentheses) {
             // writeln(i, ": ", token);
             // writeln(stack);
+            Debugger.print("Token[", i , "]: ", token);
+            Debugger.print("Paren stack: ", parenStackArity);
+            Debugger.print("opStack:     ", opStack);
+            Debugger.print();
             
             final switch(token.speech) {
                 case SpeechPart.Verb:
@@ -216,6 +223,7 @@ class Interpreter {
                                 InsName.CloseParen,
                                 BigInt(count)
                             );
+                            parenStackArity[$-1]++;
                             break;
                             
                         case InsName.Break:
