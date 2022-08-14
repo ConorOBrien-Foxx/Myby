@@ -72,9 +72,11 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `exit` | `FE00` | ✔️ | verb(1) | int | n/a | Exits with specified code |
 | `exit` | `FE00` | ✔️ | verb(1) | any | n/a |  Exits with code 0 |
 | `exit` | `FE00` |    | verb(2) | any, any | n/a | Exits with code 0 |
+| `primq` | `FE70` | ✔️ | verb(1) | int | int | Nth prime |
 | `primq` | `FE71` | ✔️ | verb(1) | int | bool | Test for prime |
 | `primf` | `FE72` | ✔️ | verb(1) | int | list | Prime factors |
 | `primo` | `FE73` | ✔️ | verb(1) | int | list | Number of prime factors (Omega) |
+| `prims` | `FE78` | ✔️ | verb(1) | int | list | First N primes |
 
 # Example programs
 

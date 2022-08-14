@@ -93,7 +93,7 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. A variabl
 | `0xFC` | Split-Compose |
 | `0xFD` | Reflex |
 | `0xFEZZ` | [Two-Byte extensions] |
-| `0xFE00` | Exit/Y |
+| `0xFE00` | Exit/Exit |
 | `0xFE70` | N-th prime/Y |
 | `0xFE71` | Prime/Coprime test |
 | `0xFE72` | Prime factors/Y |
@@ -102,4 +102,5 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. A variabl
 | `0xFE75` | Number of distinct prime factors/Y |
 | `0xFE76` | Prime before/Y |
 | `0xFE77` | Prime after/Y |
+| `0xFE78` | First N Primes/Y |
 | `0xFF` | Section break |

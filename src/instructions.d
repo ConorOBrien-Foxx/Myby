@@ -62,6 +62,7 @@ enum InsName {
     UniqPrimeFactorsCount,  //FE75
     PreviousPrime,          //FE76
     NextPrime,              //FE77
+    FirstNPrimes,           //FE78
     Break,                  //FF
 }
 
@@ -104,6 +105,7 @@ enum Nibble[][string] InstructionMap = [
     "primod": [0xF, 0xE, 0x7, 0x5],
     "prevp": [0xF, 0xE, 0x7, 0x6],
     "nextp": [0xF, 0xE, 0x7, 0x7],
+    "prims": [0xF, 0xE, 0x7, 0x8],
     ";": [0xF, 0x2],
     "!": [0xF, 0x3],
     "=": [0xF, 0x4],
@@ -174,6 +176,7 @@ enum NameInfo[int] NameMap = [
     0xFE75: NameInfo(SpeechPart.Verb,             InsName.UniqPrimeFactorsCount),
     0xFE76: NameInfo(SpeechPart.Verb,             InsName.PreviousPrime),
     0xFE77: NameInfo(SpeechPart.Verb,             InsName.NextPrime),
+    0xFE78: NameInfo(SpeechPart.Verb,             InsName.FirstNPrimes),
     0xFF:   NameInfo(SpeechPart.Syntax,           InsName.Break),
 ];
 
@@ -907,6 +910,15 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((_1, _2) => exit())
             .setMarkedArity(1);
+            
+        verbs[InsName.NthPrime] = new Verb("primn")
+            // Nth prime
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(nthPrime(a)),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
         
         verbs[InsName.IsPrime] = new Verb("primq")
             // Is Prime
@@ -930,6 +942,15 @@ Verb getVerb(InsName name) {
             // Big Omega (prime factor count)
             .setMonad(a => a.match!(
                 (BigInt a) => Atom(BigInt(primeFactors(a).length)),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.FirstNPrimes] = new Verb("prims")
+            // First N Primes
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(firstNPrimes(a).map!Atom.array),
                 _ => Nil.nilAtom,
             ))
             .setDyad((_1, _2) => Nil.nilAtom)
