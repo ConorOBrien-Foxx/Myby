@@ -104,8 +104,6 @@ enum Nibble[][string] InstructionMap = [
     "primod": [0xF, 0xE, 0x7, 0x5],
     "prevp": [0xF, 0xE, 0x7, 0x6],
     "nextp": [0xF, 0xE, 0x7, 0x7],
-    "q.": [0xF, 0xE, 0x7, 0x4],
-    "q..": [0xF, 0xE, 0x7, 0x5],
     ";": [0xF, 0x2],
     "!": [0xF, 0x3],
     "=": [0xF, 0x4],
@@ -274,7 +272,29 @@ class Infinity {
     }
 }
 
-alias Atom = SumType!(Nil, BigInt, Infinity, string, bool, This[]);
+alias _AtomValue = SumType!(Nil, BigInt, Infinity, string, bool, Atom[]);
+struct Atom {
+    _AtomValue value;
+    this(T)(T v) {
+        value = v;
+    }
+    
+    ref Atom opAssign(T)(T rhs) {
+        value = rhs;
+        return this;
+    }
+    
+    int opCmp(Atom other) {
+        return match!(
+            (a, b) => a < b ? -1 : a == b ? 0 : 1,
+            (_1, _2) => assert(0, "Cannot match")
+        )(value, other.value);
+    }
+    
+    // trick learned from https://stackoverflow.com/a/73351663/4119004
+    alias value this;
+}
+
 alias VerbMonad = Atom delegate(Atom);
 alias VerbDyad = Atom delegate(Atom, Atom);
 alias AdjectiveMonad = Verb delegate(Verb);
@@ -839,10 +859,11 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             // Lesser of 2
-            .setDyad((a, b) => match!(
-                (a, b) => a < b ? atomFor(a) : atomFor(b),
-                (_1, _2) => assert(0, "Cannot compare")
-            )(a, b))
+            .setDyad((l, r) => min(l, r))
+            // .setDyad((a, b) => match!(
+                // (a, b) => a < b ? atomFor(a) : atomFor(b),
+                // (_1, _2) => assert(0, "Cannot compare")
+            // )(a, b))
             // .setDyad((l, r) => match!(
                 // (a, b) => Atom(min(a, b)),
                 // (_1, _2) => Nil.nilAtom,
@@ -856,11 +877,11 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             // Greater of 2
-            .setDyad((a, b) => match!(
-                (a, b) => a < b ? atomFor(b) : atomFor(a),
-                (_1, _2) => assert(0, "Cannot compare")
-            )(a, b))
-            // .setDyad((l, r) => max(l, r))
+            .setDyad((l, r) => max(l, r))
+            // .setDyad((a, b) => match!(
+                // (a, b) => a < b ? atomFor(b) : atomFor(a),
+                // (_1, _2) => assert(0, "Cannot compare")
+            // )(a, b))
             // .setDyad((l, r) => match!(
                 // (a, b) => Atom(max(a, b)),
                 // (_1, _2) => Nil.nilAtom,
