@@ -27,3 +27,4 @@ docs/
 *.ilk
 *.pdb
 test.myby
+test/*

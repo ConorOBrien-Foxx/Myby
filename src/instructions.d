@@ -208,12 +208,82 @@ class Nil {
         return na;
     }
 }
-alias Atom = SumType!(Nil, BigInt, string, bool, This[]);
+
+// this might be painful to integrate at this stage, but is necessary
+// for identities such as lesser of
+class Infinity {
+    bool isPositive;
+    this(bool p) {
+        isPositive = p;
+    }
+    
+    override string toString() {
+        return isPositive ? "∞" : "-∞";
+    }
+    
+    override int opCmp(Object o) {
+        Infinity test = cast(Infinity) o;
+        if(test is null) {
+            return isPositive ? 1 : -1;
+        }
+        else {
+            return isPositive == test.isPositive ? 0 : isPositive ? 1 : -1;
+        }
+    }
+    
+    int opCmp(T)(T o) {
+        return isPositive ? 1 : -1;
+    }
+    
+    static Infinity positive() {
+        static Infinity pos;
+        
+        if(!pos) pos = new Infinity(true);
+        
+        return pos;
+    }
+    static Infinity negative() {
+        static Infinity neg;
+        
+        if(!neg) neg = new Infinity(false);
+        
+        return neg;
+    }
+    
+    static Atom positiveAtom() {
+        static Atom pos;
+        static bool initialized = false;
+        
+        if(!initialized) {
+            pos = Atom(positive);
+            initialized = true;
+        }
+        
+        return pos;
+    }
+    static Atom negativeAtom() {
+        static Atom neg;
+        static bool initialized = false;
+        
+        if(!initialized) {
+            neg = Atom(negative);
+            initialized = true;
+        }
+        
+        return neg;
+    }
+}
+
+alias Atom = SumType!(Nil, BigInt, Infinity, string, bool, This[]);
 alias VerbMonad = Atom delegate(Atom);
 alias VerbDyad = Atom delegate(Atom, Atom);
 alias AdjectiveMonad = Verb delegate(Verb);
 alias ConjunctionDyad = Verb delegate(Verb, Verb);
 alias MultiConjunctionFunction = Verb delegate(Verb[]);
+
+int opCmp(Atom a, Atom b) {
+    return 1;
+}
 
 Atom atomFor(T)(T a) {
     static if(is(T == Atom)) {
@@ -279,6 +349,7 @@ string arrayToString(Atom[] x, bool forceLinear=false) {
 string atomToString(Atom a, bool forceLinear=false) {
     return a.match!(
         (Nil x) => x.toString(),
+        (Infinity x) => x.toString(),
         (BigInt x) => to!string(x),
         (string x) => x,
         (bool x) => x ? "1b" : "0b",
@@ -377,9 +448,11 @@ class Verb {
             case 2:
                 return evaluate(arguments[0], arguments[1]);
             default:
-                import std.stdio : writeln;
-                writeln("no such argument arity ", arguments.length);
-                return Nil.nilAtom;
+                import std.stdio;
+                import myby.format;
+                writeln("Problem verb:\n", treeToBoxedString(this));
+                writeln(arguments);
+                assert(0, "no such argument arity " ~ to!string(arguments.length));
         }
     }
     
@@ -501,6 +574,7 @@ bool truthiness(Atom a) {
         a => a.length != 0,
         (bool a) => a,
         (Nil a) => false,
+        (Infinity) => true,
     );
 }
 
@@ -727,7 +801,7 @@ Verb getVerb(InsName name) {
             .setMonad(_ => Nil.nilAtom)
             // Less than
             .setDyad((l, r) => match!(
-                (BigInt a, BigInt b) => Atom(a < b),
+                (a, b) => Atom(a < b),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(2);
@@ -736,7 +810,7 @@ Verb getVerb(InsName name) {
             .setMonad(_ => Nil.nilAtom)
             // Greater than
             .setDyad((l, r) => match!(
-                (BigInt a, BigInt b) => Atom(a > b),
+                (a, b) => Atom(a > b),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(2);
@@ -761,23 +835,37 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.Minimum] = new Verb("<.")
             .setMonad(a => a.match!(
-                (Atom[] a) => a.reduce!((x, y) => verbs[InsName.Minimum](x, y)),
+                (Atom[] a) => foldFor(verbs[InsName.Minimum])(Atom(a)),
                 _ => Nil.nilAtom,
             ))
             // Lesser of 2
-            .setDyad((l, r) => match!(
-                (BigInt a, BigInt b) => Atom(min(a, b)),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((a, b) => match!(
+                (a, b) => a < b ? atomFor(a) : atomFor(b),
+                (_1, _2) => assert(0, "Cannot compare")
+            )(a, b))
+            // .setDyad((l, r) => match!(
+                // (a, b) => Atom(min(a, b)),
+                // (_1, _2) => Nil.nilAtom,
+            // )(l, r))
+            .setIdentity(Infinity.positiveAtom)
             .setMarkedArity(2);
         
         verbs[InsName.Maximum] = new Verb(">.")
-            .setMonad(_ => Nil.nilAtom)
-            // Greater than or equal to
-            .setDyad((l, r) => match!(
-                (BigInt a, BigInt b) => Atom(max(a, b)),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setMonad(a => a.match!(
+                (Atom[] a) => foldFor(verbs[InsName.Maximum])(Atom(a)),
+                _ => Nil.nilAtom,
+            ))
+            // Greater of 2
+            .setDyad((a, b) => match!(
+                (a, b) => a < b ? atomFor(b) : atomFor(a),
+                (_1, _2) => assert(0, "Cannot compare")
+            )(a, b))
+            // .setDyad((l, r) => max(l, r))
+            // .setDyad((l, r) => match!(
+                // (a, b) => Atom(max(a, b)),
+                // (_1, _2) => Nil.nilAtom,
+            // )(l, r))
+            .setIdentity(Infinity.negativeAtom)
             .setMarkedArity(2);
         
         verbs[InsName.Print] = new Verb("echo")
@@ -851,9 +939,15 @@ Verb foldFor(Verb v) {
             ? arr.reduce!v
             : reduce!v(v.identity, arr);
     }
+    import myby.debugger;
     return new Verb("₂\\")
         .setMonad(a => a.match!(
-            (Atom[] arr) => reduc(arr),
+            (Atom[] arr) {
+                Debugger.print("Fold for  ", v);
+                Debugger.print("Identity: ", v.identity);
+                Debugger.print("Array:    ", arr);
+                return reduc(arr);
+            },
             (BigInt n) => reduc(iota(v.rangeStart, n + 1).map!Atom),
             _ => Nil.nilAtom,
         ))
