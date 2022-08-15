@@ -29,6 +29,7 @@ auto getoptSafeError(T...)(ref string[] args, T opts) {
 
 int main(string[] args) {
     import std.file : read, FileException, write, exists;
+    import core.exception : AssertError;
     
     bool compile;
     bool literate;
@@ -155,13 +156,28 @@ int main(string[] args) {
     Debugger.unsilence();
     Debugger.print("Verb args: ", verbArgs.map!"a.toString()");
     
-    if(verbArgs.length > 0) {
-        writeln(mainVerb(verbArgs).atomToString());
+    try {
+        if(verbArgs.length > 0) {
+            writeln(mainVerb(verbArgs).atomToString());
+        }
+        else {
+            //TODO: For now, just call it without arguments.
+            //In the future, probably read from STDIN
+            writeln(mainVerb().atomToString());
+        }
     }
-    else {
-        //TODO: For now, just call it without arguments.
-        //In the future, probably read from STDIN
-        writeln(mainVerb().atomToString());
+    catch(AssertError e) {
+        if(Debugger.printing) {
+            Debugger.print(e);
+        }
+        else {
+            stderr.writeln(
+                "AssertError@", e.file, "(", e.line, ")", ": ",
+                e.msg
+            );
+        
+        }
+        return 1;
     }
     
     return 0;

@@ -11,6 +11,7 @@ import std.conv : to;
 
 import myby.nibble;
 import myby.prime;
+import myby.debugger;
 
 enum InsName {
     Integer,                //0
@@ -236,6 +237,14 @@ class Infinity {
         return isPositive ? 1 : -1;
     }
     
+    override bool opEquals(Object o) {
+        return opCmp(o) == 0;
+    }
+
+    bool opEquals(T)(T o) {
+        return opCmp(o) == 0;
+    }
+    
     static Infinity positive() {
         static Infinity pos;
         
@@ -276,6 +285,22 @@ class Infinity {
 }
 
 alias _AtomValue = SumType!(Nil, BigInt, Infinity, string, bool, Atom[]);
+string readableTypeName(_AtomValue value) {
+    return value.match!(
+        (Nil _) => "nil",
+        (BigInt _) => "int",
+        (Infinity _) => "inf",
+        (string _) => "str",
+        (bool _) => "bool",
+        (Atom[] _) => "arr",
+    );
+}
+string readableTypeName(T)(T value) {
+    return readableTypeName(atomFor(value));
+}
+string readableTypeName(T, S)(T a, S b) {
+    return readableTypeName(a) ~ " and " ~ readableTypeName(b);
+}
 struct Atom {
     _AtomValue value;
     this(T)(T v) {
@@ -289,8 +314,15 @@ struct Atom {
     
     int opCmp(Atom other) {
         return match!(
-            (a, b) => a < b ? -1 : a == b ? 0 : 1,
-            (_1, _2) => assert(0, "Cannot match")
+            (a, b) => a < b ? -1 : a > b ? 1 : 0,
+            (a, b) => assert(0, "Cannot compare " ~ readableTypeName(a, b)),
+        )(value, other.value);
+    }
+    
+    bool opEquals(Atom other) {
+        return match!(
+            (a, b) => a == b,
+            (a, b) => assert(0, "Cannot compare " ~ readableTypeName(a, b)),
         )(value, other.value);
     }
     
