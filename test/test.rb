@@ -27,6 +27,14 @@ tests = [
         input: '-l -e "(#%2)\ ^" 9',
         output: "[1, 3, 5, 7, 9]\n",
         succeeds: true,
+    },
+    {
+        input: '-c -e "3+4"',
+        output: "\x03@K",
+        succeeds: true,
+    },
+    {
+        
     }
 ]
 

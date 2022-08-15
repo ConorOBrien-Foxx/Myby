@@ -185,6 +185,7 @@ class Interpreter {
                     break;
                 case SpeechPart.Conjunction:
                     // this is where precedence handling would go
+                    flushOpStack();
                     opStack ~= token;
                     parenStackArity[$-1]--;
                     break;

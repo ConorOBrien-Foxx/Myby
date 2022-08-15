@@ -175,7 +175,6 @@ int main(string[] args) {
                 "AssertError@", e.file, "(", e.line, ")", ": ",
                 e.msg
             );
-        
         }
         return 1;
     }
