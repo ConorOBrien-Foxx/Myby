@@ -34,7 +34,9 @@ tests = [
         succeeds: true,
     },
     {
-        
+        input: 'example/half-square-double.cmyby 10',
+        output: "50\n",
+        succeeds: true,
     }
 ]
 
