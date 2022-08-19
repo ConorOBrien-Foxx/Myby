@@ -52,8 +52,8 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. A variabl
 | `0x3` | Map/ZipWith Adjective |
 | `0x4` | Absolute Value/Add |
 | `0x5` | Negate/Subtract |
-| `0x6` | X/Multiply |
-| `0x7` | X/Divide |
+| `0x6` | Flatten/Multiply |
+| `0x7` | Unique/Divide |
 | `0x8` | OneRange/Exponentiate |
 | `0x9` | Identity/Pair |
 | `0xA` | Bond Conjunction |
@@ -62,7 +62,7 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. A variabl
 | `0xD` | Compose Conjunction |
 | `0xE` | Range/Range |
 | `0xFZ` | [Multinibble instructions, as follows] |
-| `0xF0` | X/Modulus |
+| `0xF0` | Sort/Modulus |
 | `0xF1Z` | [More multinible instructions, as follows] |
 | `0xF10` | 1st Chain |
 | `0xF11` | 2nd Chain |

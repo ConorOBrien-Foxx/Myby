@@ -1,20 +1,22 @@
 module myby.main;
 
-import std.stdio;
-import std.bigint;
-import std.sumtype;
-import std.getopt;
-import std.array;
 import std.algorithm.iteration : map;
+import std.array;
+import std.bigint;
+import std.getopt;
+import std.stdio;
+import std.sumtype;
 
-import myby.integer;
-import myby.string;
-import myby.nibble;
-import myby.literate;
-import myby.interpreter;
-import myby.instructions;
+// TODO: remove superfluous headers
 import myby.debugger;
 import myby.format;
+import myby.instructions;
+import myby.integer;
+import myby.interpreter;
+import myby.literate;
+import myby.nibble;
+import myby.speech;
+import myby.string;
 
 auto getoptSafeError(T...)(ref string[] args, T opts) {
     try {

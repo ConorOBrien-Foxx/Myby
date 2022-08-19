@@ -24,10 +24,11 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `*` | `6`    | | verb(1) | list | list | Flatten |
 | `*` | `6`    | ✔️ | verb(2) | list, string | Join |
 | `*` | `6`    | ✔️ | verb(2) | int, int | int | Multiplication. `RS`=1. |
-| `/` | `7`    | | verb(1) | string | list | List of character strings |
+| `/` | `7`    | | verb(1) | list | list | Unique-ify |
+| `/` | `7`    | | verb(1) | string | list | Characters |
 | `/` | `7`    | ✔️ | verb(2) | int, int | int | Division |
 | `/` | `7`    | ✔️ | verb(2) | list, int | list(list) | Chunk list |
-| `/` | `7`    | ✔️ | verb(2) | string, string | list(string) | Split strink on list |
+| `/` | `7`    | ✔️ | verb(2) | string, string | list(string) | Split string on list |
 | `^` | `8`    | | verb(1) | int | list | Range starting at 1 |
 | `^` | `8`    | ✔️ | verb(2) | int, int | int | Exponentiation |
 | `#` | `9`    | ✔️ | verb(1) | any | any | Identity |

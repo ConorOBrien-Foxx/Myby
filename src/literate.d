@@ -1,17 +1,17 @@
 module myby.literate;
 
-import std.stdio : writeln;
 import std.ascii : isDigit;
-import std.conv : to;
-import std.string : strip;
-import std.range : popFrontN, popBackN;
 import std.bigint;
+import std.conv : to;
+import std.range : popFrontN, popBackN;
+import std.stdio : writeln;
+import std.string : strip;
 
-import myby.nibble;
-import myby.integer;
-import myby.string;
-import myby.instructions;
 import myby.debugger;
+import myby.instructions;
+import myby.integer;
+import myby.nibble;
+import myby.string;
 
 enum NiladParseState {
     None,

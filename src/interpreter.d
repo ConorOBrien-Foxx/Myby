@@ -4,12 +4,13 @@ import std.bigint;
 import std.conv : to;
 import std.range : back, popBack, popBackN;
 
-import myby.nibble;
+import myby.debugger;
 import myby.instructions;
 import myby.integer;
-import myby.string;
-import myby.debugger;
 import myby.literate : NiladParseState;
+import myby.nibble;
+import myby.speech;
+import myby.string;
 
 struct Token {
     SpeechPart speech;

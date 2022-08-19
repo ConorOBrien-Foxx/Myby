@@ -2,10 +2,9 @@ module myby.format;
 
 import std.algorithm.iteration : map;
 import std.algorithm.searching : maxElement;
-import std.range : padRight, repeat;
-import std.conv : to;
 import std.array;
-
+import std.conv : to;
+import std.range : padRight, repeat;
 import std.stdio;
 
 struct BoxedString {
