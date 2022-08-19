@@ -58,6 +58,8 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `;` | `F2`   | ✔️ | verb(2) | any, any | list | Pair |
 | `!` | `F3`   | | verb(1) | list | list(list) | Enumerate |
 | `!` | `F3`   | ✔️ | verb(2) | int, int | int | Binomial |
+| `=` | `F4`   | | verb(1) | int | Identity Matrix |
+| `=` | `F4`   | | verb(1) | list | Self-classify (as in J) |
 | `=` | `F4`   | ✔️ | verb(2) | any, any | bool | Equality |
 | `<` | `F5`   | ✔️ | verb(2) | any, any | bool | Less than |
 | `>` | `F6`   | ✔️ | verb(2) | any, any | bool | Greater than |
