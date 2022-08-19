@@ -31,6 +31,21 @@ bool isPrime(T)(T n) {
     return true;
 }
 
+T nextPrime(T)(T n) {
+    do {
+        n++;
+    } while(!isPrime(n));
+    return n;
+}
+
+T previousPrime(T)(T n) {
+    assert(n > 2, "No prime smaller than 2");
+    do {
+        n--;
+    } while(!isPrime(n));
+    return n;
+}
+
 T[] primeFactors(T)(T n) {
     T[] factors;
 
@@ -42,6 +57,42 @@ T[] primeFactors(T)(T n) {
         pragma(inline, true);
         while(n % divisor == 0) {
             n /= divisor;
+            T append = divisor;
+            factors ~= append;
+        }
+    }
+    
+    static foreach(divisor; PreCheckPrimes) {
+        addDivisibleFactors(divisor);
+    }
+    
+    for(T i = FirstCheckPrime; i * i <= n; i += 6) {
+        addDivisibleFactors(i);
+        addDivisibleFactors(i + 2);
+    }
+    
+    if(n > 2) {
+        factors ~= n;
+    }
+    
+    return factors;
+}
+
+T[] primeFactorsUnique(T)(T n) {
+    T[] factors;
+
+    if(n <= 1) {
+        return factors;
+    }
+    
+    void addDivisibleFactors(S)(S divisor) {
+        pragma(inline, true);
+        bool divided = false;
+        while(n % divisor == 0) {
+            n /= divisor;
+            divided = true;
+        }
+        if(divided) {
             T append = divisor;
             factors ~= append;
         }

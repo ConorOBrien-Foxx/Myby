@@ -517,10 +517,46 @@ Verb getVerb(InsName name) {
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
+        verbs[InsName.UniqPrimeFactors] = new Verb("primfd")
+            // Prime Factorization (no duplicates)
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(primeFactorsUnique(a).map!Atom.array),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.UniqPrimeFactorsCount] = new Verb("primod")
+            // Distinct prime factor count
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(BigInt(primeFactorsUnique(a).length)),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
         verbs[InsName.FirstNPrimes] = new Verb("prims")
             // First N Primes
             .setMonad(a => a.match!(
                 (BigInt a) => Atom(firstNPrimes(a).map!Atom.array),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.PreviousPrime] = new Verb("prevp")
+            // Next Prime After
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(previousPrime(a)),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.NextPrime] = new Verb("nextp")
+            // Next Prime After
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(nextPrime(a)),
                 _ => Nil.nilAtom,
             ))
             .setDyad((_1, _2) => Nil.nilAtom)

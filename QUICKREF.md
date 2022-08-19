@@ -79,6 +79,10 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `primq` | `FE71` | ✔️ | verb(1) | int | bool | Test for prime |
 | `primf` | `FE72` | ✔️ | verb(1) | int | list | Prime factors |
 | `primo` | `FE73` | ✔️ | verb(1) | int | list | Number of prime factors (Omega) |
+| `primfd` | `FE74` | ✔️ | verb(1) | int | list | Distinct prime factors |
+| `primod` | `FE75` | ✔️ | verb(1) | int | list | Number of distinct prime factors |
+| `prevp` | `FE76` | ✔️ | verb(1) | int | int | Previous prime |
+| `nextp` | `FE77` | ✔️ | verb(1) | int | int | Next prime |
 | `prims` | `FE78` | ✔️ | verb(1) | int | list | First N primes |
 
 # Example programs
