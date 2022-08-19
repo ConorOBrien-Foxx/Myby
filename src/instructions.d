@@ -250,7 +250,7 @@ Verb getVerb(InsName name) {
                 // Characters
                 (string a) => Atom(a.map!(to!string).map!Atom.array),
                 // Unique
-                (Atom[] a) => Atom(a.uniq.array),
+                (Atom[] a) => Atom(a.nub.array),
                 _ => Nil.nilAtom,
             ))
             .setDyad((Atom l, Atom r) => match!(
@@ -540,11 +540,6 @@ Adjective getAdjective(InsName name) {
         // Filter/Fold
         adjectives[InsName.Filter] = new Adjective(
             (Verb v) {
-                import std.stdio;
-                // writeln("Verb v: ", v);
-                // writeln("Verb v's identity: ", v.identity.toString());
-                // writeln(" ^^is nil?: ", v.identity.isNil);
-                
                 // filter 
                 if(v.markedArity == 1) {
                     return filterFor(v);

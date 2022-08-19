@@ -108,12 +108,39 @@ Verb foldFor(Verb v) {
         .setChildren([v]);
 }
 
+Atom[] nub(Atom[] a) {
+    Atom[] res;
+    foreach(x; a) {
+        if(!res.canFind(x)) {
+            res ~= x;
+        }
+    }
+    return res;
+}
+
 Atom[] eye(BigInt b) {
-    //todo:
-    return [];
+    if(b <= 0) {
+        return [Atom(cast(Atom[]) [])];
+    }
+    Atom[] rows;
+    for(BigInt i = 0; i < b; i++) {
+        Atom[] row;
+        for(BigInt j = 0; j < b; j++) {
+            row ~= Atom(BigInt(i == j ? 1 : 0));
+        }
+        rows ~= Atom(row);
+    }
+    return rows;
 }
 
 Atom[] selfClassify(Atom[] a) {
-    //todo:
-    return [];
+    Atom[] rows;
+    foreach(u; a.nub) {
+        Atom[] row;
+        foreach(x; a) {
+            row ~= Atom(BigInt(u == x ? 1 : 0));
+        }
+        rows ~= Atom(row);
+    }
+    return rows;
 }
