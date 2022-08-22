@@ -44,6 +44,7 @@ enum InsName {
     Maximum,                //F18
     OnLeft,                 //F19
     OnRight,                //F1A
+    Generate,               //F1B
     Power,                  //F1D
     Print,                  //F1E
     MonadChain,             //F1F
@@ -100,6 +101,7 @@ enum Nibble[][string] InstructionMap = [
     ">.": [0xF, 0x1, 0x8],
     "[": [0xF, 0x1, 0x9],
     "]": [0xF, 0x1, 0xA],
+    "G": [0xF, 0x1, 0xB],
     //...
     "^:": [0xF, 0x1, 0xD],
     "echo": [0xF, 0x1, 0xE],
@@ -160,6 +162,8 @@ enum NameInfo[int] NameMap = [
     0xF18:  NameInfo(SpeechPart.Verb,             InsName.Maximum),
     0xF19:  NameInfo(SpeechPart.Adjective,        InsName.OnLeft),
     0xF1A:  NameInfo(SpeechPart.Adjective,        InsName.OnRight),
+    0xF1B:  NameInfo(SpeechPart.Adjective,        InsName.Generate),
+    // 0xF1C
     0xF1D:  NameInfo(SpeechPart.Conjunction,      InsName.Power),
     0xF1E:  NameInfo(SpeechPart.Verb,             InsName.Print),
     0xF1F:  NameInfo(SpeechPart.MultiConjunction, InsName.MonadChain),
@@ -665,6 +669,21 @@ Adjective getAdjective(InsName name) {
                 .setMonad(a => v(a, a))
                 .setDyad((x, y) => v(y, x))
                 .setMarkedArity(2)
+                .setChildren([v])
+        );
+        
+        // Generate
+        adjectives[InsName.Generate] = new Adjective(
+            (Verb v) => new Verb("G")
+                .setMonad((a) {
+                    auto ind = BigInt(0);
+                    while(!v(a, Atom(ind)).truthiness) {
+                        ind++;
+                    }
+                    return Atom(ind);
+                })
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
                 .setChildren([v])
         );
     }
