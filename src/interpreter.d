@@ -267,7 +267,7 @@ class Interpreter {
                 f = verbs[$-2];
                 g = verbs[$-1];
                 verbs.popBack;
-                if(g.niladic && f.markedArity == 2) {
+                if(g.niladic && f.markedArity == 2 || f.niladic && g.markedArity == 2) {
                     Debugger.print("Atop redirected to Bind");
                     verbs[$-1] = bind(f, g);
                 }
