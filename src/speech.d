@@ -10,6 +10,7 @@ import std.conv : to;
 import std.range;
 import std.sumtype;
 
+import myby.debugger;
 import myby.nibble;
 
 class Nil {
@@ -19,6 +20,17 @@ class Nil {
     
     override string toString() {
         return "nil";
+    }
+    
+    override bool opEquals(Object o) {
+        // all Nils are equal
+        Nil test = cast(Nil) o;
+        return test !is null;
+    }
+
+    bool opEquals(T)(T o) {
+        // only the Nil class can possibly be equal to a Nil
+        return false;
     }
     
     static Nil nil() {
@@ -153,7 +165,8 @@ struct Atom {
     bool opEquals(Atom other) {
         return match!(
             (a, b) => a == b,
-            (a, b) => assert(0, "Cannot compare " ~ readableTypeName(a, b)),
+            // if a == b does not compile for a and b, then they cannot be equal
+            (_1, _2) => false,
         )(value, other.value);
     }
     

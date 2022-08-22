@@ -73,8 +73,8 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. A variabl
 | `0xF16` | X/Greater than or equal |
 | `0xF17` | Minimum/Lesser of 2 |
 | `0xF18` | Maximum/Greater of 2 |
-| `0xF19` |  |
-| `0xF1A` |  |
+| `0xF19` | OnLeft |
+| `0xF1A` | OnRight |
 | `0xF1B` |  |
 | `0xF1C` |  |
 | `0xF1D` | Power |
@@ -88,8 +88,7 @@ When specified, X/Y refers to the Unary/Binary behavior, respectively. A variabl
 | `0xF7` | Force opposite implicit Adjective |
 | `0xF8` | First/Index |
 | `0xF9` | Last/X |
-| `0xFA` | OnLeft |
-| `0xFB` | OnRight |
+| `0xFA` | OnPrefixes |
 | `0xFC` | Split-Compose |
 | `0xFD` | Reflex |
 | `0xFEZZ` | [Two-Byte extensions] |

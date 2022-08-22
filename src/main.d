@@ -150,7 +150,7 @@ int main(string[] args) {
     Debugger.silence();
     Atom[] verbArgs = args[fileName ? 2 : 1..$]
         .map!((arg) {
-            auto temp = new Interpreter(arg);
+            auto temp = new Interpreter(arg ~ " @.");
             temp.shunt;
             return temp.condense()();
         })

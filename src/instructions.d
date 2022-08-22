@@ -42,6 +42,8 @@ enum InsName {
     LessEqual,              //F16
     Minimum,                //F17
     Maximum,                //F18
+    OnLeft,                 //F19
+    OnRight,                //F1A
     Power,                  //F1D
     Print,                  //F1E
     MonadChain,             //F1F
@@ -53,8 +55,7 @@ enum InsName {
     ArityForce,             //F7
     First,                  //F8
     Last,                   //F9
-    OnLeft,                 //FA
-    OnRight,                //FB
+    OnPrefixes,             //FA
     SplitCompose,           //FC
     Reflex,                 //FD
     Exit,                   //FE00
@@ -97,6 +98,8 @@ enum Nibble[][string] InstructionMap = [
     ">:": [0xF, 0x1, 0x6],
     "<.": [0xF, 0x1, 0x7],
     ">.": [0xF, 0x1, 0x8],
+    "[": [0xF, 0x1, 0x9],
+    "]": [0xF, 0x1, 0xA],
     //...
     "^:": [0xF, 0x1, 0xD],
     "echo": [0xF, 0x1, 0xE],
@@ -118,8 +121,7 @@ enum Nibble[][string] InstructionMap = [
     "`": [0xF, 0x7],
     "{": [0xF, 0x8],
     "}": [0xF, 0x9],
-    "[": [0xF, 0xA],
-    "]": [0xF, 0xB],
+    "\\.": [0xF, 0xA],
     "O": [0xF, 0xC],
     "~": [0xF, 0xD],
     "exit": [0xF, 0xE, 0x0, 0x0],
@@ -156,6 +158,8 @@ enum NameInfo[int] NameMap = [
     0xF16:  NameInfo(SpeechPart.Verb,             InsName.GreaterEqual),
     0xF17:  NameInfo(SpeechPart.Verb,             InsName.Minimum),
     0xF18:  NameInfo(SpeechPart.Verb,             InsName.Maximum),
+    0xF19:  NameInfo(SpeechPart.Adjective,        InsName.OnLeft),
+    0xF1A:  NameInfo(SpeechPart.Adjective,        InsName.OnRight),
     0xF1D:  NameInfo(SpeechPart.Conjunction,      InsName.Power),
     0xF1E:  NameInfo(SpeechPart.Verb,             InsName.Print),
     0xF1F:  NameInfo(SpeechPart.MultiConjunction, InsName.MonadChain),
@@ -167,8 +171,7 @@ enum NameInfo[int] NameMap = [
     0xF7:   NameInfo(SpeechPart.Adjective,        InsName.ArityForce),
     0xF8:   NameInfo(SpeechPart.Verb,             InsName.First),
     0xF9:   NameInfo(SpeechPart.Verb,             InsName.Last),
-    0xFA:   NameInfo(SpeechPart.Adjective,        InsName.OnLeft),
-    0xFB:   NameInfo(SpeechPart.Adjective,        InsName.OnRight),
+    0xFA:   NameInfo(SpeechPart.Adjective,        InsName.OnPrefixes),
     0xFC:   NameInfo(SpeechPart.MultiConjunction, InsName.SplitCompose),
     0xFD:   NameInfo(SpeechPart.Adjective,        InsName.Reflex),
     0xFE00: NameInfo(SpeechPart.Verb,             InsName.Exit),
@@ -293,6 +296,9 @@ Verb getVerb(InsName name) {
             .setDyad((Atom l, Atom r) => match!(
                 // Modulus
                 (BigInt a, BigInt b) => Atom(a % b),
+                // Intersection, a la APL
+                (Atom[] a, Atom[] b) => Atom(a.filter!(e => b.canFind(e)).array),
+                (Atom[] a, b) => Atom(a.filter!(e => e == atomFor(b)).array),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(2);
@@ -631,6 +637,24 @@ Adjective getAdjective(InsName name) {
                 .setMonad(a => v(a))
                 .setDyad((a, b) => v(b))
                 .setMarkedArity(2)
+                .setChildren([v])
+        );
+        
+        // OnPrefixes
+        adjectives[InsName.OnPrefixes] = new Adjective(
+            (Verb v) => new Verb("\\.")
+                .setMonad(a => a.match!(
+                    (Atom[] a) => Atom(
+                        iota(a.length)
+                            .map!(i => a[0..i + 1])
+                            .map!Atom
+                            .map!v
+                            .array
+                    ),
+                    _ => Nil.nilAtom,
+                ))
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
                 .setChildren([v])
         );
         
