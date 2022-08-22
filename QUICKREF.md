@@ -66,9 +66,9 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `<` | `F5`   | ✔️ | verb(2) | any, any | bool | Less than |
 | `>` | `F6`   | ✔️ | verb(2) | any, any | bool | Greater than |
 | \`  | `F7`   | | adjective | verb(N) | verb(2-N) | Forces the non-marked arity |
-| `{` | `F8`   | | verb(1) | list | any | First element |
-| `{` | `F8`   | | verb(2) | list, int | any | Index element |
-| `}` | `F9`   | | verb(1) | list | any | Last element |
+| `{` | `F8`   | | verb(1) | list/string | any | First element |
+| `{` | `F8`   | | verb(2) | int, list/string | any | Index element |
+| `}` | `F9`   | | verb(1) | list/string | any | Last element |
 | `\.`| `FA`   | | adjective | verb(1) | verb(1) | On Prefixes |
 | `O` | `FC`   | | multi-conjunction | verbs(1,2,1) | verb(2) | Split-Compose/directional fork, i.e. `(f x) g (h y)` |
 | `~` | `FD`   | | adjective | verb(2) | verb(1) | Reflex, makes a verb take the same argument twice, i.e. `x f x` |

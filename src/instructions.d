@@ -295,7 +295,7 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((Atom l, Atom r) => match!(
                 // Modulus
-                (BigInt a, BigInt b) => Atom(a % b),
+                (BigInt a, BigInt b) => Atom(positiveMod(a, b)),
                 // Intersection, a la APL
                 (Atom[] a, Atom[] b) => Atom(a.filter!(e => b.canFind(e)).array),
                 (Atom[] a, b) => Atom(a.filter!(e => e == atomFor(b)).array),
@@ -361,22 +361,22 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.First] = new Verb("{")
             // First element
-            .setMonad(a => a.match!(
-                (Atom[] a) => a[0],
-                _ => Nil.nilAtom,
-            ))
+            .setMonad(a => verbs[InsName.First](a, atomFor(BigInt(0))))
             // Index
             .setDyad((l, r) => match!(
-                (Atom[] a, BigInt b) => a[to!uint(b) % a.length],
+                (BigInt b, Atom[] a) =>
+                    a[moldIndex(b, a.length)],
+                (BigInt b, string a) =>
+                    Atom(to!string(a[moldIndex(b, a.length)])),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(2);
         
         verbs[InsName.Last] = new Verb("}")
             // Last element
-            .setMonad(a => a.match!(
-                (Atom[] a) => a[$-1],
-                _ => Nil.nilAtom,
+            .setMonad(a => verbs[InsName.First](
+                atomFor(a),
+                Atom(BigInt(-1))
             ))
             .setDyad((l, r) => match!(
                 (_1, _2) => Nil.nilAtom,
@@ -433,6 +433,7 @@ Verb getVerb(InsName name) {
             .setMarkedArity(2);
         
         verbs[InsName.Minimum] = new Verb("<.")
+            // Minimum
             .setMonad(a => a.match!(
                 (Atom[] a) => foldFor(verbs[InsName.Minimum])(Atom(a)),
                 _ => Nil.nilAtom,

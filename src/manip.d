@@ -61,6 +61,17 @@ BigInt pow(BigInt a, BigInt b) {
     return a;
 }
 
+auto positiveMod(S, T)(S a, T b) {
+    auto mod = a % b;
+    if(mod < 0) mod += b;
+    return mod;
+}
+
+uint moldIndex(S, T)(S index, T max) {
+    assert(max > 0, "Cannot index from a non-positive length");
+    return to!uint(positiveMod(index, max));
+}
+
 Atom exit(BigInt code = 0) {
     import core.stdc.stdlib;
     core.stdc.stdlib.exit(to!uint(code));
