@@ -46,6 +46,18 @@ Atom[] atomChars(string str) {
     return res;
 }
 
+Atom[] atomOrds(string str) {
+    return str.map!(to!uint).map!BigInt.map!Atom.array;
+}
+
+string atomUnords(Atom[] ords) {
+    string res;
+    foreach(o; ords) {
+        res ~= o.as!dchar;
+    }
+    return res;
+}
+
 string joinToString(Atom[] arr) {
     string res;
     foreach(atom; arr) {
@@ -155,4 +167,39 @@ Atom[] selfClassify(Atom[] a) {
         rows ~= Atom(row);
     }
     return rows;
+}
+
+Atom succ(Atom n) {
+    return n.match!(
+        (bool b) => Atom(!b),
+        (real r) => Atom(r + 1.0),
+        (BigInt b) => Atom(b + 1),
+        _ => Nil.nilAtom,
+    );
+}
+
+bool arraySucc(ref Atom[] base, Atom[] start, Atom[] max) {
+    for(uint i = 1; i <= base.length; i++) {
+        base[$-i] = succ(base[$-i]);
+        if(base[$-i] > max[$-i]) {
+            base[$-i] = start[$-i];
+        }
+        else {
+            return true;
+        }
+    }
+    return false;
+}
+
+Atom[][] arrayRange(Atom[] start, Atom[] end) {
+    Atom[][] res;
+    Atom[] i = start.dup;
+    import std.stdio;
+    while(i <= end) {
+        res ~= i.dup;
+        if(!i.arraySucc(start, end)) {
+            break;
+        }
+    }
+    return res;
 }

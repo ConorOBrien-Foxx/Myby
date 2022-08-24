@@ -295,6 +295,13 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((l, r) => match!(
                 (BigInt a, BigInt b) => Atom(iota(a, b + 1).map!Atom.array),
+                (Atom[] a, Atom[] b) => Atom(arrayRange(a, b).map!Atom.array),
+                (string a, string b) => Atom(
+                    arrayRange(a.atomOrds, b.atomOrds)
+                    .map!atomUnords
+                    .map!Atom
+                    .array
+                ),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(1);

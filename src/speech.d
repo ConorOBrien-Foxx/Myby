@@ -174,12 +174,24 @@ struct Atom {
         );
     }
     
-    real as(Type)() if(is(Type == real)) {
+    real as(Type : real)() {
         return value.match!(
             (a) => cast(real) a,
             // _ => 0.0,
             (a) => assert(0, "Cannot convert " ~ readableTypeName(a) ~ " to " ~ typeid(Type).toString()),
         );
+    }
+    
+    dchar as(Type : dchar)() {
+        return value.match!(
+            (a) => cast(dchar) a,
+            (a) => assert(0, "Cannot convert " ~ readableTypeName(a) ~ " to " ~ typeid(Type).toString()),
+        );
+    }
+    
+    Atom opBinary(string op, T)(T rhs)
+    if(!is(T == Atom)) {
+        return opBinary!op(Atom(rhs));
     }
     
     enum mathOps = ["+", "-", "/", "*", "%", "^^"];
