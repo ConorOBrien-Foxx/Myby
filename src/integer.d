@@ -20,7 +20,7 @@ import myby.nibble;
  *    | 8 | 8
  *    | 9 | 9
  *    | a | 10
- *    | b | 100
+ *    | b | A real number encoded using the next two integers
  *    | cw | A special constant encoded using the next nibble
  *    | c0 | 1000
  *    | c1 | 16
@@ -30,7 +30,7 @@ import myby.nibble;
  *    | c5 | 256
  *    | c6 | 512
  *    | c7 | 1024
- *    | c8 | 50
+ *    | c8 | 100
  *    | c9 | 255
  *    | ca | 65
  *    | cb | 97
@@ -47,7 +47,7 @@ import myby.nibble;
 enum BaseConstants = [
     0, 1, 2, 3,
     4, 5, 6, 7,
-    8, 9, 10, 100
+    8, 9, 10
 ];
 
 enum OneMillionPlaceholder = -3; // limits inferred cache size
@@ -55,7 +55,7 @@ enum OneMillion = 1000000;
 enum ExtraConstants = [
     1000, 16, 32, 64,
     128, 256, 512, 1024,
-    50, 255, 65, 97,
+    100, 255, 65, 97,
     OneMillionPlaceholder, 48, -2, -1
 ];
 enum HIGHEST_NEGATIVE = -3;
@@ -143,7 +143,9 @@ Nibble[] integerToNibbles(T)(T n) {
             }
             else {
                 // TODO: figure out what this constant 0x119(281) is
-                targetIndex = n - 0x119;
+                // TODO: really actually do this, it depends on BaseConstants.length
+                // somehow. constant changed to 0x118(280).
+                targetIndex = n - 0x118;
                 if(n > OneMillion) targetIndex--;
             }
             arr ~= 0xF;
@@ -161,15 +163,20 @@ Nibble[] integerToNibbles(T)(T n) {
 }
 
 enum REPEAT_FLAG = BigInt("0xFFFFFFFFFFFFFFF");
-BigInt nibblesToInteger(Nibble[] nibbles, ref uint i) {
+BigInt nibblesToInteger(Nibble[] nibbles, ref uint i, bool isExtra = false) {
     // import std.stdio;
-    assert(nibbles[i] == 0x0, "Trying to parse a non-integer as an integer");
+    if(!isExtra) {
+        assert(nibbles[i] == 0x0, "Trying to parse a non-integer as an integer");
 
-    i++;
+        i++;
+    }
     
     BigInt res = BigInt("0");
     if(nibbles[i] < BaseConstants.length) {
         res = BaseConstants[nibbles[i]];
+    }
+    else if(nibbles[i] == 0xB) {
+        assert(isExtra, "Cannot parse a real as an integer");
     }
     else if(nibbles[i] == 0xC) {
         res = ExtraConstants[nibbles[++i]];
@@ -208,4 +215,33 @@ BigInt nibblesToInteger(Nibble[] nibbles, ref uint i) {
 BigInt nibblesToInteger(Nibble[] nibbles) {
     uint i = 0;
     return nibblesToInteger(nibbles, i);
+}
+
+Nibble[] realToNibbles(BigInt num, BigInt den)
+out(r; r.length >= 4, "Must return 0x0B and at least 1 nibble for each part")
+{
+    return cast(Nibble[]) [0x0, 0xB]
+        ~ integerToNibbles(num)[1..$]
+        ~ integerToNibbles(den)[1..$];
+}
+
+real nibblesToReal(Nibble[] nibbles, ref uint i) {
+    import std.range : retro;
+    
+    i += 2;
+    BigInt ip = nibblesToInteger(nibbles, i, true);
+    BigInt fp = nibblesToInteger(nibbles, i, true);
+    assert(fp > 0, "Fraction part cannot be negative");
+    
+    string fpStr = fp.toDecimalString();
+    real fpSize = fpStr.length;
+    BigInt fpRev = BigInt(fpStr.retro);
+    
+    real first = cast(real)ip;
+    real second = cast(real)fpRev * 10.0^^-fpSize;
+    
+    // match signs so addition is concatenation
+    if(first < 0) second *= -1;
+    
+    return first + second;
 }

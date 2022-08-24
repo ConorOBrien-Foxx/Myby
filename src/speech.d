@@ -127,14 +127,15 @@ class Infinity {
     }
 }
 
-alias _AtomValue = SumType!(Nil, BigInt, Infinity, string, bool, Atom[]);
+alias _AtomValue = SumType!(Nil, BigInt, real, Infinity, string, bool, Atom[]);
 string readableTypeName(_AtomValue value) {
     return value.match!(
         (Nil _) => "nil",
+        (bool _) => "bool",
+        (real _) => "real",
         (BigInt _) => "int",
         (Infinity _) => "inf",
         (string _) => "str",
-        (bool _) => "bool",
         (Atom[] _) => "arr",
     );
 }
@@ -153,6 +154,45 @@ struct Atom {
     ref Atom opAssign(T)(T rhs) {
         value = rhs;
         return this;
+    }
+    
+    bool isType(Type)() {
+        return value.match!(
+            (Type _) => true,
+            _ => false,
+        );
+    }
+    
+    bool isNumeric() {
+        return value.match!(
+            (bool _) => true,
+            (real _) => true,
+            (BigInt _) => true,
+            (Infinity _) => true,
+            _ => false,
+        );
+    }
+    
+    real as(Type)() if(is(Type == real)) {
+        return value.match!(
+            (a) => cast(real) a,
+            // _ => 0.0,
+            (a) => assert(0, "Cannot convert " ~ readableTypeName(a) ~ " to " ~ typeid(Type).toString()),
+        );
+    }
+    
+    Atom opBinary(string op : "+")(Atom rhs) {
+        if(isNumeric && rhs.isNumeric) {
+            // real casts all args to real
+            if(isType!real || rhs.isType!real) {
+                return Atom(this.as!real + rhs.as!real);
+            }
+        }
+        return match!(
+            (a, b) => atomFor(a + b),
+            (string a, string b) => Atom(a ~ b),
+            (_1, _2) => Nil.nilAtom,
+        )(this, rhs);
     }
     
     int opCmp(Atom other) {
@@ -415,8 +455,9 @@ string atomToString(Atom a, bool forceLinear=false) {
         (Nil x) => x.toString(),
         (Infinity x) => x.toString(),
         (BigInt x) => to!string(x),
-        (string x) => x,
         (bool x) => x ? "1b" : "0b",
+        (real x) => to!string(x),
+        (string x) => x,
         (Atom[] x) => arrayToString(x, forceLinear),
     );
 }

@@ -3,7 +3,7 @@ module myby.literate;
 import std.ascii : isDigit;
 import std.bigint;
 import std.conv : to;
-import std.range : popFrontN, popBackN;
+import std.range : popFrontN, popBackN, retro;
 import std.stdio : writeln;
 import std.string : strip;
 
@@ -57,18 +57,32 @@ Nibble[] parseLiterate(T)(T str) {
             if(state == NiladParseState.LastWasNiladSeparator) {
                 code ~= 0x2;
             }
-            int sign = 1;
-            auto start = i;
-            if(str[start] == '_') {
-                sign = -1;
-                start++;
-                i++;
+            BigInt parseNumber(bool reverse=false) {
+                int sign = 1;
+                auto start = i;
+                if(str[start] == '_') {
+                    sign = -1;
+                    start++;
+                    i++;
+                }
+                while(i < str.length && str[i].isDigit) {
+                    i++;
+                }
+                string rep = str[start..i];
+                return sign * BigInt(reverse ? to!string(rep.retro) : rep);
             }
-            while(i < str.length && str[i].isDigit) {
+            
+            BigInt head = parseNumber();
+            if(i < str.length && str[i] == '.') {
                 i++;
+                BigInt tail = parseNumber(true);
+                Debugger.print("Float: <", head, ".rev ", tail, ">");
+                code ~= realToNibbles(head, tail);
             }
-            Debugger.print("Integer: <", str[start..i], ">");
-            code ~= integerToNibbles(sign * BigInt(str[start..i]));
+            else {
+                Debugger.print("Integer: <", head, ">");
+                code ~= integerToNibbles(head);
+            }
             Debugger.print("Code after append: ", code);
             nextState = NiladParseState.LastWasNilad;
         }

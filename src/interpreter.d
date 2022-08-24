@@ -18,18 +18,32 @@ struct Token {
     union {
         BigInt big;
         string str;
+        real   dec;
     };
     int index = -1;
     
     string toString() {
+        string addendum;
+        switch(name) {
+            case InsName.Integer:
+            case InsName.CloseParen:
+                addendum = to!string(big);
+                break;
+            case InsName.String:
+                addendum = str;
+                break;
+            case InsName.Real:
+                addendum = to!string(dec);
+                break;
+            default:
+                break;
+        }
+        if(addendum) {
+            addendum = ' ' ~ addendum;
+        }
         return "Token(" ~ to!string(speech)
-            ~ " `" ~ to!string(name) ~ "`" ~ (
-                name == InsName.Integer || name == InsName.CloseParen
-                    ? ' ' ~ to!string(big)
-                    : name == InsName.String
-                        ? ' ' ~ str
-                        : ""
-            )
+            ~ " `" ~ to!string(name) ~ "`"
+            ~ addendum
             ~ " @" ~ to!string(index)
             ~ ")";
     }
@@ -53,11 +67,19 @@ Token[] tokenize(Nibble[] code) {
         Token token;
         token.index = i;
         Nibble nib = code[i];
+        // reminder that nouns are just niladic verbs 
         if(nib == 0x0) {
-            // reminder that nouns are just niladic verbs 
-            token.speech = SpeechPart.Verb;
-            token.name = InsName.Integer;
-            token.big = nibblesToInteger(code, i);
+            // distinguish between doubles and ints
+            if(i + 1 < code.length && code[i + 1] == 0xB) {
+                token.speech = SpeechPart.Verb;
+                token.name = InsName.Real;
+                token.dec = nibblesToReal(code, i);
+            }
+            else {
+                token.speech = SpeechPart.Verb;
+                token.name = InsName.Integer;
+                token.big = nibblesToInteger(code, i);
+            }
         }
         else if(nib == 0x1) {
             token.speech = SpeechPart.Verb;
@@ -322,6 +344,10 @@ class Interpreter {
                     }
                     else if(token.name == InsName.String) {
                         addNilad(token.str);
+                        nextState = NiladParseState.LastWasNilad;
+                    }
+                    else if(token.name == InsName.Real) {
+                        addNilad(token.dec);
                         nextState = NiladParseState.LastWasNilad;
                     }
                     else {

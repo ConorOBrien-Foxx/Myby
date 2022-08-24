@@ -18,6 +18,7 @@ import myby.speech;
 
 enum InsName {
     Integer,                //0
+    Real,                   //0B
     String,                 //1
     Filter,                 //2
     Map,                    //3
@@ -207,11 +208,7 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             // Addition
-            .setDyad((Atom l, Atom r) => match!(
-                (BigInt a, BigInt b) => Atom(a + b),
-                (string a, string b) => Atom(a ~ b),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((Atom a, Atom b) => a + b)
             .setMarkedArity(2)
             .setIdentity(Atom(BigInt(0)));
         
@@ -250,7 +247,6 @@ Verb getVerb(InsName name) {
             .setMarkedArity(2)
             .setIdentity(Atom(BigInt(1)))
             .setRangeStart(BigInt(1));
-        //TODO: setIdentity per cased function
         
         verbs[InsName.Divide] = new Verb("/")
             .setMonad((Atom a) => a.match!(
