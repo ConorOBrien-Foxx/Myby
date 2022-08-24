@@ -38,6 +38,7 @@ Atom[] reshape(Number)(Atom[] arr, Number n) {
 }
 
 Atom[] atomChars(string str) {
+    // return str.map!(to!string).map!Atom.array
     Atom[] res;
     foreach(ch; str) {
         res ~= Atom(ch ~ "");

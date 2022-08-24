@@ -223,10 +223,7 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             // Subtraction
-            .setDyad((Atom l, Atom r) => match!(
-                (BigInt a, BigInt b) => Atom(a - b),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((Atom a, Atom b) => a - b)
             .setMarkedArity(2);
         
         verbs[InsName.Multiply] = new Verb("*")
@@ -237,13 +234,7 @@ Verb getVerb(InsName name) {
                 (BigInt b) => Atom(BigInt(b < 0 ? -1 : b == 0 ? 0 : 1)),
                 _ => Nil.nilAtom,
             ))
-            .setDyad((Atom l, Atom r) => match!(
-                // Multiplication
-                (BigInt a, BigInt b) => Atom(a * b),
-                // Join by
-                (Atom[] a, string b) => Atom(a.map!(to!string).join(b)),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((Atom a, Atom b) => a * b)
             .setMarkedArity(2)
             .setIdentity(Atom(BigInt(1)))
             .setRangeStart(BigInt(1));
@@ -251,26 +242,12 @@ Verb getVerb(InsName name) {
         verbs[InsName.Divide] = new Verb("/")
             .setMonad((Atom a) => a.match!(
                 // Characters
-                (string a) => Atom(a.map!(to!string).map!Atom.array),
+                (string a) => Atom(a.atomChars),
                 // Unique
                 (Atom[] a) => Atom(a.nub.array),
                 _ => Nil.nilAtom,
             ))
-            .setDyad((Atom l, Atom r) => match!(
-                // Chunk
-                (Atom[] a, BigInt b) =>
-                    Atom(a.chunks(to!size_t(b))
-                    .map!Atom
-                    .array),
-                (string a, BigInt b) =>
-                    verbs[InsName.Divide](verbs[InsName.Divide](a), b),
-                // Division
-                (BigInt a, BigInt b) => Atom(a / b),
-                // Split on
-                (string a, string b) =>
-                    Atom(a.split(b).map!Atom.array),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((Atom a, Atom b) => a / b)
             .setMarkedArity(2);
         
         verbs[InsName.Exponentiate] = new Verb("^")
@@ -281,10 +258,7 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             // Exponentiation
-            .setDyad((Atom l, Atom r) => match!(
-                (BigInt a, BigInt b) => Atom(pow(a, b)),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((Atom a, Atom b) => a ^^ b)
             .setMarkedArity(2);
         
         verbs[InsName.Modulus] = new Verb("%")
@@ -293,14 +267,7 @@ Verb getVerb(InsName name) {
                 (Atom[] a) => Atom(a.sort.array),
                 _ => Nil.nilAtom,
             ))
-            .setDyad((Atom l, Atom r) => match!(
-                // Modulus
-                (BigInt a, BigInt b) => Atom(positiveMod(a, b)),
-                // Intersection, a la APL
-                (Atom[] a, Atom[] b) => Atom(a.filter!(e => b.canFind(e)).array),
-                (Atom[] a, b) => Atom(a.filter!(e => e == atomFor(b)).array),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((Atom a, Atom b) => a % b)
             .setMarkedArity(2);
         
         // Identity/Reshape

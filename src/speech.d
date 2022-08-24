@@ -12,6 +12,7 @@ import std.sumtype;
 
 import myby.debugger;
 import myby.nibble;
+import myby.manip;
 
 class Nil {
     this() {
@@ -181,18 +182,70 @@ struct Atom {
         );
     }
     
-    Atom opBinary(string op : "+")(Atom rhs) {
+    enum mathOps = ["+", "-", "/", "*", "%", "^^"];
+    Atom opBinary(string op)(Atom rhs)
+    if(mathOps.canFind(op)) {
         if(isNumeric && rhs.isNumeric) {
             // real casts all args to real
             if(isType!real || rhs.isType!real) {
-                return Atom(this.as!real + rhs.as!real);
+                double a = this.as!real;
+                double b = rhs.as!real;
+                return Atom(mixin("a " ~ op ~ " b"));
             }
         }
         return match!(
-            (a, b) => atomFor(a + b),
+            (a, b) => atomFor(mixin("a " ~ op ~ " b")),
+            (_1, _2) => binaryFallback!op(rhs),
+        )(this, rhs);
+    }
+    
+    Atom binaryFallback(string op : "+")(Atom rhs) {
+        return match!(
             (string a, string b) => Atom(a ~ b),
             (_1, _2) => Nil.nilAtom,
         )(this, rhs);
+    }
+    Atom binaryFallback(string op : "*")(Atom rhs) {
+        return match!(
+            (Atom[] a, string b) => Atom(a.map!(to!string).join(b)),
+            (_1, _2) => Nil.nilAtom,
+        )(this, rhs);
+    }
+    Atom binaryFallback(string op : "/")(Atom rhs) {
+        return match!(
+            // Chunk
+            (Atom[] a, BigInt b) =>
+                Atom(a.chunks(to!size_t(b))
+                .map!Atom
+                .array),
+            (string a, BigInt b) =>
+                Atom(a.atomChars) / rhs,
+            // Split on
+            (string a, string b) =>
+                Atom(a.split(b).map!Atom.array),
+            (_1, _2) => Nil.nilAtom,
+        )(this, rhs);
+    }
+    Atom binaryFallback(string op : "^^")(Atom rhs) {
+        return match!(
+            (BigInt a, BigInt b) => Atom(pow(a, b)),
+            (_1, _2) => Nil.nilAtom,
+        )(this, rhs);
+    }
+    Atom binaryFallback(string op : "%")(Atom rhs) {
+        return match!(
+            // Modulus
+            (BigInt a, BigInt b) => Atom(positiveMod(a, b)),
+            // Intersection, a la APL
+            (Atom[] a, Atom[] b) => Atom(a.filter!(e => b.canFind(e)).array),
+            (Atom[] a, b) => Atom(a.filter!(e => e == atomFor(b)).array),
+            (_1, _2) => Nil.nilAtom,
+        )(this, rhs);
+    }
+    
+    // fall through
+    Atom binaryFallback(string op)(Atom rhs) {
+        return Nil.nilAtom;
     }
     
     int opCmp(Atom other) {
