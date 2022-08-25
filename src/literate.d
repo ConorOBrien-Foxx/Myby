@@ -35,7 +35,10 @@ Nibble[] parseLiterate(T)(T str) {
     
     Debugger.print("Parsing input literate code: <", str, ">");
     NiladParseState state = NiladParseState.None;
+    bool lastWasConjunction = false;
+    string lastConjunction;
     while(i < str.length) {
+        bool thisIsConjuction = false;
         Debugger.print("i=", i, ": ", str[i]);
         Debugger.print("code: ", code);
         NiladParseState nextState = NiladParseState.None;
@@ -156,7 +159,16 @@ Nibble[] parseLiterate(T)(T str) {
             auto r = name in InstructionMap;
             if(r !is null) {
                 Debugger.print("---> Operator");
-                code ~= *r;
+                code ~= r.nibs;
+                thisIsConjuction = r.speech == SpeechPart.Conjunction;
+                // TODO: throw an actual syntax error.
+                assert(
+                    !(lastWasConjunction && thisIsConjuction),
+                    "Syntax error: Two consecutive conjunctions `"
+                        ~ lastConjunction ~ '`'
+                        ~ " and `" ~ name ~ '`'
+                );
+                lastConjunction = name;
             }
             else switch(head) {
                 case ' ':
@@ -184,6 +196,7 @@ Nibble[] parseLiterate(T)(T str) {
             i++;
         }
         state = nextState;
+        lastWasConjunction = thisIsConjuction;
     }
     
     Debugger.print("Final paren count: ", finalParenCount);

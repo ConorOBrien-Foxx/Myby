@@ -57,8 +57,9 @@ struct Token {
     static Token Break = Token(SpeechPart.Syntax, InsName.Break);
 }
 
+enum ConjunctionNibbles = [0xA, 0xD];
 Token[] tokenize(Nibble[] code) {
-    import std.stdio : writeln;
+    import std.algorithm.searching : canFind;
     Debugger.print("Tokenizing:");
     Debugger.print("    ", code);
     uint i = 0;
@@ -94,14 +95,20 @@ Token[] tokenize(Nibble[] code) {
                 nib = code[++i];
                 name += nib;
             }
+            // extended characters
             if(nib == 0xF) {
                 appendNibble;
-                // extended characters
                 if(nib == 0x1) {
                     appendNibble;
                 }
                 else if(nib == 0xE) {
                     appendNibble;
+                    appendNibble;
+                }
+            }
+            // consecutive conjunctions mean something else
+            else if(ConjunctionNibbles.canFind(nib)) {
+                while(i + 1 < code.length && ConjunctionNibbles.canFind(code[i + 1])) {
                     appendNibble;
                 }
             }

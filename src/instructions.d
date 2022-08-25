@@ -74,7 +74,6 @@ enum InsName {
     Break,                  //FF
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
-alias NameInfo = Tuple!(SpeechPart, "speech", InsName, "name");
 
 struct InsInfo {
     string name;
@@ -106,6 +105,7 @@ enum InsInfo[InsName] Info = [
     InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
     InsName.CloseParen:             InsInfo(")",       0xC,       SpeechPart.Syntax),
     InsName.Compose:                InsInfo("@",       0xD,       SpeechPart.Conjunction),
+    InsName.MonadChain:             InsInfo("@.",      0xDD,      SpeechPart.MultiConjunction),
     InsName.Range:                  InsInfo("R",       0xE,       SpeechPart.Verb),
     InsName.Modulus:                InsInfo("%",       0xF0,      SpeechPart.Verb),
     InsName.Pair:                   InsInfo(";",       0xF2,      SpeechPart.Verb),
@@ -136,7 +136,6 @@ enum InsInfo[InsName] Info = [
     InsName.Inverse:                InsInfo("!.",      0xF1C,     SpeechPart.Adjective),
     InsName.Power:                  InsInfo("^:",      0xF1D,     SpeechPart.Conjunction),
     InsName.Print:                  InsInfo("echo",    0xF1E,     SpeechPart.Verb),
-    InsName.MonadChain:             InsInfo("@.",      0xF1F,     SpeechPart.MultiConjunction),
     InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
     InsName.NthPrime:               InsInfo("primn",   0xFE70,    SpeechPart.Verb),
     InsName.IsPrime:                InsInfo("primq",   0xFE71,    SpeechPart.Verb),
@@ -149,10 +148,12 @@ enum InsInfo[InsName] Info = [
     InsName.FirstNPrimes:           InsInfo("prims",   0xFE78,    SpeechPart.Verb),
 ];
 
-enum InstructionMap = Info.mapKeyValue!(Nibble[][string],
-    (ref hash, k, v) => hash[v.name] = v.nibs
+alias LiterateInfo = Tuple!(Nibble[], "nibs", SpeechPart, "speech");
+enum InstructionMap = Info.mapKeyValue!(LiterateInfo[string],
+    (ref hash, k, v) => hash[v.name] = LiterateInfo(v.nibs, v.speech)
 );
 
+alias NameInfo = Tuple!(SpeechPart, "speech", InsName, "name");
 enum NameMap = Info.mapKeyValue!(NameInfo[int], 
     (ref hash, k, v) => hash[v.code] = NameInfo(v.speech, k)
 );
