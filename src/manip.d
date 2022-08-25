@@ -82,7 +82,7 @@ BigInt pow(BigInt a, BigInt b) {
     for(BigInt i = 0; i < b; i++) {
         res *= a;
     }
-    return a;
+    return res;
 }
 
 auto positiveMod(S, T)(S a, T b) {
