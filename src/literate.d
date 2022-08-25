@@ -88,6 +88,8 @@ Nibble[] parseLiterate(T)(T str) {
         }
         else if(str[i] == '\'') {
             Debugger.print("---> String");
+            // TODO: a separator might not be necessary, since 
+            // what else could two adjacent nilads indicate?
             if(state == NiladParseState.LastWasNiladSeparator) {
                 code ~= 0x2;
             }

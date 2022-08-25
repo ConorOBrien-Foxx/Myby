@@ -9,8 +9,19 @@ import std.bigint;
 import std.conv : to;
 import std.range;
 import std.sumtype;
+import std.traits;
 
 import myby.speech;
+
+template mapKeyValue(ReturnHash, alias fun) {
+    auto mapKeyValue(Hash)(Hash a) if(isAssociativeArray!Hash) {
+        ReturnHash res;
+        foreach(k, v; a) {
+            fun(res, k, v);
+        }
+        return res;
+    }
+}
 
 auto productOver(T)(T arr) {
     return reduce!"a * b"(BigInt(1), arr);

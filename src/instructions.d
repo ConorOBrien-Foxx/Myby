@@ -73,125 +73,89 @@ enum InsName {
     FirstNPrimes,           //FE78
     Break,                  //FF
 }
-
-// + -> [4] -> Add
-
-enum Nibble[][string] InstructionMap = [
-    "\\": [0x2],
-    "\"": [0x3],
-    "+": [0x4],
-    "-": [0x5],
-    "*": [0x6],
-    "/": [0x7],
-    "^": [0x8],
-    "#": [0x9],
-    "&": [0xA],
-    "(": [0xB],
-    ")": [0xC],
-    "@": [0xD],
-    "R": [0xE],
-    "%": [0xF, 0x0],
-    "$": [0xF, 0x1, 0x0],
-    "$1": [0xF, 0x1, 0x0],
-    "$2": [0xF, 0x1, 0x1],
-    "$3": [0xF, 0x1, 0x2],
-    "$4": [0xF, 0x1, 0x3],
-    "$N": [0xF, 0x1, 0x4],
-    "<:": [0xF, 0x1, 0x5],
-    ">:": [0xF, 0x1, 0x6],
-    "<.": [0xF, 0x1, 0x7],
-    ">.": [0xF, 0x1, 0x8],
-    "[": [0xF, 0x1, 0x9],
-    "]": [0xF, 0x1, 0xA],
-    "G": [0xF, 0x1, 0xB],
-    "!.": [0xF, 0x1, 0xC],
-    "^:": [0xF, 0x1, 0xD],
-    "echo": [0xF, 0x1, 0xE],
-    "@.": [0xF, 0x1, 0xF],
-    "primn": [0xF, 0xE, 0x7, 0x0],
-    "primq": [0xF, 0xE, 0x7, 0x1],
-    "primf": [0xF, 0xE, 0x7, 0x2],
-    "primo": [0xF, 0xE, 0x7, 0x3],
-    "primfd": [0xF, 0xE, 0x7, 0x4],
-    "primod": [0xF, 0xE, 0x7, 0x5],
-    "prevp": [0xF, 0xE, 0x7, 0x6],
-    "nextp": [0xF, 0xE, 0x7, 0x7],
-    "prims": [0xF, 0xE, 0x7, 0x8],
-    ";": [0xF, 0x2],
-    "!": [0xF, 0x3],
-    "=": [0xF, 0x4],
-    "<": [0xF, 0x5],
-    ">": [0xF, 0x6],
-    "`": [0xF, 0x7],
-    "{": [0xF, 0x8],
-    "}": [0xF, 0x9],
-    "\\.": [0xF, 0xA],
-    "O": [0xF, 0xC],
-    "~": [0xF, 0xD],
-    "exit": [0xF, 0xE, 0x0, 0x0],
-    "\n": [0xF, 0xF],
-];
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
-
 alias NameInfo = Tuple!(SpeechPart, "speech", InsName, "name");
 
-enum NameInfo[int] NameMap = [
-    0x0:    NameInfo(SpeechPart.Verb,             InsName.Integer),
-    0x1:    NameInfo(SpeechPart.Verb,             InsName.String),
-    0x2:    NameInfo(SpeechPart.Adjective,        InsName.Filter),
-    0x3:    NameInfo(SpeechPart.Adjective,        InsName.Map),
-    0x4:    NameInfo(SpeechPart.Verb,             InsName.Add),
-    0x5:    NameInfo(SpeechPart.Verb,             InsName.Subtract),
-    0x6:    NameInfo(SpeechPart.Verb,             InsName.Multiply),
-    0x7:    NameInfo(SpeechPart.Verb,             InsName.Divide),
-    0x8:    NameInfo(SpeechPart.Verb,             InsName.Exponentiate),
-    0x9:    NameInfo(SpeechPart.Verb,             InsName.Identity),
-    0xA:    NameInfo(SpeechPart.Conjunction,      InsName.Bond),
-    0xB:    NameInfo(SpeechPart.Syntax,           InsName.OpenParen),
-    0xC:    NameInfo(SpeechPart.Syntax,           InsName.CloseParen),
-    0xD:    NameInfo(SpeechPart.Conjunction,      InsName.Compose),
-    0xE:    NameInfo(SpeechPart.Verb,             InsName.Range),
-    0xF0:   NameInfo(SpeechPart.Verb,             InsName.Modulus),
-    0xF10:  NameInfo(SpeechPart.Verb,             InsName.FirstChain),
-    0xF11:  NameInfo(SpeechPart.Verb,             InsName.SecondChain),
-    0xF12:  NameInfo(SpeechPart.Verb,             InsName.ThirdChain),
-    0xF13:  NameInfo(SpeechPart.Verb,             InsName.FourthChain),
-    //TODO: should this(v) be a conjunction?
-    0xF14:  NameInfo(SpeechPart.Verb,             InsName.NthChain),
-    0xF15:  NameInfo(SpeechPart.Verb,             InsName.LessEqual),
-    0xF16:  NameInfo(SpeechPart.Verb,             InsName.GreaterEqual),
-    0xF17:  NameInfo(SpeechPart.Verb,             InsName.Minimum),
-    0xF18:  NameInfo(SpeechPart.Verb,             InsName.Maximum),
-    0xF19:  NameInfo(SpeechPart.Adjective,        InsName.OnLeft),
-    0xF1A:  NameInfo(SpeechPart.Adjective,        InsName.OnRight),
-    0xF1B:  NameInfo(SpeechPart.Adjective,        InsName.Generate),
-    0xF1C:  NameInfo(SpeechPart.Adjective,        InsName.Inverse),
-    0xF1D:  NameInfo(SpeechPart.Conjunction,      InsName.Power),
-    0xF1E:  NameInfo(SpeechPart.Verb,             InsName.Print),
-    0xF1F:  NameInfo(SpeechPart.MultiConjunction, InsName.MonadChain),
-    0xF2:   NameInfo(SpeechPart.Verb,             InsName.Pair),
-    0xF3:   NameInfo(SpeechPart.Verb,             InsName.Binomial),
-    0xF4:   NameInfo(SpeechPart.Verb,             InsName.Equality),
-    0xF5:   NameInfo(SpeechPart.Verb,             InsName.LessThan),
-    0xF6:   NameInfo(SpeechPart.Verb,             InsName.GreaterThan),
-    0xF7:   NameInfo(SpeechPart.Adjective,        InsName.ArityForce),
-    0xF8:   NameInfo(SpeechPart.Verb,             InsName.First),
-    0xF9:   NameInfo(SpeechPart.Verb,             InsName.Last),
-    0xFA:   NameInfo(SpeechPart.Adjective,        InsName.OnPrefixes),
-    0xFC:   NameInfo(SpeechPart.MultiConjunction, InsName.SplitCompose),
-    0xFD:   NameInfo(SpeechPart.Adjective,        InsName.Reflex),
-    0xFE00: NameInfo(SpeechPart.Verb,             InsName.Exit),
-    0xFE70: NameInfo(SpeechPart.Verb,             InsName.NthPrime),
-    0xFE71: NameInfo(SpeechPart.Verb,             InsName.IsPrime),
-    0xFE72: NameInfo(SpeechPart.Verb,             InsName.PrimeFactors),
-    0xFE73: NameInfo(SpeechPart.Verb,             InsName.PrimeFactorsCount),
-    0xFE74: NameInfo(SpeechPart.Verb,             InsName.UniqPrimeFactors),
-    0xFE75: NameInfo(SpeechPart.Verb,             InsName.UniqPrimeFactorsCount),
-    0xFE76: NameInfo(SpeechPart.Verb,             InsName.PreviousPrime),
-    0xFE77: NameInfo(SpeechPart.Verb,             InsName.NextPrime),
-    0xFE78: NameInfo(SpeechPart.Verb,             InsName.FirstNPrimes),
-    0xFF:   NameInfo(SpeechPart.Syntax,           InsName.Break),
+struct InsInfo {
+    string name;
+    int code;
+    Nibble[] nibs;
+    SpeechPart speech;
+
+    this(string n, int c, SpeechPart s) {
+        name = n;
+        code = c;
+        speech = s;
+        while(c) {
+            nibs = [cast(Nibble)(c % 16)] ~ nibs;
+            c /= 16;
+        }
+    }
+}
+
+enum InsInfo[InsName] Info = [
+    InsName.Filter:                 InsInfo("\\",      0x2,       SpeechPart.Adjective),
+    InsName.Map:                    InsInfo("\"",      0x3,       SpeechPart.Adjective),
+    InsName.Add:                    InsInfo("+",       0x4,       SpeechPart.Verb),
+    InsName.Subtract:               InsInfo("-",       0x5,       SpeechPart.Verb),
+    InsName.Multiply:               InsInfo("*",       0x6,       SpeechPart.Verb),
+    InsName.Divide:                 InsInfo("/",       0x7,       SpeechPart.Verb),
+    InsName.Exponentiate:           InsInfo("^",       0x8,       SpeechPart.Verb),
+    InsName.Identity:               InsInfo("#",       0x9,       SpeechPart.Verb),
+    InsName.Bond:                   InsInfo("&",       0xA,       SpeechPart.Conjunction),
+    InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
+    InsName.CloseParen:             InsInfo(")",       0xC,       SpeechPart.Syntax),
+    InsName.Compose:                InsInfo("@",       0xD,       SpeechPart.Conjunction),
+    InsName.Range:                  InsInfo("R",       0xE,       SpeechPart.Verb),
+    InsName.Modulus:                InsInfo("%",       0xF0,      SpeechPart.Verb),
+    InsName.Pair:                   InsInfo(";",       0xF2,      SpeechPart.Verb),
+    InsName.Binomial:               InsInfo("!",       0xF3,      SpeechPart.Verb),
+    InsName.Equality:               InsInfo("=",       0xF4,      SpeechPart.Verb),
+    InsName.LessThan:               InsInfo("<",       0xF5,      SpeechPart.Verb),
+    InsName.GreaterThan:            InsInfo(">",       0xF6,      SpeechPart.Verb),
+    InsName.ArityForce:             InsInfo("`",       0xF7,      SpeechPart.Adjective),
+    InsName.First:                  InsInfo("{",       0xF8,      SpeechPart.Verb),
+    InsName.Last:                   InsInfo("}",       0xF9,      SpeechPart.Verb),
+    InsName.OnPrefixes:             InsInfo("\\.",     0xFA,      SpeechPart.Adjective),
+    InsName.SplitCompose:           InsInfo("O",       0xFC,      SpeechPart.MultiConjunction),
+    InsName.Reflex:                 InsInfo("~",       0xFD,      SpeechPart.Adjective),
+    InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
+    InsName.FirstChain:             InsInfo("$1",      0xF10,     SpeechPart.Verb),
+    InsName.FirstChain:             InsInfo("$",       0xF10,     SpeechPart.Verb),
+    InsName.SecondChain:            InsInfo("$2",      0xF11,     SpeechPart.Verb),
+    InsName.ThirdChain:             InsInfo("$3",      0xF12,     SpeechPart.Verb),
+    InsName.FourthChain:            InsInfo("$4",      0xF13,     SpeechPart.Verb),
+    InsName.NthChain:               InsInfo("$N",      0xF14,     SpeechPart.Verb),
+    InsName.LessEqual:              InsInfo("<:",      0xF15,     SpeechPart.Verb),
+    InsName.GreaterEqual:           InsInfo(">:",      0xF16,     SpeechPart.Verb),
+    InsName.Minimum:                InsInfo("<.",      0xF17,     SpeechPart.Verb),
+    InsName.Maximum:                InsInfo(">.",      0xF18,     SpeechPart.Verb),
+    InsName.OnLeft:                 InsInfo("[",       0xF19,     SpeechPart.Adjective),
+    InsName.OnRight:                InsInfo("]",       0xF1A,     SpeechPart.Adjective),
+    InsName.Generate:               InsInfo("G",       0xF1B,     SpeechPart.Adjective),
+    InsName.Inverse:                InsInfo("!.",      0xF1C,     SpeechPart.Adjective),
+    InsName.Power:                  InsInfo("^:",      0xF1D,     SpeechPart.Conjunction),
+    InsName.Print:                  InsInfo("echo",    0xF1E,     SpeechPart.Verb),
+    InsName.MonadChain:             InsInfo("@.",      0xF1F,     SpeechPart.MultiConjunction),
+    InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
+    InsName.NthPrime:               InsInfo("primn",   0xFE70,    SpeechPart.Verb),
+    InsName.IsPrime:                InsInfo("primq",   0xFE71,    SpeechPart.Verb),
+    InsName.PrimeFactors:           InsInfo("primf",   0xFE72,    SpeechPart.Verb),
+    InsName.PrimeFactorsCount:      InsInfo("primo",   0xFE73,    SpeechPart.Verb),
+    InsName.UniqPrimeFactors:       InsInfo("primfd",  0xFE74,    SpeechPart.Verb),
+    InsName.UniqPrimeFactorsCount:  InsInfo("primod",  0xFE75,    SpeechPart.Verb),
+    InsName.PreviousPrime:          InsInfo("prevp",   0xFE76,    SpeechPart.Verb),
+    InsName.NextPrime:              InsInfo("nextp",   0xFE77,    SpeechPart.Verb),
+    InsName.FirstNPrimes:           InsInfo("prims",   0xFE78,    SpeechPart.Verb),
 ];
+
+enum InstructionMap = Info.mapKeyValue!(Nibble[][string],
+    (ref hash, k, v) => hash[v.name] = v.nibs
+);
+
+enum NameMap = Info.mapKeyValue!(NameInfo[int], 
+    (ref hash, k, v) => hash[v.code] = NameInfo(v.speech, k)
+);
 
 Verb getVerb(InsName name) {
     static Verb[InsName] verbs;
