@@ -46,6 +46,7 @@ enum InsName {
     OnLeft,                 //F19
     OnRight,                //F1A
     Generate,               //F1B
+    Inverse,                //F1C
     Power,                  //F1D
     Print,                  //F1E
     MonadChain,             //F1F
@@ -103,7 +104,7 @@ enum Nibble[][string] InstructionMap = [
     "[": [0xF, 0x1, 0x9],
     "]": [0xF, 0x1, 0xA],
     "G": [0xF, 0x1, 0xB],
-    //...
+    "!.": [0xF, 0x1, 0xC],
     "^:": [0xF, 0x1, 0xD],
     "echo": [0xF, 0x1, 0xE],
     "@.": [0xF, 0x1, 0xF],
@@ -164,7 +165,7 @@ enum NameInfo[int] NameMap = [
     0xF19:  NameInfo(SpeechPart.Adjective,        InsName.OnLeft),
     0xF1A:  NameInfo(SpeechPart.Adjective,        InsName.OnRight),
     0xF1B:  NameInfo(SpeechPart.Adjective,        InsName.Generate),
-    // 0xF1C
+    0xF1C:  NameInfo(SpeechPart.Adjective,        InsName.Inverse),
     0xF1D:  NameInfo(SpeechPart.Conjunction,      InsName.Power),
     0xF1E:  NameInfo(SpeechPart.Verb,             InsName.Print),
     0xF1F:  NameInfo(SpeechPart.MultiConjunction, InsName.MonadChain),
@@ -655,6 +656,19 @@ Adjective getAdjective(InsName name) {
                 .setDyad((_1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
                 .setChildren([v])
+        );
+        
+        // Inverse
+        adjectives[InsName.Inverse] = new Adjective(
+            (Verb v) {
+                assert(v.invertable(), "Cannot invert " ~ v.display);
+                return new Verb("!.")
+                    .setMonad(a => v.inverse(a))
+                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setInverse(v)
+                    .setMarkedArity(1)
+                    .setChildren([v]);
+            }
         );
     }
     

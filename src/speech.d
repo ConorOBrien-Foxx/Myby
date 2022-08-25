@@ -290,6 +290,8 @@ class Verb {
     // TODO: display niladic as repr (e.g. "asdf" not asdf)
     VerbMonad monad;
     VerbDyad dyad;
+    Verb inverse;
+    // TODO: figure this out idfk
     
     uint markedArity = 2;
     bool niladic = false;
@@ -300,6 +302,10 @@ class Verb {
     this(string di) {
         display = di;
         identity = Nil.nilAtom;
+    }
+    
+    bool invertable() {
+        return inverse !is null;
     }
     
     string head() {
@@ -313,6 +319,11 @@ class Verb {
     
     Verb setDyad(VerbDyad d) {
         dyad = d;
+        return this;
+    }
+    
+    Verb setInverse(Verb i) {
+        inverse = i;
         return this;
     }
     

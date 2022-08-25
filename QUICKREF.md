@@ -54,6 +54,7 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `[` | `F19`  | | adjective | verb(1) | verb(2) | Applies verb on left argument |
 | `]` | `F1A`  | | adjective | verb(1) | verb(2) | Applies verb on right argument |
 | `G` | `F1B`  | | adjective | verb(2) | verb(1) | Generate. Calls f(g,i) with i=0..infinity until it returns true |
+| `!.`| `F1C`  | | adjective | verb(1) | verb(1) | Inverse. |
 | `^:`| `F1D`  | ✔️ | conjunction | any, any | verb | Power |
 | `echo`| `F1E`| ✔️ | verb(1) | any | any | Print |
 | `@.`| `F1F`  | | multi-conjunction | verbs(\*) | verb(1) | Monad Chain, i.e. `f1@f2@f3@...@fN y` |
