@@ -92,7 +92,10 @@ struct InsInfo {
     }
 }
 
+// Unassigned *AND* Unimplemented: Initial ) at start of program.
 enum InsInfo[InsName] Info = [
+    // Integer: 0
+    // String: 1
     InsName.Filter:                 InsInfo("\\",      0x2,       SpeechPart.Adjective),
     InsName.Map:                    InsInfo("\"",      0x3,       SpeechPart.Adjective),
     InsName.Add:                    InsInfo("+",       0x4,       SpeechPart.Verb),
@@ -102,12 +105,39 @@ enum InsInfo[InsName] Info = [
     InsName.Exponentiate:           InsInfo("^",       0x8,       SpeechPart.Verb),
     InsName.Identity:               InsInfo("#",       0x9,       SpeechPart.Verb),
     InsName.Bond:                   InsInfo("&",       0xA,       SpeechPart.Conjunction),
+    // Unassigned *AND* Unimplemented: AC       NB: `&)` has no meaning
+    InsName.LessEqual:              InsInfo("<:",      0xAA,      SpeechPart.Verb),
+    InsName.GreaterEqual:           InsInfo(">:",      0xAD,      SpeechPart.Verb),
+    // Unassigned: AAA, AAD, ADA, ADD, AAAA, ...etc.
     InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
+    // Unassigned *AND* Unimplemented: BA       NB: `(&` has no meaning
+    // Unassigned *AND* Unimplemented: BC       NB: `()` has no meaning
+    // Unassigned *AND* Unimplemented: BD       NB: `(@` has no meaning
     InsName.CloseParen:             InsInfo(")",       0xC,       SpeechPart.Syntax),
     InsName.Compose:                InsInfo("@",       0xD,       SpeechPart.Conjunction),
+    // Unassigned: DA
+    // Unassigned *AND* Unimplemented: DC       NB: `@)` has no meaning
     InsName.MonadChain:             InsInfo("@.",      0xDD,      SpeechPart.MultiConjunction),
+    // Unassigned: DAA, DAD, DDA, DDD, DAAA, ...etc.
     InsName.Range:                  InsInfo("R",       0xE,       SpeechPart.Verb),
     InsName.Modulus:                InsInfo("%",       0xF0,      SpeechPart.Verb),
+    InsName.FirstChain:             InsInfo("$1",      0xF10,     SpeechPart.Verb),
+    InsName.FirstChain:             InsInfo("$",       0xF10,     SpeechPart.Verb),
+    InsName.SecondChain:            InsInfo("$2",      0xF11,     SpeechPart.Verb),
+    InsName.ThirdChain:             InsInfo("$3",      0xF12,     SpeechPart.Verb),
+    InsName.FourthChain:            InsInfo("$4",      0xF13,     SpeechPart.Verb),
+    InsName.NthChain:               InsInfo("$N",      0xF14,     SpeechPart.Verb),
+    // Unassigned: F15
+    // Unassigned: F16
+    InsName.Minimum:                InsInfo("<.",      0xF17,     SpeechPart.Verb),
+    InsName.Maximum:                InsInfo(">.",      0xF18,     SpeechPart.Verb),
+    InsName.OnLeft:                 InsInfo("[",       0xF19,     SpeechPart.Adjective),
+    InsName.OnRight:                InsInfo("]",       0xF1A,     SpeechPart.Adjective),
+    InsName.Generate:               InsInfo("G",       0xF1B,     SpeechPart.Adjective),
+    InsName.Inverse:                InsInfo("!.",      0xF1C,     SpeechPart.Adjective),
+    InsName.Power:                  InsInfo("^:",      0xF1D,     SpeechPart.Conjunction),
+    InsName.Print:                  InsInfo("echo",    0xF1E,     SpeechPart.Verb),
+    // Unassigned: F1F
     InsName.Pair:                   InsInfo(";",       0xF2,      SpeechPart.Verb),
     InsName.Binomial:               InsInfo("!",       0xF3,      SpeechPart.Verb),
     InsName.Equality:               InsInfo("=",       0xF4,      SpeechPart.Verb),
@@ -117,25 +147,9 @@ enum InsInfo[InsName] Info = [
     InsName.First:                  InsInfo("{",       0xF8,      SpeechPart.Verb),
     InsName.Last:                   InsInfo("}",       0xF9,      SpeechPart.Verb),
     InsName.OnPrefixes:             InsInfo("\\.",     0xFA,      SpeechPart.Adjective),
+    // 0xFB
     InsName.SplitCompose:           InsInfo("O",       0xFC,      SpeechPart.MultiConjunction),
     InsName.Reflex:                 InsInfo("~",       0xFD,      SpeechPart.Adjective),
-    InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
-    InsName.FirstChain:             InsInfo("$1",      0xF10,     SpeechPart.Verb),
-    InsName.FirstChain:             InsInfo("$",       0xF10,     SpeechPart.Verb),
-    InsName.SecondChain:            InsInfo("$2",      0xF11,     SpeechPart.Verb),
-    InsName.ThirdChain:             InsInfo("$3",      0xF12,     SpeechPart.Verb),
-    InsName.FourthChain:            InsInfo("$4",      0xF13,     SpeechPart.Verb),
-    InsName.NthChain:               InsInfo("$N",      0xF14,     SpeechPart.Verb),
-    InsName.LessEqual:              InsInfo("<:",      0xF15,     SpeechPart.Verb),
-    InsName.GreaterEqual:           InsInfo(">:",      0xF16,     SpeechPart.Verb),
-    InsName.Minimum:                InsInfo("<.",      0xF17,     SpeechPart.Verb),
-    InsName.Maximum:                InsInfo(">.",      0xF18,     SpeechPart.Verb),
-    InsName.OnLeft:                 InsInfo("[",       0xF19,     SpeechPart.Adjective),
-    InsName.OnRight:                InsInfo("]",       0xF1A,     SpeechPart.Adjective),
-    InsName.Generate:               InsInfo("G",       0xF1B,     SpeechPart.Adjective),
-    InsName.Inverse:                InsInfo("!.",      0xF1C,     SpeechPart.Adjective),
-    InsName.Power:                  InsInfo("^:",      0xF1D,     SpeechPart.Conjunction),
-    InsName.Print:                  InsInfo("echo",    0xF1E,     SpeechPart.Verb),
     InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
     InsName.NthPrime:               InsInfo("primn",   0xFE70,    SpeechPart.Verb),
     InsName.IsPrime:                InsInfo("primq",   0xFE71,    SpeechPart.Verb),
@@ -146,6 +160,7 @@ enum InsInfo[InsName] Info = [
     InsName.PreviousPrime:          InsInfo("prevp",   0xFE76,    SpeechPart.Verb),
     InsName.NextPrime:              InsInfo("nextp",   0xFE77,    SpeechPart.Verb),
     InsName.FirstNPrimes:           InsInfo("prims",   0xFE78,    SpeechPart.Verb),
+    InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
 ];
 
 alias LiterateInfo = Tuple!(Nibble[], "nibs", SpeechPart, "speech");

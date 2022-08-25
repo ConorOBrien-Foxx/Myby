@@ -34,9 +34,12 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `#` | `9`    | ✔️ | verb(1) | any | any | Identity |
 | `#` | `9`    | | verb(2) | any, any | list | Reshape |
 | `&` | `A`    | | conjunction | any, any | verb | Bond. `MA`=1 if either operand is niladic, 2 otherwise. |
+| `<:`| `AA`   | ✔️ | verb(2) | any, any | bool | Less or equal to |
+| `>:`| `AD`   | ✔️ | verb(2) | any, any | bool | Greater or equal to |
 | `(` | `B`    | | syntax | | | Open parentheses |
 | `)` | `C`    | | syntax | | | Close parentheses |
 | `@` | `D`    | | conjunction | any, any | verb | Compose |
+| `@.`| `DD`   | | multi-conjunction | verbs(\*) | verb(1) | Monad Chain, i.e. `f1@f2@f3@...@fN y` |
 | `R` | `E`    | ✔️ | verb(1) | int | list | Range (0, exclusive) |
 | `R` | `E`    | | verb(2) | int, int | list | Range [a,b] (inclusive) |
 | `%` | `F0`   | ✔️ | verb(2) | int, int | int | Modulus |
@@ -45,8 +48,6 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `$2`| `F12`  | | verb(N) | any | any | Third chain |
 | `$3`| `F13`  | | verb(N) | any | any | Fourth chain |
 | `$N`| `F14`  | | verb(N) | any | any | Nth chain |
-| `>:`| `F15`  | ✔️ | verb(2) | any, any | bool | Less or equal to |
-| `<:`| `F16`  | ✔️ | verb(2) | any, any | bool | Greater or equal to |
 | `>.`| `F17`  | | verb(1) | list | any | Minimum |
 | `>.`| `F17`  | ✔️ | verb(2) | any, any | bool | Lesser of |
 | `<.`| `F18`  | | verb(1) | list | any | Maximum |
@@ -57,7 +58,6 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `!.`| `F1C`  | | adjective | verb(1) | verb(1) | Inverse. |
 | `^:`| `F1D`  | ✔️ | conjunction | any, any | verb | Power |
 | `echo`| `F1E`| ✔️ | verb(1) | any | any | Print |
-| `@.`| `F1F`  | | multi-conjunction | verbs(\*) | verb(1) | Monad Chain, i.e. `f1@f2@f3@...@fN y` |
 | `;` | `F2`   | | verb(1) | any | list | Wrap (singleton list) |
 | `;` | `F2`   | ✔️ | verb(2) | any, any | list | Pair |
 | `!` | `F3`   | | verb(1) | list | list(list) | Enumerate |
