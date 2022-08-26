@@ -231,7 +231,7 @@ real nibblesToReal(Nibble[] nibbles, ref uint i) {
     i += 2;
     BigInt ip = nibblesToInteger(nibbles, i, true);
     BigInt fp = nibblesToInteger(nibbles, i, true);
-    assert(fp > 0, "Fraction part cannot be negative");
+    assert(fp >= 0, "Fraction part cannot be negative");
     
     string fpStr = fp.toDecimalString();
     real fpSize = fpStr.length;
