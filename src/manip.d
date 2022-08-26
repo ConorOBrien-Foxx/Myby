@@ -6,7 +6,7 @@ import std.algorithm.searching;
 import std.algorithm.sorting;
 import std.array;
 import std.bigint;
-import std.conv : to;
+import std.conv : to, ConvOverflowException;
 import std.range;
 import std.sumtype;
 import std.traits;
@@ -77,12 +77,25 @@ string joinToString(Atom[] arr) {
     return res;
 }
 
-BigInt pow(BigInt a, BigInt b) {
-    BigInt res = 1;
-    for(BigInt i = 0; i < b; i++) {
-        res *= a;
+BigInt pow(BigInt base, BigInt exp) {
+    if(exp == 0) return BigInt("1");
+    try {
+        return base ^^ cast(ulong) exp;
     }
-    return res;
+    catch(ConvOverflowException) {
+        // thanks to @betseg
+        // technically not necessary but it's nice to have
+        // if we ever get computers beefy enough, i guess
+        BigInt acc = 1;
+        while(exp > 1) {
+            if(exp % 2 == 1) {
+                acc *= base;
+            }
+            exp /= 2;
+            base *= base;
+        }
+        return acc * base;
+    }
 }
 
 auto positiveMod(S, T)(S a, T b) {
