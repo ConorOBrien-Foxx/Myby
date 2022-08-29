@@ -189,6 +189,13 @@ struct Atom {
         );
     }
     
+    string as(Type : string)() {
+        return value.match!(
+            (a) => a.toString(),
+            (a) => to!string(a),
+        );
+    }
+    
     Atom opBinary(string op, T)(T rhs)
     if(!is(T == Atom)) {
         return opBinary!op(Atom(rhs));

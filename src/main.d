@@ -147,15 +147,9 @@ int main(string[] args) {
         writeln(treeToBoxedString(mainVerb));
     }
     
-    Debugger.silence();
     Atom[] verbArgs = args[fileName ? 2 : 1..$]
-        .map!((arg) {
-            auto temp = new Interpreter(arg ~ " @.");
-            temp.shunt;
-            return temp.condense()();
-        })
+        .map!(arg => Interpreter.evaluate(arg ~ " @."))
         .array;
-    Debugger.unsilence();
     Debugger.print("Verb args: ", verbArgs.map!"a.toString()");
     
     try {

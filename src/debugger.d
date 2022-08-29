@@ -4,7 +4,7 @@ import std.stdio;
 
 struct DebuggerContainer {
     bool enabled = false;
-    bool silenced = false;
+    int silenced = 0;
     
     bool printing() {
         return enabled && !silenced;
@@ -20,11 +20,14 @@ struct DebuggerContainer {
     void disable() {
         enabled = false;
     }
+    // works in steps, so it works when nested
     void silence() {
-        silenced = true;
+        silenced++;
     }
     void unsilence() {
-        silenced = false;
+        if(silenced) {
+            silenced--;
+        }
     }
 }
 

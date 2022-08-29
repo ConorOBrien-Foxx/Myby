@@ -11,6 +11,7 @@ import std.sumtype;
 import std.typecons;
 
 import myby.debugger;
+import myby.interpreter : Interpreter;
 import myby.manip;
 import myby.nibble;
 import myby.prime;
@@ -29,9 +30,13 @@ enum InsName {
     Exponentiate,           //8
     Identity,               //9
     Bond,                   //A
+    LessEqual,              //AA
+    GreaterEqual,           //AD
     OpenParen,              //B
     CloseParen,             //C
     Compose,                //D
+    Under,                  //DA
+    MonadChain,             //DD
     Range,                  //E
     Modulus,                //F0
     FirstChain,             //F10
@@ -39,8 +44,6 @@ enum InsName {
     ThirdChain,             //F12
     FourthChain,            //F13
     NthChain,               //F14
-    GreaterEqual,           //F15
-    LessEqual,              //F16
     Minimum,                //F17
     Maximum,                //F18
     OnLeft,                 //F19
@@ -49,7 +52,6 @@ enum InsName {
     Inverse,                //F1C
     Power,                  //F1D
     Print,                  //F1E
-    MonadChain,             //F1F
     Pair,                   //F2
     Binomial,               //F3
     Equality,               //F4
@@ -115,7 +117,7 @@ enum InsInfo[InsName] Info = [
     // Unassigned *AND* Unimplemented: BD       NB: `(@` has no meaning
     InsName.CloseParen:             InsInfo(")",       0xC,       SpeechPart.Syntax),
     InsName.Compose:                InsInfo("@",       0xD,       SpeechPart.Conjunction),
-    // Unassigned: DA
+    InsName.Under:                  InsInfo("&.",      0xDA,      SpeechPart.Conjunction),
     // Unassigned *AND* Unimplemented: DC       NB: `@)` has no meaning
     InsName.MonadChain:             InsInfo("@.",      0xDD,      SpeechPart.MultiConjunction),
     // Unassigned: DAA, DAD, DDA, DDD, DAAA, ...etc.
@@ -199,6 +201,8 @@ Verb getVerb(InsName name) {
                 (BigInt n) => Atom(-n),
                 // Reverse
                 (Atom[] a) => Atom(a.retro.array),
+                // Reverse
+                (string a) => Atom(a.retro.to!string),
                 // Negate
                 (bool b) => Atom(!b),
                 _ => Nil.nilAtom,
@@ -352,7 +356,17 @@ Verb getVerb(InsName name) {
             .setMarkedArity(2);
         
         verbs[InsName.LessThan] = new Verb("<")
-            .setMonad(_ => Nil.nilAtom)
+            // ToString
+            .setMonad(a => Atom(a.as!string))
+            // Inverse: Evaluate
+            .setInverse(new Verb("< inv")
+                .setMonad(a => a.match!(
+                    (string a) => Interpreter.evaluate(a),
+                    _ => Nil.nilAtom,
+                ))
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+            )
             // Less than
             .setDyad((l, r) => match!(
                 (a, b) => Atom(a < b),
@@ -693,6 +707,17 @@ Conjunction getConjunction(InsName name) {
                 .setDyad((_1, _2) => Nil.nilAtom)
                 .setMarkedArity(f.markedArity)
                 .setChildren([f, g])
+        );
+        
+        conjunctions[InsName.Under] = new Conjunction(
+            (Verb f, Verb g) {
+                assert(g.invertable(), "Cannot invert " ~ g.display);
+                return new Verb("&.")
+                    .setMonad(a => g.inverse(f(g(a))))
+                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setMarkedArity(1)
+                    .setChildren([f, g]);
+            }
         );
     }
     

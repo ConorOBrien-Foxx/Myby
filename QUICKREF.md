@@ -39,6 +39,7 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `(` | `B`    | | syntax | | | Open parentheses |
 | `)` | `C`    | | syntax | | | Close parentheses |
 | `@` | `D`    | | conjunction | any, any | verb | Compose |
+| `&.`| `DA`   | | conjunction | verb, verb | verb | Under; `f&.g` is `g!. f g @.`, that is, application of `g`, then `f`, then `g`'s inverse |
 | `@.`| `DD`   | | multi-conjunction | verbs(\*) | verb(1) | Monad Chain, i.e. `f1@f2@f3@...@fN y` |
 | `R` | `E`    | ✔️ | verb(1) | int | list | Range (0, exclusive) |
 | `R` | `E`    | | verb(2) | int, int | list | Range [a,b] (inclusive) |
@@ -55,7 +56,7 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `[` | `F19`  | | adjective | verb(1) | verb(2) | Applies verb on left argument |
 | `]` | `F1A`  | | adjective | verb(1) | verb(2) | Applies verb on right argument |
 | `G` | `F1B`  | | adjective | verb(2) | verb(1) | Generate. Calls f(g,i) with i=0..infinity until it returns true |
-| `!.`| `F1C`  | | adjective | verb(1) | verb(1) | Inverse. |
+| `!.`| `F1C`  | | adjective | verb(1) | verb(1) | Inverse |
 | `^:`| `F1D`  | ✔️ | conjunction | any, any | verb | Power |
 | `echo`| `F1E`| ✔️ | verb(1) | any | any | Print |
 | `;` | `F2`   | | verb(1) | any | list | Wrap (singleton list) |

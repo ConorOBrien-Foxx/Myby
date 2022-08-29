@@ -457,4 +457,14 @@ class Interpreter {
         // TODO: empty program
         return chains[0];
     }
+    
+    static Atom evaluate(string str, Atom[] args = []) {
+        // TODO: add another debugging level for interior evaluate
+        Debugger.silence();
+        auto temp = new Interpreter(str);
+        temp.shunt;
+        auto value = temp.condense()(args);
+        Debugger.unsilence();
+        return value;
+    }
 }
