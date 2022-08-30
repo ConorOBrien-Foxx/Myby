@@ -186,7 +186,7 @@ Verb getVerb(InsName name) {
         verbs[InsName.Add] = new Verb("+")
             // Absolute value/Length
             .setMonad((Atom a) => a.match!(
-                (BigInt b) => Atom(b < 0 ? -b : b),
+                b => atomFor(b < 0 ? -b : b),
                 s => Atom(BigInt(s.length)),
                 _ => Nil.nilAtom,
             ))
@@ -199,6 +199,7 @@ Verb getVerb(InsName name) {
             .setMonad((Atom a) => a.match!(
                 // Negate
                 (BigInt n) => Atom(-n),
+                (real n) => Atom(-n),
                 // Reverse
                 (Atom[] a) => Atom(a.retro.array),
                 // Reverse

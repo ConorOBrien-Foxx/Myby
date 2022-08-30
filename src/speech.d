@@ -221,6 +221,7 @@ struct Atom {
     Atom binaryFallback(string op : "+")(Atom rhs) {
         return match!(
             (string a, string b) => Atom(a ~ b),
+            (Atom[] a, Atom[] b) => Atom(a ~ b),
             (_1, _2) => Nil.nilAtom,
         )(this, rhs);
     }

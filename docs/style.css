@@ -1,0 +1,103 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Roboto+Mono&display=swap');
+html {
+    background: #222222;
+    color: #eeeeee;
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+}
+
+header h1 {
+    margin: 0;
+}
+
+a, a:visited {
+    color: #aaaacc;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #ccccee;
+    text-decoration: underline;
+}
+
+#content {
+    max-width: 900px;
+    line-height: 29px;
+    left: max(0px, calc(50% - 900px/2));
+    position: relative;
+}
+
+code {
+    font-family: "Roboto Mono", Consolas, monospace;
+}
+
+#content :not(pre) > code {
+    color: #abb2bf;
+    background: #282c34;
+    padding: 3px;
+    border-radius: 5px;
+}
+
+header {
+    text-align: center;
+    font-size: 1.2em;
+}
+
+table {
+    width: auto;
+    margin: 16px 0;
+    border: 1px solid #ddd;
+    max-width: 100%;
+    border-collapse: collapse;
+    border-spacing: 0;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    /* table-layout: fixed; */
+}
+
+th {
+    background: #454545;
+}
+
+th, td {
+    border-top: 0;
+    border-bottom-width: 2px;
+    border: 1px solid #ddd;
+    vertical-align: center;
+    padding: 8px;
+    text-align: left;
+    font-weight: normal;
+}
+
+table th:first-child {
+    width: 250px;
+}
+
+ol {
+    list-style-type: none;
+    counter-reset: item;
+}
+
+ol > li {
+    display: table;
+    counter-increment: item;
+}
+
+ol > li:before {
+    content: counters(item, ".") ". ";
+    display: table-cell;
+    padding-right: 0.6em;
+}
+
+li ol > li {
+    margin: 0;
+}
+
+li ol > li:before {
+    content: counters(item, ".") ". ";
+}
+
+h4 {
+    text-decoration: underline;
+    margin: 0;
+}
