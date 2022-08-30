@@ -298,7 +298,7 @@ Verb getVerb(InsName name) {
             // Wrap
             .setMonad(a => Atom([a]))
             // Pair
-            .setDyad((a, b) => Atom([a, b]))
+            .setDyad((a, b) => a.linkWith(b))
             .setMarkedArity(2);
         
         verbs[InsName.Binomial] = new Verb("!")
@@ -378,7 +378,11 @@ Verb getVerb(InsName name) {
             .setMarkedArity(2);
         
         verbs[InsName.GreaterThan] = new Verb(">")
-            .setMonad(_ => Nil.nilAtom)
+            // Single Join
+            .setMonad(a => a.match!(
+                (Atom[] a) => Atom(a.joinToString),
+                _ => Nil.nilAtom,
+            ))
             // Greater than
             .setDyad((l, r) => match!(
                 (a, b) => Atom(a > b),

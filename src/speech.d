@@ -268,6 +268,13 @@ struct Atom {
         return Nil.nilAtom;
     }
     
+    Atom linkWith(Atom o) {
+        return Atom(o.match!(
+            (Atom[] arr) => [this] ~ arr,
+            _ => [this, o]
+        ));
+    }
+    
     int opCmp(Atom other) {
         return match!(
             (a, b) => a < b ? -1 : a > b ? 1 : 0,
