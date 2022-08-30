@@ -22,6 +22,10 @@ struct Token {
     };
     int index = -1;
     
+    bool isNilad() {
+        return name == InsName.Integer || name == InsName.String;
+    }
+    
     string toString() {
         string addendum;
         switch(name) {
@@ -188,6 +192,7 @@ class Interpreter {
         Token[] opStack;
         uint[] parenStackArity = [0];
         SpeechPart previous = SpeechPart.Syntax;
+        bool previousWasNilad = false;
         
         void flushOpStack() {
             while(opStack.length && opStack[$-1].name != InsName.OpenParen) {
@@ -197,8 +202,7 @@ class Interpreter {
         }
         
         foreach(i, token; code.tokenize.autoCompleteParentheses) {
-            // writeln(i, ": ", token);
-            // writeln(stack);
+            bool thisIsNilad = false;
             Debugger.print("Token[", i , "]: ", token);
             Debugger.print("Paren stack: ", parenStackArity);
             Debugger.print("opStack:     ", opStack);
@@ -210,11 +214,17 @@ class Interpreter {
                     if(previous == SpeechPart.Verb || previous == SpeechPart.Adjective) {
                         flushOpStack();
                     }
+                    thisIsNilad = token.isNilad;
                     stack ~= token;
                     parenStackArity[$-1]++;
                     break;
                 case SpeechPart.Adjective:
                     flushOpStack();
+                    if(token.name == InsName.Filter && previousWasNilad) {
+                        // the next verb is a FAKE verb, and should not affect
+                        // the count of actual verbs
+                        parenStackArity[$-1]--;
+                    }
                     stack ~= token;
                     break;
                 case SpeechPart.Conjunction:
@@ -273,6 +283,7 @@ class Interpreter {
             }
             
             previous = token.speech;
+            previousWasNilad = thisIsNilad;
         }
         
         flushOpStack();
@@ -426,6 +437,7 @@ class Interpreter {
                     // TODO: handle more syntax?
                     auto amount = to!int(token.big);
                     finishListBuild;
+                    writeln("amount: ", amount);
                     auto last = verbs[$-amount..$];
                     verbs.popBackN(amount-1);
                     condenseVerbChain(last);
