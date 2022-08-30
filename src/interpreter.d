@@ -58,6 +58,7 @@ struct Token {
 }
 
 enum ConjunctionNibbles = [0xA, 0xD];
+enum TwoNibbleOverrides = [0xAC, 0xDC, 0xBA, 0xBC, 0xBD];
 Token[] tokenize(Nibble[] code) {
     import std.algorithm.searching : canFind;
     Debugger.print("Tokenizing:");
@@ -96,7 +97,10 @@ Token[] tokenize(Nibble[] code) {
                 name += nib;
             }
             // extended characters
-            if(nib == 0xF) {
+            if(i + 1 < code.length && TwoNibbleOverrides.canFind(name * 16 + code[i + 1])) {
+                appendNibble;
+            }
+            else if(nib == 0xF) {
                 appendNibble;
                 if(nib == 0x1) {
                     appendNibble;

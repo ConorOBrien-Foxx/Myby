@@ -33,6 +33,7 @@ enum InsName {
     LessEqual,              //AA
     GreaterEqual,           //AD
     OpenParen,              //B
+    Test,                   //BC
     CloseParen,             //C
     Compose,                //D
     Under,                  //DA
@@ -107,18 +108,19 @@ enum InsInfo[InsName] Info = [
     InsName.Exponentiate:           InsInfo("^",       0x8,       SpeechPart.Verb),
     InsName.Identity:               InsInfo("#",       0x9,       SpeechPart.Verb),
     InsName.Bond:                   InsInfo("&",       0xA,       SpeechPart.Conjunction),
-    // Unassigned *AND* Unimplemented: AC       NB: `&)` has no meaning
+    // Unassigned: AC       NB: `&)` has no meaning
     InsName.LessEqual:              InsInfo("<:",      0xAA,      SpeechPart.Verb),
     InsName.GreaterEqual:           InsInfo(">:",      0xAD,      SpeechPart.Verb),
     // Unassigned: AAA, AAD, ADA, ADD, AAAA, ...etc.
     InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
-    // Unassigned *AND* Unimplemented: BA       NB: `(&` has no meaning
-    // Unassigned *AND* Unimplemented: BC       NB: `()` has no meaning
-    // Unassigned *AND* Unimplemented: BD       NB: `(@` has no meaning
+    // Unassigned: BA       NB: `(&` has no meaning
+    // Unassigned: BC       NB: `()` has no meaning
+    InsName.Test:                   InsInfo("test",    0XBC,      SpeechPart.Verb),
+    // Unassigned: BD       NB: `(@` has no meaning
     InsName.CloseParen:             InsInfo(")",       0xC,       SpeechPart.Syntax),
     InsName.Compose:                InsInfo("@",       0xD,       SpeechPart.Conjunction),
     InsName.Under:                  InsInfo("&.",      0xDA,      SpeechPart.Conjunction),
-    // Unassigned *AND* Unimplemented: DC       NB: `@)` has no meaning
+    // Unassigned: DC       NB: `@)` has no meaning
     InsName.MonadChain:             InsInfo("@.",      0xDD,      SpeechPart.MultiConjunction),
     // Unassigned: DAA, DAD, DDA, DDD, DAAA, ...etc.
     InsName.Range:                  InsInfo("R",       0xE,       SpeechPart.Verb),
