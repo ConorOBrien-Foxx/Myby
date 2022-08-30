@@ -199,13 +199,13 @@ Verb getVerb(InsName name) {
             .setMonad((Atom a) => a.match!(
                 // Negate
                 (BigInt n) => Atom(-n),
+                (bool b) => Atom(!b),
                 (real n) => Atom(-n),
                 // Reverse
                 (Atom[] a) => Atom(a.retro.array),
                 // Reverse
                 (string a) => Atom(a.retro.to!string),
                 // Negate
-                (bool b) => Atom(!b),
                 _ => Nil.nilAtom,
             ))
             // Subtraction
