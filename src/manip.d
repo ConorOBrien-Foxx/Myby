@@ -156,6 +156,27 @@ Verb foldFor(Verb v) {
         .setChildren([v]);
 }
 
+Verb powerFor(Verb f, Verb g) {
+    return new Verb("^:")
+        .setMonad((a) {
+            Atom times = g(a);
+            return times.match!(
+                (Infinity i) => assert(0, "TODO: Fixpoint"),
+                (n) {
+                    assert(n >= 0, "TODO: Negative (inverse) repetition");
+                    for(typeof(n) i = 0; i < n; i++) {
+                        a = f(a);
+                    }
+                    return a;
+                },
+                _ => Nil.nilAtom,
+            );
+        })
+        .setDyad((_1, _2) => Nil.nilAtom)
+        .setMarkedArity(1)
+        .setChildren([f, g]);
+}
+
 Atom[] nub(Atom[] a) {
     Atom[] res;
     foreach(x; a) {

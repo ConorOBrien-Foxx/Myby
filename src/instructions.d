@@ -309,12 +309,14 @@ Verb getVerb(InsName name) {
             .setMarkedArity(2);
         
         verbs[InsName.Binomial] = new Verb("!")
-            // Enumerate
             .setMonad(a => a.match!(
+                // Enumerate
                 (Atom[] a) =>
                     Atom(a.enumerate()
                     .map!(t => Atom([Atom(BigInt(t[0])), t[1]]))
                     .array),
+                // Square
+                (a) => atomFor(a * a),
                 _ => Nil.nilAtom,
             ))
             .setDyad((l, r) => match!(
@@ -727,11 +729,7 @@ Conjunction getConjunction(InsName name) {
         );
         
         conjunctions[InsName.Power] = new Conjunction(
-            (Verb f, Verb g) => new Verb("^:")
-                .setMonad(_ => Nil.nilAtom)
-                .setDyad((_1, _2) => Nil.nilAtom)
-                .setMarkedArity(f.markedArity)
-                .setChildren([f, g])
+            (Verb f, Verb g) => powerFor(f, g),
         );
         
         conjunctions[InsName.Under] = new Conjunction(
