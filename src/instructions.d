@@ -53,6 +53,7 @@ enum InsName {
     Inverse,                //F1C
     Power,                  //F1D
     Print,                  //F1E
+    Scan,                   //F1F
     Pair,                   //F2
     Binomial,               //F3
     Equality,               //F4
@@ -65,6 +66,9 @@ enum InsName {
     SplitCompose,           //FC
     Reflex,                 //FD
     Exit,                   //FE00
+    Empty,                  //FE40
+    Ascii,                  //FE41
+    Alpha,                  //FE42
     NthPrime,               //FE70
     IsPrime,                //FE71
     PrimeFactors,           //FE72
@@ -141,7 +145,7 @@ enum InsInfo[InsName] Info = [
     InsName.Inverse:                InsInfo("!.",      0xF1C,     SpeechPart.Adjective),
     InsName.Power:                  InsInfo("^:",      0xF1D,     SpeechPart.Conjunction),
     InsName.Print:                  InsInfo("echo",    0xF1E,     SpeechPart.Verb),
-    // Unassigned: F1F
+    InsName.Scan:                   InsInfo("\\:",     0xF1F,     SpeechPart.Conjunction),
     InsName.Pair:                   InsInfo(";",       0xF2,      SpeechPart.Verb),
     InsName.Binomial:               InsInfo("!",       0xF3,      SpeechPart.Verb),
     InsName.Equality:               InsInfo("=",       0xF4,      SpeechPart.Verb),
@@ -155,6 +159,9 @@ enum InsInfo[InsName] Info = [
     InsName.SplitCompose:           InsInfo("O",       0xFC,      SpeechPart.MultiConjunction),
     InsName.Reflex:                 InsInfo("~",       0xFD,      SpeechPart.Adjective),
     InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
+    InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
+    InsName.Ascii:                  InsInfo("A",       0xFE41,    SpeechPart.Verb),
+    InsName.Alpha:                  InsInfo("L",       0xFE42,    SpeechPart.Verb),
     InsName.NthPrime:               InsInfo("primn",   0xFE70,    SpeechPart.Verb),
     InsName.IsPrime:                InsInfo("primq",   0xFE71,    SpeechPart.Verb),
     InsName.PrimeFactors:           InsInfo("primf",   0xFE72,    SpeechPart.Verb),
@@ -310,8 +317,8 @@ Verb getVerb(InsName name) {
                     .array),
                 _ => Nil.nilAtom,
             ))
-            // Binomial
             .setDyad((l, r) => match!(
+                // Binomial
                 (BigInt a, BigInt b) =>
                     Atom(a > b
                         ? BigInt(0)
@@ -544,6 +551,17 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
+        
+        verbs[InsName.Empty] = Verb.nilad(Atom(cast(Atom[])[]));
+        verbs[InsName.Empty].display = "E";
+        
+        verbs[InsName.Ascii] = Verb.nilad(Atom(
+            iota(128).map!(a => Atom("" ~ cast(char)a)).array
+        ));
+        verbs[InsName.Ascii].display = "A";
+        
+        verbs[InsName.Alpha] = Verb.nilad(Atom("abcdefghijklmnopqrstuvwxyz"));
+        verbs[InsName.Alpha].display = "L";
     }
     
     Verb* verb = name in verbs;
@@ -725,6 +743,22 @@ Conjunction getConjunction(InsName name) {
                     .setMarkedArity(1)
                     .setChildren([f, g]);
             }
+        );
+        
+        conjunctions[InsName.Scan] = new Conjunction(
+            (Verb f, Verb seedFn) => new Verb("\\:")
+                .setMonad(a => a.match!(
+                    (Atom[] arr) {
+                        // TODO: relegate a specific atom for
+                        // using f's identity as seed?
+                        Atom seed = seedFn(a);
+                        return Atom(arr.scanThrough(f, seed));
+                    },
+                    _ => Nil.nilAtom,
+                ))
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+                .setChildren([f, seedFn])
         );
     }
     

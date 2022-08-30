@@ -227,3 +227,19 @@ Atom[][] arrayRange(Atom[] start, Atom[] end) {
     }
     return res;
 }
+
+Atom[] scanThrough(Atom[] base, Verb fn, Atom seed) {
+    Atom[] res;
+    foreach(el; base) {
+        el.match!(
+            (Atom[] next) {
+                res ~= Atom(scanThrough(next, fn, seed));
+            },
+            (a) {
+                seed = fn(seed, a);
+                res ~= seed;
+            },
+        );
+    }
+    return res;
+}

@@ -495,13 +495,14 @@ bool isArray(Atom a) {
     );
 }
 
+// TODO: assert array rows do not consist of arrays
 bool is2DArray(Atom[] x) {
     return x.all!isArray;
 }
 
 string arrayToString(Atom[] x, bool forceLinear=false) {
     if(forceLinear || !x.is2DArray) {
-        string inner = x.map!(a => a.atomToString(forceLinear))
+        string inner = x.map!(a => a.atomToString(true))
             .join(", ");
         return '[' ~ inner ~ ']';
     }
