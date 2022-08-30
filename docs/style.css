@@ -63,7 +63,7 @@ th, td {
     border-top: 0;
     border-bottom-width: 2px;
     border: 1px solid #ddd;
-    vertical-align: center;
+    vertical-align: middle;
     padding: 8px;
     text-align: left;
     font-weight: normal;
@@ -71,6 +71,11 @@ th, td {
 
 table th:first-child {
     width: 250px;
+}
+@media (width <= 900px) {
+    table th:first-child {
+        width: auto;
+    }
 }
 
 ol {
