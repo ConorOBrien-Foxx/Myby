@@ -276,10 +276,10 @@ Verb getVerb(InsName name) {
         verbs[InsName.Identity] = new Verb("#")
             .setMonad(_ => _)
             .setDyad((a, b) => match!(
-                (Atom[] a, BigInt b) => Atom(reshape(a, b)),
-                (BigInt a, Atom[] b) => Atom(reshape(b, a)),
-                (string a, BigInt b) => Atom(reshape(a.atomChars, b).joinToString),
-                (BigInt a, string b) => Atom(reshape(b.atomChars, a).joinToString),
+                (Atom[] a, b) => Atom(reshape(a, b)),
+                (a, Atom[] b) => Atom(reshape(b, a)),
+                (string a, b) => Atom(reshape(a.atomChars, b).joinToString),
+                (a, string b) => Atom(reshape(b.atomChars, a).joinToString),
                 // TODO: Atom[], Atom[] to filter by
                 (_1, _2) => Nil.nilAtom,
             )(a, b))
@@ -315,6 +315,11 @@ Verb getVerb(InsName name) {
             .setDyad((a, b) => a.linkWith(b))
             .setMarkedArity(2);
         
+        
+        auto a = BigInt(3);
+        auto b = BigInt(5);
+        Debugger.print("OWO: ", binomial(a, b));
+        
         verbs[InsName.Binomial] = new Verb("!")
             .setMonad(a => a.match!(
                 // Enumerate
@@ -328,11 +333,7 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((l, r) => match!(
                 // Binomial
-                (BigInt a, BigInt b) =>
-                    Atom(a > b
-                        ? BigInt(0)
-                        : productOver(iota(a + 2, b + 1)) / productOver(iota(BigInt(1), a + 1))
-                    ),
+                (a, b) => Atom(binomial(a, b)),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(2);

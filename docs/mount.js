@@ -26,6 +26,13 @@ hljs.registerLanguage("myby", (h) => {
         case_insensitive: false,
         unicodeRegex: true,
         contains: [
+            {
+                className: "comment",
+                variants: [
+                    { begin: `NB.=>` },
+                ],
+                relevance: 10,
+            },
             h.COMMENT(/NB\./, /$/, {
                 relevance: 0,
                 contains: [{
@@ -60,7 +67,7 @@ hljs.registerLanguage("myby", (h) => {
             {
                 className: "string",
                 variants: [
-                    { begin: /'(?:.|'')+'/ }
+                    { begin: /'(?:[^']|'')+'/ },
                 ],
                 relevance: 0,
             }

@@ -34,11 +34,13 @@ The various properties of manipulatable parts of speech.
   
 ## Signatures
 
-To describe the behavior of commands, the format **A** → **B** is used to denote the _signature_ of a command with arguments **A** resulting in **B**. Furthermore, to describe a returned verb, the format **V** : **A** → **B** is used. Here are some examples:
+To describe the behavior of commands, the format **A** → **B** is used to denote the _signature_ of a command with arguments **A** resulting in **B**. Furthermore, to describe a returned verb, the format **V** : **A** → **B** is used. Arguments separated by a comma indicate strict order; arguments separated by an ampersand indicate any order is acceptable and equivlanet. Here are some examples:
 
 - int → string - *input is an integer, returns a string*
 - string → list(string) - *input is a string, returns a list of strings*
 - int, int → int - *input is two integers, returns an integer**
+- string, int → string - *input is a string and an int in that order, returns a string*
+- string & int → string - *input is a string and an int in either order, returns a string*
 - verb → verb - *input is a verb, returns a verb*
 - verb(2) → verb(1) - *input is a verb whose marked arity is 2, returns a verb whose marked arity is 1*
 - verb(N) → verb(3-N) - *input is a verb whose marked arity is N, returns a verb whose marked arity is 3-N*
@@ -254,9 +256,9 @@ NB. E.g., input = 6:
 | Statistic | Value |
 |----|----|
 | Speech Part | Verb |
-| Hex Representation | `7` |
+| Hex Representation | `8` |
 | Nibble Cost | 1 |
-| Symbolic Usage | `/a`; `x/y` |
+| Symbolic Usage | `^a`; `x^y` |
 | Marked Arity | 2 |
 | Identity | 1 |
 | Range Start | 2 |
@@ -268,13 +270,113 @@ NB. E.g., input = 6:
 
 ### `#` - Identity
 
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `9` |
+| Nibble Cost | 1 |
+| Symbolic Usage | `#a`; `x#y` |
+| Marked Arity | 2 |
+
+| Signature | Explanation |
+|----|----|
+| any → any | Identity |
+| string & number → string; list & number → list | Reshape |
+| list, list | TODO: filter a la J |
+
 ### `R` - Range
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `E` |
+| Nibble Cost | 1 |
+| Symbolic Usage | `Ra`; `xRy` |
+| Marked Arity | 1 |
+
+| Signature | Explanation |
+|----|----|
+| number → list(number) | Range \[0,a). (Reversed if a < 0.) |
+| number, number → list(number) | Range [x,y] |
+| list, list → list; string, string → string | Multi Range. (Treats `x` as the minimums and `y` as the maximums of a mixed base system, and generates all the entries from `x` to `y`. See the Examples below.) |
+
+#### Examples
+
+```myby
+R5
+NB.=> [0, 1, 2, 3, 4]
+3R6
+NB.=> [3, 4, 5, 6]
+1 2R2 5
+NB.=> 1 2
+NB.=> 1 3
+NB.=> 1 4
+NB.=> 1 5
+NB.=> 2 2
+NB.=> 2 3
+NB.=> 2 4
+NB.=> 2 5
+'aa'R'cc'
+NB.=> [aa, ab, ac, ba, bb, bc, ca, cb, cc]
+```
 
 ### `%` - Modulus
 
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `F0` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `%a`; `x%y` |
+| Marked Arity | 2 |
+
+| Signature | Explanation |
+|----|----|
+| list → list | Sorted |
+| number, number → number | Modulus |
+
 ### `;` - Pair
 
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `F2` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `;a`; `x;y` |
+| Marked Arity | 2 |
+
+| Signature | Explanation |
+|----|----|
+| any → list(any) | Wrap. (Creates a list consisting of only `a`.) |
+| any, any → list | Link. (Pairs `x` and `y`. Flattens `y` if a list.) |
+
+#### Examples
+
+```myby
+;@5
+NB.=> [5]
+NB. @ is necessary here, since ;'s marked arity is 2, and (;5) redirects to ;&5
+4;'a'
+NB.=> [4, a]
+1;2;3;4
+NB.=> [1, 2, 3, 4]
+```
+
 ### `!` - Binomial
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `F3` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `!a`; `x!y` |
+| Marked Arity | 2 |
+
+| Signature | Explanation |
+|----|----|
+| number → number | Square |
+| list → list(list) | Enumerate. (Equivalent to `R@+ ;" #`.) |
+| number, number → number | Combinations. ([The number of ways `x` things can be chosen out of `y`.](https://www.jsoftware.com/help/dictionary/d410.htm)) |
 
 ### `{` - First
 

@@ -24,7 +24,29 @@ template mapKeyValue(ReturnHash, alias fun) {
 }
 
 auto productOver(T)(T arr) {
-    return reduce!"a * b"(BigInt(1), arr);
+    alias Base = ElementType!T;
+    return reduce!"a * b"(cast(Base) 1, arr);
+}
+
+auto binomial(T, S)(T a, S b) {
+    static if(is(T == real) || is(S == real)) {
+        alias Return = real;
+    }
+    else static if(is(T == BigInt) || is(S == BigInt)) {
+        alias Return = BigInt;
+    }
+    else {
+        alias Return = T;
+    }
+    
+    Return left = a;
+    Return right = b;
+    Return underMin = min(left, right - left);
+    Return underMax = max(left, right - left);
+    
+    return a > b
+        ? cast(Return) 0
+        : productOver(iota(underMax + 1, right + 1)) / productOver(iota(cast(Return) 1, underMin + 1));
 }
 
 Atom[] flatten(Atom[] arr) {
