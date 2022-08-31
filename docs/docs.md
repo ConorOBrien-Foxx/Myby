@@ -6,6 +6,16 @@ This page contains documentation for Myby's commands and their various implement
 
 Note: Mathematical operations result in a double if either `x` or `y` is a double, and is otherwise an integer. Also, for mathematical operations, bools are treated as `1` and `0` if `true` or `false` respectively.
 
+| Statistic | Meaning |
+|----|----|
+| Speech Part | Either Verb, Adjective, Conjunction, or Multi Conjunction |
+| Hex Representation | The underlying representation |
+| Nibble Cost | How many nibbles the underlying representation is |
+| Symbolic Usage | The command used in context(s) |
+| Marked Arity | For verbs, what is the "more common" arity, which certain Adjectives and Conjunctions use to make a judgment call for behavior |
+| Identity | What folds are seeded with. None if unspecified. If unspecified, such verbs will error when given the empty list. |
+| Range Start | Where folds start when given an integer. 0 if unspecified. |
+
 ## Types
 
 The various properties of manipulatable parts of speech.
@@ -53,6 +63,8 @@ To describe the behavior of commands, the format **A** → **B** is used to deno
 |----|----|
 | verb(1) → (verb(1) : list → list) | Filter from. (Retains only elements `x` from the list for which `u@x` is truthy.) |
 | verb(2) → (verb(1) : list → any) | Fold over. (Condenses the list by repeatedly applying `u` to an accumulator value and each member of the list. This accumulator value is often defined by `u`, but is otherwise taken to be the first element of the given list.) |
+| verb(2) → (verb(1) : number → any) | Fold over implicit range. (Same as above, but over the list from the verb's Range Start to `a`.) |
+| verb(2) → (verb(1) : list, list → list(list)) | Table over. (Using the left list `x` and the right list `y` as "anchors" for a corresponding function table, computed as `a u b` for every possible pair `(a,b)`, with `a` in `x` and `b` in `y`, organized in a table.) |
 
 #### Examples
 
@@ -60,8 +72,28 @@ To describe the behavior of commands, the format **A** → **B** is used to deno
 +\          NB. sum.
             NB. +'s marked arity is 2, so \ deduces fold
 (#<5)\      NB. filter for less than 5.
-            NB. marked arity for a Fork with Niladic tine is 1, so \ deduces fold
+            NB. marked arity for a Fork with Niladic tine is 1, so \ deduces fold.
 ```
+
+```myby
+NB. A multiplication table using the two given arrays:
+1 2 3 4 *\ 5 6 7
+NB. Results in:
+ 5  6  7
+10 12 14
+15 18 21
+20 24 28
+NB. Using monadic ^, One Range, a multiplication table along the given input:
+*\~ ^
+NB. E.g., input = 6:
+1  2  3  4  5  6
+2  4  6  8 10 12
+3  6  9 12 15 18
+4  8 12 16 20 24
+5 10 15 20 25 30
+6 12 18 24 30 36
+```
+
 
 ### `"` - Map/Zip
 
@@ -155,10 +187,10 @@ To describe the behavior of commands, the format **A** → **B** is used to deno
 |----|----|
 | int → int; real → real | Absolute value |
 | bool → int | `1` if `a`, `0` otherwise |
-| string → int; array → int | Length |
+| string → int; list → int | Length |
 | number, number → number | Addition |
 | string, string → string | String concatenation |
-| array, array → array | Array concatenation |
+| list, list → list | list concatenation |
 
 ### `-` - Subtract
 
@@ -169,20 +201,70 @@ To describe the behavior of commands, the format **A** → **B** is used to deno
 | Nibble Cost | 1 |
 | Symbolic Usage | `-a`; `x-y` |
 | Marked Arity | 2 |
-| Identity | none |
 
 | Signature | Explanation |
 |----|----|
 | number → number | Negation |
 | bool → bool | Logical negation |
-| string → string; array → array | Reverse |
+| string → string; list → list | Reverse |
 | number, number → number | Subtraction |
 
 ### `*` - Multiplication
 
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `6` |
+| Nibble Cost | 1 |
+| Symbolic Usage | `*a`; `x*y` |
+| Marked Arity | 2 |
+| Identity | 1 |
+| Range Start | 1 |
+
+| Signature | Explanation |
+|----|----|
+| number → number | Sign. (1 if positive, -1 if negative, 0 if zero.) |
+| list → list | Flatten |
+| number, number → number | Multiplication |
+| list, string → string | Join by |
+
 ### `/` - Division
 
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `7` |
+| Nibble Cost | 1 |
+| Symbolic Usage | `/a`; `x/y` |
+| Marked Arity | 2 |
+| Identity | 1 |
+| Range Start | 1 |
+
+| Signature | Explanation |
+|----|----|
+| string → list(string) | Characters |
+| list → list | Unique |
+| number → real | Reciprocal |
+| number, number → number | Division |
+| list, number; string, number | Chunk. (Splits `x` into parts of no longer than `y`.) |
+| string, string → list(string) | Split. (Splits `x` on occurrences of `y`.) |
+
 ### `^` - Exponentiation
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `7` |
+| Nibble Cost | 1 |
+| Symbolic Usage | `/a`; `x/y` |
+| Marked Arity | 2 |
+| Identity | 1 |
+| Range Start | 2 |
+
+| Signature | Explanation |
+|----|----|
+| number → list(number) | Inclusive range starting at 1 |
+| number, number → number | Exponentiation |
 
 ### `#` - Identity
 

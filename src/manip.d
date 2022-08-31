@@ -126,23 +126,35 @@ Verb filterFor(Verb v) {
 }
 
 Verb foldFor(Verb v) {
-    Atom reduc(T)(T arr) {
+    import myby.debugger;
+    Atom reduceHelper(T)(T arr) {
         // TODO: I don't like that this conditional is checked every time
         // find a way to eliminate it
-        return v.identity.isNil
+        Debugger.print("Reducing: ", arr);
+        return v.identity.isNil || !arr.empty
             ? arr.reduce!v
             : reduce!v(v.identity, arr);
     }
-    import myby.debugger;
     return new Verb("₂\\")
         .setMonad(a => a.match!(
             (Atom[] arr) {
                 Debugger.print("Fold for  ", v);
                 Debugger.print("Identity: ", v.identity);
                 Debugger.print("Array:    ", arr);
-                return reduc(arr);
+                return reduceHelper(arr);
             },
-            (BigInt n) => reduc(iota(v.rangeStart, n + 1).map!Atom),
+            // TODO: it might be more useful to special case filter when called on integers
+            // like, who's gonna use ^\ ????
+            (n) {
+                auto start = v.rangeStart.as!(typeof(n));
+                if(start > n) {
+                    // iota doesn't correctly handle reals creating an empty range
+                    return reduceHelper(cast(Atom[]) []);
+                }
+                else {
+                    return reduceHelper(iota(start, n + 1).map!Atom);
+                }
+            },
             _ => Nil.nilAtom,
         ))
         .setDyad((a, b) => match!(

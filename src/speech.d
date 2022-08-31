@@ -151,6 +151,17 @@ struct Atom {
     this(T)(T v) {
         value = v;
     }
+    this(real v) {
+        if(v == real.infinity) {
+            value = Infinity.positive;
+        }
+        else if(v == -real.infinity) {
+            value = Infinity.negative;
+        }
+        else {
+            value = v;
+        }
+    }
     
     ref Atom opAssign(T)(T rhs) {
         value = rhs;
@@ -196,6 +207,13 @@ struct Atom {
         );
     }
     
+    BigInt as(Type : BigInt)() {
+        return value.match!(
+            (a) => BigInt(a),
+            (a) => assert(0, "Cannot convert " ~ readableTypeName(a) ~ " to " ~ typeid(Type).toString()),
+        );
+    }
+    
     Atom opBinary(string op, T)(T rhs)
     if(!is(T == Atom)) {
         return opBinary!op(Atom(rhs));
@@ -234,12 +252,14 @@ struct Atom {
     Atom binaryFallback(string op : "/")(Atom rhs) {
         return match!(
             // Chunk
-            (Atom[] a, BigInt b) =>
+            (Atom[] a, b) =>
                 Atom(a.chunks(to!size_t(b))
                 .map!Atom
                 .array),
-            (string a, BigInt b) =>
-                Atom(a.atomChars) / rhs,
+            (string a, b) {
+                static assert(!is(typeof(b) == string));
+                return Atom(a.atomChars) / Atom(b);
+            },
             // Split on
             (string a, string b) =>
                 Atom(a.split(b).map!Atom.array),
@@ -310,7 +330,7 @@ class Verb {
     
     uint markedArity = 2;
     bool niladic = false;
-    BigInt rangeStart = BigInt(0);
+    Atom rangeStart = BigInt(0);
     Atom identity;
     Verb[] children;
     
@@ -361,7 +381,7 @@ class Verb {
         identity = i;//todo: clone?
         return this;
     }
-    Verb setRangeStart(BigInt rs) {
+    Verb setRangeStart(T)(T rs) {
         rangeStart = rs;
         return this;
     }

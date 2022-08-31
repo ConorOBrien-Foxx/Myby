@@ -201,8 +201,8 @@ Verb getVerb(InsName name) {
             ))
             // Addition
             .setDyad((Atom a, Atom b) => a + b)
-            .setMarkedArity(2)
-            .setIdentity(Atom(BigInt(0)));
+            .setIdentity(Atom(BigInt(0)))
+            .setMarkedArity(2);
         
         verbs[InsName.Subtract] = new Verb("-")
             .setMonad((Atom a) => a.match!(
@@ -219,6 +219,7 @@ Verb getVerb(InsName name) {
             ))
             // Subtraction
             .setDyad((Atom a, Atom b) => a - b)
+            .setIdentity(Atom(BigInt(0)))
             .setMarkedArity(2);
         
         verbs[InsName.Multiply] = new Verb("*")
@@ -240,20 +241,26 @@ Verb getVerb(InsName name) {
                 (string a) => Atom(a.atomChars),
                 // Unique
                 (Atom[] a) => Atom(a.nub.array),
+                // Reciprocal
+                n => Atom(1 / cast(real)n),
                 _ => Nil.nilAtom,
             ))
             .setDyad((Atom a, Atom b) => a / b)
-            .setMarkedArity(2);
+            .setMarkedArity(2)
+            .setIdentity(Atom(BigInt(1)))
+            .setRangeStart(BigInt(1));
         
         verbs[InsName.Exponentiate] = new Verb("^")
             // OneRange
             .setMonad((Atom a) => a.match!(
-                (BigInt a) =>
-                    verbs[InsName.Range](BigInt(1), a),
+                (a) =>
+                    verbs[InsName.Range](cast(typeof(a)) 1, a),
                 _ => Nil.nilAtom,
             ))
             // Exponentiation
             .setDyad((Atom a, Atom b) => a ^^ b)
+            .setIdentity(Atom(BigInt(1)))
+            .setRangeStart(BigInt(2))
             .setMarkedArity(2);
         
         verbs[InsName.Modulus] = new Verb("%")
@@ -281,7 +288,7 @@ Verb getVerb(InsName name) {
         // Range (indices)
         verbs[InsName.Range] = new Verb("R")
             .setMonad(a => a.match!(
-                (BigInt n) => Atom(
+                (n) => Atom(
                     n < 0
                         ? iota(-n).map!(a => Atom(-n - 1 - a)).array
                         : iota(n).map!Atom.array
@@ -289,7 +296,7 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom
             ))
             .setDyad((l, r) => match!(
-                (BigInt a, BigInt b) => Atom(iota(a, b + 1).map!Atom.array),
+                (a, b) => Atom(iota(a, b + 1).map!Atom.array),
                 (Atom[] a, Atom[] b) => Atom(arrayRange(a, b).map!Atom.array),
                 (string a, string b) => Atom(
                     arrayRange(a.atomOrds, b.atomOrds)

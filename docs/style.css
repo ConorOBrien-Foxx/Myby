@@ -69,12 +69,12 @@ th, td {
     font-weight: normal;
 }
 
-table th:first-child {
-    width: 250px;
+table td:first-child {
+    white-space: nowrap;
 }
 @media (width <= 900px) {
-    table th:first-child {
-        width: auto;
+    table td:first-child {
+        white-space: normal;
     }
 }
 
