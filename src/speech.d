@@ -151,6 +151,9 @@ struct Atom {
     this(T)(T v) {
         value = v;
     }
+    this(bool v) {
+        value = v;
+    }
     this(real v) {
         if(v == real.infinity) {
             value = Infinity.positive;
