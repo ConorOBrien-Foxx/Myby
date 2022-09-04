@@ -16,17 +16,24 @@ struct Token {
     SpeechPart speech;
     InsName name;
     union {
-        BigInt big;
-        string str;
-        real   dec;
+        BigInt  big;
+        string  str;
+        real    dec;
+        Token[] arr;
     };
     int index = -1;
     
     bool isNilad() {
-        return name == InsName.Integer || name == InsName.String;
+        return name == InsName.Integer
+            || name == InsName.String
+            || name == InsName.Real
+            || name == InsName.ListLiteral;
     }
     
     string toString() {
+        import std.algorithm.iteration : map;
+        import std.array : join;
+        
         string addendum;
         switch(name) {
             case InsName.Integer:
@@ -35,6 +42,9 @@ struct Token {
                 break;
             case InsName.String:
                 addendum = str;
+                break;
+            case InsName.ListLiteral:
+                addendum = arr.map!(a => a.toString()).join(", ");
                 break;
             case InsName.Real:
                 addendum = to!string(dec);
@@ -69,6 +79,7 @@ Token[] tokenize(Nibble[] code) {
     Debugger.print("    ", code);
     uint i = 0;
     Token[] tokens;
+    bool lastWasNilad = false;
     while(i < code.length) {
         Token token;
         token.index = i;
@@ -128,8 +139,26 @@ Token[] tokenize(Nibble[] code) {
             token.speech = tup.speech;
             i++;
         }
-        tokens ~= token;
+        
+        if(lastWasNilad && token.name == InsName.Filter) {
+            Token* lastToken = &tokens[$ - 1];
+            if(lastToken.name != InsName.ListLiteral) {
+                Token copy = *lastToken;
+                lastToken.arr = [copy];
+                lastToken.name = InsName.ListLiteral;
+            }
+            // we do not push this token, since it is just a literal
+        }
+        else if(lastWasNilad && token.isNilad) {
+            tokens[$ - 1].arr ~= token;
+        }
+        else {
+            lastWasNilad = token.isNilad;
+            tokens ~= token;
+        }
     }
+    // list condensation step
+    // Debugger.print(tokens);
     return tokens;
 }
 
@@ -340,17 +369,53 @@ class Interpreter {
             listBuild = [];
         }
         void addNilad(T)(T n) {
-            Debugger.print("Adding nilad...");
+            Debugger.print("Adding nilad to verb chain");
             auto v = Verb.nilad(n);
-            if(state == NiladParseState.LastWasNiladSeparator) {
-                Debugger.print("...to list!");
-                listBuild ~= v();
-                Debugger.print("List: ", listBuild);
+            verbs ~= v;
+        }
+        Atom handleVerb(Token token, bool mustBeNilad = false) {
+            assert(!mustBeNilad || token.isNilad, "Expected a nilad when forced");
+            
+            import std.algorithm.iteration : map;
+            import std.array : array;
+            
+            if(token.isNilad) {
+                nextState = NiladParseState.LastWasNilad;
+                Atom result;
+                switch(token.name) {
+                    // TODO: instruction name to atom function instead of
+                    // this wacky recursive function
+                    case InsName.Integer:
+                        result = token.big;
+                        break;
+                    
+                    case InsName.String:
+                        result = token.str;
+                        break;
+                    
+                    case InsName.Real:
+                        result = token.dec;
+                        break;
+                    
+                    case InsName.ListLiteral:
+                        result = token.arr.map!(a => handleVerb(a, true)).array;
+                        break;
+                    
+                    default:
+                        assert(0, "Unhandled nilad " ~ to!string(token.name));
+                }
+                if(mustBeNilad) {
+                    return result;
+                }
+                else {
+                    addNilad(result);
+                }
             }
             else {
-                Debugger.print("...to verb chain!");
-                verbs ~= v;
+                finishListBuild;
+                verbs ~= getVerb(token.name);
             }
+            return Nil.nilAtom;
         }
         foreach(token; chain) {
             nextState = NiladParseState.None;
@@ -359,22 +424,7 @@ class Interpreter {
             Debugger.print("token: ", token);
             final switch(token.speech) {
                 case SpeechPart.Verb:
-                    if(token.name == InsName.Integer) {
-                        addNilad(token.big);
-                        nextState = NiladParseState.LastWasNilad;
-                    }
-                    else if(token.name == InsName.String) {
-                        addNilad(token.str);
-                        nextState = NiladParseState.LastWasNilad;
-                    }
-                    else if(token.name == InsName.Real) {
-                        addNilad(token.dec);
-                        nextState = NiladParseState.LastWasNilad;
-                    }
-                    else {
-                        finishListBuild;
-                        verbs ~= getVerb(token.name);
-                    }
+                    handleVerb(token);
                     break;
                     
                 case SpeechPart.Adjective:

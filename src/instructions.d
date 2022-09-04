@@ -21,6 +21,7 @@ enum InsName {
     Integer,                //0
     Real,                   //0B
     String,                 //1
+    ListLiteral,            //x2x
     Filter,                 //2
     Map,                    //3
     Add,                    //4
