@@ -12,6 +12,7 @@ import std.sumtype;
 import std.traits;
 
 import myby.speech;
+import myby.debugger;
 
 template mapKeyValue(ReturnHash, alias fun) {
     auto mapKeyValue(Hash)(Hash a) if(isAssociativeArray!Hash) {
@@ -139,7 +140,8 @@ Atom exit(BigInt code = 0) {
 Verb filterFor(Verb v) {
     return new Verb("₁\\")
         .setMonad(a => a.match!(
-            (Atom[] a) => Atom(a.filter!(a => v(a).truthiness).array),
+            (Atom[] a) =>
+                Atom(a.filter!(a => v(a).truthiness).array),
             _ => Nil.nilAtom,
         ))
         .setDyad((a, b) => Nil.nilAtom)

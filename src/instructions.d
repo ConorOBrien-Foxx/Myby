@@ -364,8 +364,8 @@ Verb getVerb(InsName name) {
         verbs[InsName.Last] = new Verb("}")
             // Last element
             .setMonad(a => verbs[InsName.First](
-                atomFor(a),
-                Atom(BigInt(-1))
+                Atom(BigInt(-1)),
+                atomFor(a)
             ))
             .setDyad((l, r) => match!(
                 (_1, _2) => Nil.nilAtom,
@@ -806,11 +806,12 @@ MultiConjunction getMultiConjunction(InsName name) {
                 }
                 assert(verbs.length > 1, "Cannot multi-compose with this many verbs");
                 // so that we fold from right to left
-                import std.algorithm.mutation : reverse;
-                verbs.reverse;
+                auto reversed = verbs.retro.array;
                 return new Verb("@.")
-                    .setMonad(y => reduce!((atom, v) => v(atom))(y, verbs))
-                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setMonad(y => reduce!((atom, v) => v(atom))(y, reversed))
+                    .setDyad((a, b) => reduce!((atom, v) => v(atom))(
+                        reversed[0](a, b), reversed[1..$]
+                    ))
                     .setMarkedArity(1)
                     .setChildren(verbs);
             }

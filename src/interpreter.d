@@ -263,15 +263,17 @@ class Interpreter {
                     break;
                 case SpeechPart.MultiConjunction:
                     flushOpStack();
-                    stack ~= token;
                     uint valence = getMultiConjunction(token.name).valence;
                     if(valence == 0) {
                         // reduces all items in context to a single verb
+                        token.big = parenStackArity[$-1];
                         parenStackArity[$-1] = 1;
                     }
                     else {
+                        token.big = valence;
                         parenStackArity[$-1] -= valence - 1;
                     }
+                    stack ~= token;
                     break;
                 case SpeechPart.Syntax:
                     switch(token.name) {
@@ -461,13 +463,16 @@ class Interpreter {
                     MultiConjunction mc = getMultiConjunction(token.name);
                     finishListBuild;
                     Verb[] args;
-                    uint valence;
+                    uint valence = to!uint(token.big);
+                    assert(valence, "Expected non-zero final valence for MultiConjunction");
+                    /*
                     if(mc.valence == 0) {
                         valence = verbs.length;
                     }
                     else {
                         valence = mc.valence;
                     }
+                    */
                     assert(verbs.length >= valence,
                         "Expected " ~ to!string(valence) ~ " verbs for multi-conjunction "
                         ~ to!string(token.name));
