@@ -34,7 +34,8 @@ enum InsName {
     LessEqual,              //AA
     GreaterEqual,           //AD
     OpenParen,              //B
-    Test,                   //BC
+    MemberIn,               //BA
+    Vectorize,              //BC
     CloseParen,             //C
     Compose,                //D
     Under,                  //DA
@@ -119,9 +120,8 @@ enum InsInfo[InsName] Info = [
     InsName.GreaterEqual:           InsInfo(">:",      0xAD,      SpeechPart.Verb),
     // Unassigned: AAA, AAD, ADA, ADD, AAAA, ...etc.
     InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
-    // Unassigned: BA       NB: `(&` has no meaning
-    // Unassigned: BC       NB: `()` has no meaning
-    InsName.Test:                   InsInfo("test",    0XBC,      SpeechPart.Verb),
+    InsName.MemberIn:               InsInfo("e.",      0xBA,      SpeechPart.Verb),
+    InsName.Vectorize:              InsInfo("V",       0xBC,      SpeechPart.Adjective),
     // Unassigned: BD       NB: `(@` has no meaning
     InsName.CloseParen:             InsInfo(")",       0xC,       SpeechPart.Syntax),
     InsName.Compose:                InsInfo("@",       0xD,       SpeechPart.Conjunction),
@@ -283,7 +283,12 @@ Verb getVerb(InsName name) {
                 (a, Atom[] b) => Atom(reshape(b, a)),
                 (string a, b) => Atom(reshape(a.atomChars, b).joinToString),
                 (a, string b) => Atom(reshape(b.atomChars, a).joinToString),
-                // TODO: Atom[], Atom[] to filter by
+                (Atom[] a, Atom[] b) => Atom(
+                    zip(a, b)
+                        .filter!(t => t[1].truthiness)
+                        .map!(t => t[0])
+                        .array
+                ),
                 (_1, _2) => Nil.nilAtom,
             )(a, b))
             .setMarkedArity(1);
@@ -423,14 +428,6 @@ Verb getVerb(InsName name) {
             ))
             // Lesser of 2
             .setDyad((l, r) => min(l, r))
-            // .setDyad((a, b) => match!(
-                // (a, b) => a < b ? atomFor(a) : atomFor(b),
-                // (_1, _2) => assert(0, "Cannot compare")
-            // )(a, b))
-            // .setDyad((l, r) => match!(
-                // (a, b) => Atom(min(a, b)),
-                // (_1, _2) => Nil.nilAtom,
-            // )(l, r))
             .setIdentity(Infinity.positiveAtom)
             .setMarkedArity(2);
         
@@ -441,15 +438,15 @@ Verb getVerb(InsName name) {
             ))
             // Greater of 2
             .setDyad((l, r) => max(l, r))
-            // .setDyad((a, b) => match!(
-                // (a, b) => a < b ? atomFor(b) : atomFor(a),
-                // (_1, _2) => assert(0, "Cannot compare")
-            // )(a, b))
-            // .setDyad((l, r) => match!(
-                // (a, b) => Atom(max(a, b)),
-                // (_1, _2) => Nil.nilAtom,
-            // )(l, r))
             .setIdentity(Infinity.negativeAtom)
+            .setMarkedArity(2);
+        
+        verbs[InsName.MemberIn] = new Verb("e.")
+            .setMonad(a => Nil.nilAtom)
+            .setDyad((a, b) => match!(
+                (a, Atom[] b) => Atom(b.canFind(atomFor(a))),
+                (_1, _2) => Nil.nilAtom,
+            )(a, b))
             .setMarkedArity(2);
         
         verbs[InsName.Print] = new Verb("echo")
