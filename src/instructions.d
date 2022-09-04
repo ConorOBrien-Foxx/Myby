@@ -116,11 +116,11 @@ enum InsInfo[InsName] Info = [
     InsName.Identity:               InsInfo("#",       0x9,       SpeechPart.Verb),
     InsName.Bond:                   InsInfo("&",       0xA,       SpeechPart.Conjunction),
     // Unassigned: AC       NB: `&)` has no meaning
-    InsName.LessEqual:              InsInfo("<:",      0xAA,      SpeechPart.Verb),
-    InsName.GreaterEqual:           InsInfo(">:",      0xAD,      SpeechPart.Verb),
-    // Unassigned: AAA, AAD, ADA, ADD, AAAA, ...etc.
+    InsName.OnPrefixes:             InsInfo("\\.",     0xAA,      SpeechPart.Adjective),
+    InsName.SplitCompose:           InsInfo("O",       0xAD,      SpeechPart.MultiConjunction),
+    // Unassigned (maybe): AAAA, AADD, ...etc.
     InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
-    InsName.MemberIn:               InsInfo("e.",      0xBA,      SpeechPart.Verb),
+    InsName.ArityForce:             InsInfo("`",       0xBA,      SpeechPart.Adjective),
     InsName.Vectorize:              InsInfo("V",       0xBC,      SpeechPart.Adjective),
     // Unassigned: BD       NB: `(@` has no meaning
     InsName.CloseParen:             InsInfo(")",       0xC,       SpeechPart.Syntax),
@@ -128,7 +128,6 @@ enum InsInfo[InsName] Info = [
     InsName.Under:                  InsInfo("&.",      0xDA,      SpeechPart.Conjunction),
     // Unassigned: DC       NB: `@)` has no meaning
     InsName.MonadChain:             InsInfo("@.",      0xDD,      SpeechPart.MultiConjunction),
-    // Unassigned: DAA, DAD, DDA, DDD, DAAA, ...etc.
     InsName.Range:                  InsInfo("R",       0xE,       SpeechPart.Verb),
     InsName.Modulus:                InsInfo("%",       0xF0,      SpeechPart.Verb),
     InsName.LastChain:              InsInfo("$^",      0xF10,     SpeechPart.Verb),
@@ -152,12 +151,12 @@ enum InsInfo[InsName] Info = [
     InsName.Equality:               InsInfo("=",       0xF4,      SpeechPart.Verb),
     InsName.LessThan:               InsInfo("<",       0xF5,      SpeechPart.Verb),
     InsName.GreaterThan:            InsInfo(">",       0xF6,      SpeechPart.Verb),
-    InsName.ArityForce:             InsInfo("`",       0xF7,      SpeechPart.Adjective),
+    InsName.MemberIn:               InsInfo("e.",      0xF7,      SpeechPart.Verb),
     InsName.First:                  InsInfo("{",       0xF8,      SpeechPart.Verb),
     InsName.Last:                   InsInfo("}",       0xF9,      SpeechPart.Verb),
-    InsName.OnPrefixes:             InsInfo("\\.",     0xFA,      SpeechPart.Adjective),
-    // 0xFB
-    InsName.SplitCompose:           InsInfo("O",       0xFC,      SpeechPart.MultiConjunction),
+    InsName.LessEqual:              InsInfo("<:",      0xFA,      SpeechPart.Verb),
+    InsName.GreaterEqual:           InsInfo(">:",      0xFB,      SpeechPart.Verb),
+    // FC
     InsName.Reflex:                 InsInfo("~",       0xFD,      SpeechPart.Adjective),
     InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
     InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
@@ -408,13 +407,15 @@ Verb getVerb(InsName name) {
             .setMarkedArity(2);
         
         verbs[InsName.LessEqual] = new Verb("<:")
-            .setMonad(_ => Nil.nilAtom)
+            // Decrement
+            .setMonad(a => a - 1)
             // Less than or equal to
             .setDyad((a, b) => Atom(a <= b))
             .setMarkedArity(2);
         
         verbs[InsName.GreaterEqual] = new Verb(">:")
-            .setMonad(_ => Nil.nilAtom)
+            // Increment. TODO: Successor
+            .setMonad(a => a + 1)
             // Greater than or equal to
             .setDyad((a, b) => Atom(a >= b))
             .setMarkedArity(2);

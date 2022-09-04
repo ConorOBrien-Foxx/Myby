@@ -127,8 +127,11 @@ Token[] tokenize(Nibble[] code) {
             }
             // consecutive conjunctions mean something else
             else if(ConjunctionNibbles.canFind(nib)) {
-                while(i + 1 < code.length && ConjunctionNibbles.canFind(code[i + 1])) {
+                // capping because constructs like <:@x create ambiguity
+                uint max = 1;
+                while(max && i + 1 < code.length && ConjunctionNibbles.canFind(code[i + 1])) {
                     appendNibble;
+                    max--;
                 }
             }
             Debugger.print("Parsing instruction ", name.toBase16.nibbleFmt);
