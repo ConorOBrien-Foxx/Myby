@@ -520,13 +520,36 @@ NB.=> 5555
 
 ### `<:` - Less Or Equal
 
-
-
 ### `>:` - Greater Or Equal
 
 ### `<.` - Minimum
 
 ### `>.` - Maximum
+
+### `$<` - Last Chain
+
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `F10` |
+| Nibble Cost | 3 |
+| Symbolic Usage | `$<a`; `x$<y` |
+| Marked Arity | 1 (Subject to change) |
+
+| Signature | Explanation |
+|----|----|
+| any → any; any, any → any | Last Chain. (Calls the previous line of the program with the given arguments.) |
+
+#### Examples
+
+```myby
+NB. full program
+# + 5       NB. add 5
+$< ^ 2      NB. square first line
+NB. equivalent to
+NB.=> (#+5)^2
+```
 
 ### `echo`
 

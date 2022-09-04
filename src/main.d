@@ -141,7 +141,14 @@ int main(string[] args) {
         i = new Interpreter(nibs);
     }
     i.shunt;
-    Verb mainVerb = i.condense;
+    Verb[] chains = i.condense;
+    
+    if(chains.length == 0) {
+        // empty program is a no-op
+        return 0;
+    }
+    
+    Verb mainVerb = chains[$ - 1];
     
     if(Debugger.printing) {
         writeln(treeToBoxedString(mainVerb));

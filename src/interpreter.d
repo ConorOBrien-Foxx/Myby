@@ -232,14 +232,15 @@ class Interpreter {
         foreach(i, token; code.tokenize.autoCompleteParentheses) {
             bool thisIsNilad = false;
             Debugger.print("Token[", i , "]: ", token);
-            Debugger.print("Paren stack: ", parenStackArity);
-            Debugger.print("opStack:     ", opStack);
-            Debugger.print();
+            Debugger.print("Before:");
+            Debugger.print("  Paren stack: ", parenStackArity);
+            Debugger.print("  opStack:     ", opStack);
             
             final switch(token.speech) {
                 case SpeechPart.Verb:
                     // flush opStack if at barrier
-                    if(previous == SpeechPart.Verb || previous == SpeechPart.Adjective) {
+                    // TODO: maybe there's a more sane to write the below line
+                    if(previous == SpeechPart.Verb || previous == SpeechPart.Adjective || previous == SpeechPart.Syntax) {
                         flushOpStack();
                     }
                     thisIsNilad = token.isNilad;
@@ -314,6 +315,11 @@ class Interpreter {
             
             previous = token.speech;
             previousWasNilad = thisIsNilad;
+            
+            Debugger.print("After:");
+            Debugger.print("  Paren stack: ", parenStackArity);
+            Debugger.print("  opStack:     ", opStack);
+            Debugger.print("");
         }
         
         flushOpStack();
@@ -509,8 +515,7 @@ class Interpreter {
         return verbs[0];
     }
     
-    Verb condense() {
-        // import std.algorithm.iteration : splitter;
+    Verb[] condense() {
         import std.range : split;
         
         Debugger.print("Initial stack:");
@@ -523,8 +528,12 @@ class Interpreter {
             Verb chainVerb = condenseTokenChain(chain);
             chains ~= chainVerb;
         }
-        // TODO: empty program
-        return chains[0];
+        // assign links
+        foreach(i, ref chain; chains) {
+            auto info = ChainInfo(i, chains);
+            chain.setChains(info);
+        }
+        return chains;
     }
     
     static Atom evaluate(string str, Atom[] args = []) {
@@ -532,7 +541,7 @@ class Interpreter {
         Debugger.silence();
         auto temp = new Interpreter(str);
         temp.shunt;
-        auto value = temp.condense()(args);
+        auto value = temp.condense()[0](args);
         Debugger.unsilence();
         return value;
     }

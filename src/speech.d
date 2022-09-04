@@ -318,18 +318,42 @@ struct Atom {
 }
 
 alias VerbMonad = Atom delegate(Atom);
+alias VerbMonadSelf = Atom delegate(Verb, Atom);
 alias VerbDyad = Atom delegate(Atom, Atom);
+alias VerbDyadSelf = Atom delegate(Verb, Atom, Atom);
 alias AdjectiveMonad = Verb delegate(Verb);
 alias ConjunctionDyad = Verb delegate(Verb, Verb);
 alias MultiConjunctionFunction = Verb delegate(Verb[]);
+
+struct ChainInfo {
+    Verb last;
+    Verb next;
+    Verb self;
+    Verb[] stack;
+    
+    this(T)(T index, Verb[] chains) {
+        assert(index < chains.length, "Must be constructed from an existing chain");
+        // TODO: circular?
+        if(index > 0) {
+            last = chains[index - 1];
+        }
+        self = chains[index];
+        if(index + 1 < chains.length) {
+            next = chains[index + 1];
+        }
+        stack = chains;
+    }
+}
 
 class Verb {
     string display;
     // TODO: display niladic as repr (e.g. "asdf" not asdf)
     VerbMonad monad;
+    VerbMonadSelf monadSelf;
     VerbDyad dyad;
-    Verb inverse;
-    // TODO: figure this out idfk
+    VerbDyadSelf dyadSelf;
+    Verb inverse; // TODO: figure this out idfk
+    ChainInfo info;
     
     uint markedArity = 2;
     bool niladic = false;
@@ -340,6 +364,13 @@ class Verb {
     this(string di) {
         display = di;
         identity = Nil.nilAtom;
+    }
+    
+    void setChains(ChainInfo i) {
+        info = i;
+        foreach(ref v; children) {
+            v.setChains(i);
+        }
     }
     
     bool invertable() {
@@ -355,8 +386,18 @@ class Verb {
         return this;
     }
     
+    Verb setMonad(VerbMonadSelf ms) {
+        monadSelf = ms;
+        return this;
+    }
+    
     Verb setDyad(VerbDyad d) {
         dyad = d;
+        return this;
+    }
+    
+    Verb setDyad(VerbDyadSelf ds) {
+        dyadSelf = ds;
         return this;
     }
     
@@ -370,7 +411,9 @@ class Verb {
         return this;
     }
     
-    @property bool initialized() { return monad && dyad; }
+    @property bool initialized() {
+        return (!!monad ^ !!monadSelf) && (!!dyad ^ !!dyadSelf);
+    }
     
     Verb setMarkedArity(uint ma) {
         markedArity = ma;
@@ -389,14 +432,26 @@ class Verb {
         return this;
     }
     
+    Atom monadic(Atom a) {
+        return monadSelf
+            ? monadSelf(this, a)
+            : monad(a);
+    }
+    
+    Atom dyadic(Atom a, Atom b) {
+        return dyadSelf
+            ? dyadSelf(this, a, b)
+            : dyad(a, b);
+    }
+    
     Atom evaluate() {
         assert(initialized, "Cannot call uninitialized Verb " ~ display);
-        return monad(Nil.nilAtom);
+        return monadic(Nil.nilAtom);
     }
     
     Atom evaluate(Atom a) {
         assert(initialized, "Cannot call uninitialized Verb " ~ display);
-        return monad(a);
+        return monadic(a);
     }
     Atom evaluate(T)(T a)
     if(!is(T == Atom)) {
@@ -405,7 +460,7 @@ class Verb {
     
     Atom evaluate(Atom l, Atom r) {
         assert(initialized, "Cannot call uninitialized Verb " ~ display);
-        return dyad(l, r);
+        return dyadic(l, r);
     }
     Atom evaluate(T, S)(T l, S r)
     if(!is(T == Atom) || !is(S == Atom)) {

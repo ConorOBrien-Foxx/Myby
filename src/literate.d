@@ -140,9 +140,7 @@ Nibble[] parseLiterate(T)(T str) {
             bool hasNext = i + 1 < str.length;
             if(hasNext) {
                 i++;
-                bool isDollarCompound =
-                    head == '$' && '1' <= str[i] && str[i] <= '4';
-                if(isDollarCompound) {
+                if(head == '$') {
                     name ~= str[i]; 
                 }
                 else if(str[i] == '.' || str[i] == ':') {
@@ -181,8 +179,7 @@ Nibble[] parseLiterate(T)(T str) {
                     // ignore
                     break;
                 default:
-                    writeln("Unhandled instruction: " ~ name);
-                    break;
+                    assert(0, "Unhandled instruction: " ~ name);
             }
             if(head == ')') {
                 finalParenCount++;

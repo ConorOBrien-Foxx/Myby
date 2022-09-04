@@ -42,11 +42,11 @@ enum InsName {
     MonadChain,             //DD
     Range,                  //E
     Modulus,                //F0
-    FirstChain,             //F10
-    SecondChain,            //F11
-    ThirdChain,             //F12
-    FourthChain,            //F13
-    NthChain,               //F14
+    LastChain,              //F10
+    ThisChain,              //F11
+    NextChain,              //F12
+    NthChain,               //F13
+    Ternary,                //F16
     Minimum,                //F17
     Maximum,                //F18
     OnLeft,                 //F19
@@ -131,14 +131,13 @@ enum InsInfo[InsName] Info = [
     // Unassigned: DAA, DAD, DDA, DDD, DAAA, ...etc.
     InsName.Range:                  InsInfo("R",       0xE,       SpeechPart.Verb),
     InsName.Modulus:                InsInfo("%",       0xF0,      SpeechPart.Verb),
-    InsName.FirstChain:             InsInfo("$1",      0xF10,     SpeechPart.Verb),
-    InsName.FirstChain:             InsInfo("$",       0xF10,     SpeechPart.Verb),
-    InsName.SecondChain:            InsInfo("$2",      0xF11,     SpeechPart.Verb),
-    InsName.ThirdChain:             InsInfo("$3",      0xF12,     SpeechPart.Verb),
-    InsName.FourthChain:            InsInfo("$4",      0xF13,     SpeechPart.Verb),
-    InsName.NthChain:               InsInfo("$N",      0xF14,     SpeechPart.Verb),
+    InsName.LastChain:              InsInfo("$^",      0xF10,     SpeechPart.Verb),
+    InsName.ThisChain:              InsInfo("$:",      0xF11,     SpeechPart.Verb),
+    InsName.NextChain:              InsInfo("$v",      0xF12,     SpeechPart.Verb),
+    InsName.NthChain:               InsInfo("$N",      0xF13,     SpeechPart.Verb),
+    // Unassigned: F14
     // Unassigned: F15
-    // Unassigned: F16
+    InsName.Ternary:                InsInfo("?",       0xF16,     SpeechPart.MultiConjunction),
     InsName.Minimum:                InsInfo("<.",      0xF17,     SpeechPart.Verb),
     InsName.Maximum:                InsInfo(">.",      0xF18,     SpeechPart.Verb),
     InsName.OnLeft:                 InsInfo("[",       0xF19,     SpeechPart.Adjective),
@@ -548,6 +547,27 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
+            
+        verbs[InsName.LastChain] = new Verb("$^")
+            // Last Chain
+            .setMonad((Verb v, a) => v.info.last(a))
+            .setDyad((Verb v, a, b) => v.info.last(a, b))
+            // TODO: copy last chains' marked arity
+            .setMarkedArity(1);
+            
+        verbs[InsName.ThisChain] = new Verb("$:")
+            // Last Chain
+            .setMonad((Verb v, a) => v.info.self(a))
+            .setDyad((Verb v, a, b) => v.info.self(a, b))
+            // TODO: copy this chains' marked arity
+            .setMarkedArity(1);
+            
+        verbs[InsName.NextChain] = new Verb("$v")
+            // Next Chain
+            .setMonad((Verb v, a) => v.info.next(a))
+            .setDyad((Verb v, a, b) => v.info.next(a, b))
+            // TODO: copy next chains' marked arity
+            .setMarkedArity(1);
         
         // Nilads
         verbs[InsName.Empty] = Verb.nilad(Atom(cast(Atom[])[]));
@@ -796,9 +816,9 @@ MultiConjunction getMultiConjunction(InsName name) {
                     .setMarkedArity(f.niladic || h.niladic ? 1 : 2)
                     .setChildren([f, g, h]);
             }
-         );
-         
-         multiConjunctions[InsName.MonadChain] = new MultiConjunction(
+        );
+        
+        multiConjunctions[InsName.MonadChain] = new MultiConjunction(
             0, // greedy
             (Verb[] verbs) {
                 if(verbs.length == 1) {
@@ -815,7 +835,30 @@ MultiConjunction getMultiConjunction(InsName name) {
                     .setMarkedArity(1)
                     .setChildren(verbs);
             }
-         );
+        );
+         
+        multiConjunctions[InsName.Ternary] = new MultiConjunction(
+            3,
+            (Verb[] verbs) {
+                Verb ifTrue = verbs[0];
+                Verb ifFalse = verbs[1];
+                Verb condition = verbs[2];
+                return new Verb("?")
+                    .setMonad((a) {
+                        return condition(a).truthiness
+                            ? ifTrue(a)
+                            : ifFalse(a)
+                            ;}
+                    )
+                    .setDyad((a, b) =>
+                        condition(a, b).truthiness
+                            ? ifTrue(a, b)
+                            : ifFalse(a, b)
+                    )
+                    .setMarkedArity(condition.markedArity)
+                    .setChildren([ifTrue, ifFalse, condition]);
+            }
+        );
     }
     
     MultiConjunction* multiConjunction = name in multiConjunctions;

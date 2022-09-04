@@ -44,11 +44,11 @@ Trailing open parentheses are stripped and used as byte padding. Leading close p
 | `R` | `E`    | ✔️ | verb(1) | int | list | Range (0, exclusive) |
 | `R` | `E`    | | verb(2) | int, int | list | Range [a,b] (inclusive) |
 | `%` | `F0`   | ✔️ | verb(2) | int, int | int | Modulus |
-| `$` | `F10`  | | verb(N) | any | any | First chain |
-| `$1`| `F11`  | | verb(N) | any | any | Second chain |
-| `$2`| `F12`  | | verb(N) | any | any | Third chain |
-| `$3`| `F13`  | | verb(N) | any | any | Fourth chain |
-| `$N`| `F14`  | | verb(N) | any | any | Nth chain |
+| `$<`| `F10`  | | verb(N) | any | any | Last chain |
+| `$:`| `F11`  | | verb(N) | any | any | This chain |
+| `$>`| `F12`  | | verb(N) | any | any | Next chain |
+| `$N`| `F13`  | | verb(N) | any | any | Nth chain |
+| `?` | `F16`  | | multi-conjunction | verbs(\*,1) | verb(\*) | Ternary Choice |
 | `>.`| `F17`  | | verb(1) | list | any | Minimum |
 | `>.`| `F17`  | ✔️ | verb(2) | any, any | bool | Lesser of |
 | `<.`| `F18`  | | verb(1) | list | any | Maximum |
