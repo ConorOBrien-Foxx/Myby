@@ -294,7 +294,7 @@ NB.=> 6 12 18 24 30 36
 |----|----|
 | any → any | Identity |
 | string & number → string; list & number → list | Reshape |
-| list, list | TODO: filter a la J |
+| list, list | Filter. (Returns elements in `x` where the corresponding element in `y` is truthy, aka, `{" }\ ;" @.`.) |
 
 ### `R` - Range
 
