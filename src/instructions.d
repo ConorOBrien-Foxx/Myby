@@ -78,6 +78,7 @@ enum InsName {
     PreviousPrime,          //FE76
     NextPrime,              //FE77
     FirstNPrimes,           //FE78
+    Benil,                  //FE80
     Break,                  //FF
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -171,6 +172,7 @@ enum InsInfo[InsName] Info = [
     InsName.PreviousPrime:          InsInfo("prevp",   0xFE76,    SpeechPart.Verb),
     InsName.NextPrime:              InsInfo("nextp",   0xFE77,    SpeechPart.Verb),
     InsName.FirstNPrimes:           InsInfo("prims",   0xFE78,    SpeechPart.Verb),
+    InsName.Benil:                  InsInfo("benil",   0xFE80,    SpeechPart.Adjective),
     InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
 ];
 
@@ -340,7 +342,9 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.First] = new Verb("{")
             // First element
-            .setMonad(a => verbs[InsName.First](a, atomFor(BigInt(0))))
+            .setMonad(a =>
+                verbs[InsName.First](atomFor(BigInt(0)), a)
+            )
             // Index
             .setDyad((l, r) => match!(
                 (BigInt b, Atom[] a) =>
@@ -364,22 +368,19 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.Equality] = new Verb("=")
             .setMonad(a => a.match!(
-                (BigInt b) => Atom(eye(b)),
+                (b) => Atom(eye(b)),
                 (Atom[] a) => Atom(selfClassify(a)),
                 _ => Nil.nilAtom,
             ))
             // Equal to
-            .setDyad((l, r) => match!(
-                (a, b) => Atom(a == b),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((a, b) => Atom(a == b))
             .setMarkedArity(2);
         
         verbs[InsName.LessThan] = new Verb("<")
             // ToString
             .setMonad(a => Atom(a.as!string))
             // Inverse: Evaluate
-            .setInverse(new Verb("< inv")
+            .setInverse(new Verb("<!.")
                 .setMonad(a => a.match!(
                     (string a) => Interpreter.evaluate(a),
                     _ => Nil.nilAtom,
@@ -388,10 +389,7 @@ Verb getVerb(InsName name) {
                 .setMarkedArity(1)
             )
             // Less than
-            .setDyad((l, r) => match!(
-                (a, b) => Atom(a < b),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((a, b) => Atom(a < b))
             .setMarkedArity(2);
         
         verbs[InsName.GreaterThan] = new Verb(">")
@@ -401,28 +399,19 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             // Greater than
-            .setDyad((l, r) => match!(
-                (a, b) => Atom(a > b),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((a, b) => Atom(a > b))
             .setMarkedArity(2);
         
         verbs[InsName.LessEqual] = new Verb("<:")
             .setMonad(_ => Nil.nilAtom)
             // Less than or equal to
-            .setDyad((l, r) => match!(
-                (BigInt a, BigInt b) => Atom(a <= b),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((a, b) => Atom(a <= b))
             .setMarkedArity(2);
         
         verbs[InsName.GreaterEqual] = new Verb(">:")
             .setMonad(_ => Nil.nilAtom)
             // Greater than or equal to
-            .setDyad((l, r) => match!(
-                (BigInt a, BigInt b) => Atom(a >= b),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((a, b) => Atom(a >= b))
             .setMarkedArity(2);
         
         verbs[InsName.Minimum] = new Verb("<.")
@@ -562,6 +551,7 @@ Verb getVerb(InsName name) {
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
+        // Nilads
         verbs[InsName.Empty] = Verb.nilad(Atom(cast(Atom[])[]));
         verbs[InsName.Empty].display = "E";
         
@@ -695,6 +685,23 @@ Adjective getAdjective(InsName name) {
                     .setMonad(a => v.inverse(a))
                     .setDyad((_1, _2) => Nil.nilAtom)
                     .setInverse(v)
+                    .setMarkedArity(1)
+                    .setChildren([v]);
+            }
+        );
+        
+        adjectives[InsName.Benil] = new Adjective(
+            (Verb v) {
+                return new Verb("benil")
+                    .setMonad((a) {
+                        if(a.isNil) {
+                            return v(a);
+                        }
+                        else {
+                            return a;
+                        }
+                    })
+                    .setDyad((_1, _2) => Nil.nilAtom)
                     .setMarkedArity(1)
                     .setChildren([v]);
             }

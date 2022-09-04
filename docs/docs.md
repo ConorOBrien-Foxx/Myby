@@ -74,26 +74,25 @@ To describe the behavior of commands, the format **A** → **B** is used to deno
 +\          NB. sum.
             NB. +'s marked arity is 2, so \ deduces fold
 (#<5)\      NB. filter for less than 5.
-            NB. marked arity for a Fork with Niladic tine is 1, so \ deduces fold.
+            NB. marked arity for a Fork with Niladic tine is 1, so \ deduces fold
 ```
 
 ```myby
 NB. A multiplication table using the two given arrays:
 1 2 3 4 *\ 5 6 7
-NB. Results in:
- 5  6  7
-10 12 14
-15 18 21
-20 24 28
+NB.=>  5  6  7
+NB.=> 10 12 14
+NB.=> 15 18 21
+NB.=> 20 24 28
 NB. Using monadic ^, One Range, a multiplication table along the given input:
 *\~ ^
 NB. E.g., input = 6:
-1  2  3  4  5  6
-2  4  6  8 10 12
-3  6  9 12 15 18
-4  8 12 16 20 24
-5 10 15 20 25 30
-6 12 18 24 30 36
+NB.=> 1  2  3  4  5  6
+NB.=> 2  4  6  8 10 12
+NB.=> 3  6  9 12 15 18
+NB.=> 4  8 12 16 20 24
+NB.=> 5 10 15 20 25 30
+NB.=> 6 12 18 24 30 36
 ```
 
 
@@ -155,6 +154,19 @@ NB. E.g., input = 6:
 ### `~` - Reflex
 
 ### `` ` `` - Arity Force
+
+### `benil`
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `FE80` |
+| Nibble Cost | 4 |
+| Symbolic Usage | `u benil` |
+
+| Signature | Explanation |
+|----|----|
+| verb(0) → verb(1) | Nil defaulting. (Returns argument `a` if not `nil`. Otherwise, returns `u@a`, aka, niladic value of `u`.) |
 
 ## Conjunctions and Multi Conjunctions
 
@@ -305,9 +317,9 @@ NB. E.g., input = 6:
 ```myby
 R5
 NB.=> [0, 1, 2, 3, 4]
-3R6
+3 R 6
 NB.=> [3, 4, 5, 6]
-1 2R2 5
+1 2 R 2 5
 NB.=> 1 2
 NB.=> 1 3
 NB.=> 1 4
@@ -316,7 +328,7 @@ NB.=> 2 2
 NB.=> 2 3
 NB.=> 2 4
 NB.=> 2 5
-'aa'R'cc'
+'aa' R 'cc'
 NB.=> [aa, ab, ac, ba, bb, bc, ca, cb, cc]
 ```
 
@@ -356,9 +368,9 @@ NB.=> [aa, ab, ac, ba, bb, bc, ca, cb, cc]
 ;@5
 NB.=> [5]
 NB. @ is necessary here, since ;'s marked arity is 2, and (;5) redirects to ;&5
-4;'a'
+4 ; 'a'
 NB.=> [4, a]
-1;2;3;4
+1 ; 2 ; 3 ; 4
 NB.=> [1, 2, 3, 4]
 ```
 
@@ -378,17 +390,137 @@ NB.=> [1, 2, 3, 4]
 | list → list(list) | Enumerate. (Equivalent to `R@+ ;" #`.) |
 | number, number → number | Combinations. ([The number of ways `x` things can be chosen out of `y`.](https://www.jsoftware.com/help/dictionary/d410.htm)) |
 
+#### Examples
+
+```myby
+!\~ R15 @.  NB. Binomial table over [0,14]
+NB.=> 1 1 1 1 1  1  1  1  1   1   1   1   1    1    1
+NB.=> 0 1 2 3 4  5  6  7  8   9  10  11  12   13   14
+NB.=> 0 0 1 3 6 10 15 21 28  36  45  55  66   78   91
+NB.=> 0 0 0 1 4 10 20 35 56  84 120 165 220  286  364
+NB.=> 0 0 0 0 1  5 15 35 70 126 210 330 495  715 1001
+NB.=> 0 0 0 0 0  1  6 21 56 126 252 462 792 1287 2002
+NB.=> 0 0 0 0 0  0  1  7 28  84 210 462 924 1716 3003
+NB.=> 0 0 0 0 0  0  0  1  8  36 120 330 792 1716 3432
+NB.=> 0 0 0 0 0  0  0  0  1   9  45 165 495 1287 3003
+NB.=> 0 0 0 0 0  0  0  0  0   1  10  55 220  715 2002
+NB.=> 0 0 0 0 0  0  0  0  0   0   1  11  66  286 1001
+NB.=> 0 0 0 0 0  0  0  0  0   0   0   1  12   78  364
+NB.=> 0 0 0 0 0  0  0  0  0   0   0   0   1   13   91
+NB.=> 0 0 0 0 0  0  0  0  0   0   0   0   0    1   14
+NB.=> 0 0 0 0 0  0  0  0  0   0   0   0   0    0    1
+```
+
 ### `{` - First
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `F8` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `{a`; `x{y` |
+| Marked Arity | 2 |
+
+| Signature | Explanation |
+|----|----|
+| list → any; string → string | First element of |
+| number, list → any; number, string → string | `x`th element of `y`. (Implements modular indexing, i.e., wraps around. E.g., `_1{y` ⇔ `(#-1){y`.) |
 
 ### `}` - Last
 
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `F9` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `}a`; `x}y` |
+| Marked Arity | 1 |
+
+| Signature | Explanation |
+|----|----|
+| list → any; string → string | Last element of |
+
 ### `=` - Equality
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `F4` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `=a`; `x=y` |
+| Marked Arity | 1 |
+
+| Signature | Explanation |
+|----|----|
+| number → list(list(number)) | Identity matrix |
+| list → list(list(number)) | [Self-classify](https://www.jsoftware.com/help/dictionary/d000.htm). (Table equality between the unique elements of `a` and `a` itself. Equivalent to `/ =\ #`.) |
+| any, any → bool | Equality |
+
+#### Examples
+
+```myby
+3 = '3'
+NB.=> 0b
+6 = 3 + 3
+NB.=> 1b
+= 1 2 3 2 4 1 @.
+NB.=> 1 0 0 0 0 1
+NB.=> 0 1 0 1 0 0
+NB.=> 0 0 1 0 0 0
+NB.=> 0 0 0 0 1 0
+```
 
 ### `<` - Less Than
 
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `F5` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `<a`; `x<y` |
+| Marked Arity | 1 |
+
+| Signature | Explanation |
+|----|----|
+| any → string | To String |
+| any, any → bool | Less than. (Errors if incomparable.) |
+
+#### `<!.` - Evaluate
+
+| Signature | Explanation|
+|----|----|
+| string → any | Evaluate |
+
+#### Examples
+
+```myby
+'[3, 4]' = <@(3;4)
+NB.=> 1b
+-&.< 1234
+NB.=> 4321
+(# + -&.<)@1234
+NB.=> 5555
+3.5
+```
+
 ### `>` - Greater Than
 
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `F6` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `>a`; `x>y` |
+| Marked Arity | 1 |
+
+| Signature | Explanation |
+|----|----|
+| list → string | Join. (Joins `a` by the empty string, converting each element to a string.) |
+| any, any → bool | Greater than. (Errors if incomparable.) |
+
 ### `<:` - Less Or Equal
+
+
 
 ### `>:` - Greater Or Equal
 

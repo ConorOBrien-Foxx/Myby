@@ -46,6 +46,8 @@ hljs.registerLanguage("myby", (h) => {
             {
                 className: "number",
                 variants: [
+                    { begin: `[01]+b` },
+                    { begin: `[0-9]+\\.[0-9]+` },
                     { begin: `[0-9]+` },
                 ],
                 relevance: 0,
@@ -60,7 +62,7 @@ hljs.registerLanguage("myby", (h) => {
             {
                 className: "title",
                 variants: [
-                    { begin: /[&@O~]|[&@\\].|^:/ },
+                    { begin: /[&@\\]\.|[&@O~]|^:/ },
                 ],
                 relevance: 0,
             },

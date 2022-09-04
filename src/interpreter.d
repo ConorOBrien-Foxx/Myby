@@ -174,7 +174,6 @@ Token[] autoCompleteParentheses(Token[] tokens) {
     return head ~ tokens ~ tail;
 }
 
-import std.stdio;
 class Interpreter {
     Nibble[] code;
     Token[] stack;
@@ -321,7 +320,7 @@ class Interpreter {
             }
             else {
                 // i don't know how we got here
-                writeln("Huh? idk what to do with ", verbs.length, " verbs...");
+                Debugger.print("Huh? idk what to do with ", verbs.length, " verbs...");
                 assert(false);
             }
         }
@@ -437,7 +436,6 @@ class Interpreter {
                     // TODO: handle more syntax?
                     auto amount = to!int(token.big);
                     finishListBuild;
-                    writeln("amount: ", amount);
                     auto last = verbs[$-amount..$];
                     verbs.popBackN(amount-1);
                     condenseVerbChain(last);

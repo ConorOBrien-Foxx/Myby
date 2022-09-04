@@ -221,15 +221,15 @@ Atom[] nub(Atom[] a) {
     return res;
 }
 
-Atom[] eye(BigInt b) {
+Atom[] eye(Number)(Number b) {
     if(b <= 0) {
         return [Atom(cast(Atom[]) [])];
     }
     Atom[] rows;
-    for(BigInt i = 0; i < b; i++) {
+    for(Number i = 0; i < b; i++) {
         Atom[] row;
-        for(BigInt j = 0; j < b; j++) {
-            row ~= Atom(BigInt(i == j ? 1 : 0));
+        for(Number j = 0; j < b; j++) {
+            row ~= Atom(Number(i == j ? 1 : 0));
         }
         rows ~= Atom(row);
     }
