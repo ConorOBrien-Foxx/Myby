@@ -151,7 +151,10 @@ int main(string[] args) {
     Verb mainVerb = chains[$ - 1];
     
     if(Debugger.printing) {
-        writeln(treeToBoxedString(mainVerb));
+        foreach(chainIndex, v; chains) {
+            writeln("Chain ", chainIndex, ":");
+            writeln(treeToBoxedString(v));
+        }
     }
     
     Atom[] verbArgs = args[fileName ? 2 : 1..$]
