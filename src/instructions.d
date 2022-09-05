@@ -571,7 +571,8 @@ Verb getVerb(InsName name) {
                 if(v.info.index) {
                     Debugger.print("Last is correct? ", v.info.last == v.info.chains[v.info.index - 1]);
                 }
-                return v.info.last(a, b);})
+                return v.info.last(a, b);
+            })
             // TODO: copy last chains' marked arity
             .setMarkedArity(1);
             
@@ -630,12 +631,12 @@ Adjective getAdjective(InsName name) {
         adjectives[InsName.Map] = new Adjective(
             (Verb v) => new Verb("\"")
                 // map
-                .setMonad(a => a.match!(
+                .setMonad((Verb v, a) => a.match!(
                     (Atom[] arr) => Atom(arr.map!v.array),
                     _ => Nil.nilAtom,
                 ))
                 // zip
-                .setDyad((a, b) => match!(
+                .setDyad((Verb v, a, b) => match!(
                     (Atom[] a, Atom[] b) => Atom(zip(a, b).map!(t => v(t[0], t[1])).array),
                     // TODO: maybe don't call Atom every iteration?
                     (Atom[] a, b) => Atom(a.map!(t => v(t, Atom(b))).array),
@@ -649,8 +650,8 @@ Adjective getAdjective(InsName name) {
         // ArityForce
         adjectives[InsName.ArityForce] = new Adjective(
             (Verb v) => new Verb("`")
-                .setMonad(a => v(a))
-                .setDyad((a, b) => v(a, b))
+                .setMonad((Verb v, a) => v(a))
+                .setDyad((Verb v, a, b) => v(a, b))
                 .setMarkedArity(v.markedArity == 2 ? 1 : 2)
                 .setChildren([v])
         );
@@ -658,8 +659,8 @@ Adjective getAdjective(InsName name) {
         // OnLeft
         adjectives[InsName.OnLeft] = new Adjective(
             (Verb v) => new Verb("[")
-                .setMonad(a => v(a))
-                .setDyad((a, b) => v(a))
+                .setMonad((Verb v, a) => v(a))
+                .setDyad((Verb v, a, b) => v(a))
                 .setMarkedArity(2)
                 .setChildren([v])
         );
@@ -667,8 +668,8 @@ Adjective getAdjective(InsName name) {
         // OnRight
         adjectives[InsName.OnRight] = new Adjective(
             (Verb v) => new Verb("]")
-                .setMonad(a => v(a))
-                .setDyad((a, b) => v(b))
+                .setMonad((Verb v, a) => v(a))
+                .setDyad((Verb v, a, b) => v(b))
                 .setMarkedArity(2)
                 .setChildren([v])
         );
@@ -676,7 +677,7 @@ Adjective getAdjective(InsName name) {
         // OnPrefixes
         adjectives[InsName.OnPrefixes] = new Adjective(
             (Verb v) => new Verb("\\.")
-                .setMonad(a => a.match!(
+                .setMonad((Verb v, a) => a.match!(
                     (Atom[] a) => Atom(
                         iota(a.length)
                             .map!(i => a[0..i + 1])
@@ -686,7 +687,7 @@ Adjective getAdjective(InsName name) {
                     ),
                     _ => Nil.nilAtom,
                 ))
-                .setDyad((_1, _2) => Nil.nilAtom)
+                .setDyad((Verb v, _1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
                 .setChildren([v])
         );
@@ -694,8 +695,8 @@ Adjective getAdjective(InsName name) {
         // Reflex
         adjectives[InsName.Reflex] = new Adjective(
             (Verb v) => new Verb("~")
-                .setMonad(a => v(a, a))
-                .setDyad((x, y) => v(y, x))
+                .setMonad((Verb v, a) => v(a, a))
+                .setDyad((Verb v, x, y) => v(y, x))
                 .setMarkedArity(2)
                 .setChildren([v])
         );
@@ -703,14 +704,14 @@ Adjective getAdjective(InsName name) {
         // Generate
         adjectives[InsName.Generate] = new Adjective(
             (Verb v) => new Verb("G")
-                .setMonad((a) {
+                .setMonad((Verb v, a) {
                     auto ind = BigInt(0);
                     while(!v(a, Atom(ind)).truthiness) {
                         ind++;
                     }
                     return Atom(ind);
                 })
-                .setDyad((_1, _2) => Nil.nilAtom)
+                .setDyad((Verb v, _1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
                 .setChildren([v])
         );
@@ -720,8 +721,8 @@ Adjective getAdjective(InsName name) {
             (Verb v) {
                 assert(v.invertable(), "Cannot invert " ~ v.display);
                 return new Verb("!.")
-                    .setMonad(a => v.inverse(a))
-                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setMonad((Verb v, a) => v.inverse(a))
+                    .setDyad((Verb v, _1, _2) => Nil.nilAtom)
                     .setInverse(v)
                     .setMarkedArity(1)
                     .setChildren([v]);
@@ -731,7 +732,7 @@ Adjective getAdjective(InsName name) {
         // Benil
         adjectives[InsName.Benil] = new Adjective(
             (Verb v) => new Verb("benil")
-                .setMonad((a) {
+                .setMonad((Verb v, a) {
                     if(a.isNil) {
                         return v(a);
                     }
@@ -739,7 +740,7 @@ Adjective getAdjective(InsName name) {
                         return a;
                     }
                 })
-                .setDyad((_1, _2) => Nil.nilAtom)
+                .setDyad((Verb v, _1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
                 .setChildren([v])
         );
@@ -750,7 +751,7 @@ Adjective getAdjective(InsName name) {
                 import myby.memo;
                 FixedMemo!(Atom[Atom], 600) unaryMemo;
                 return new Verb("M.")
-                    .setMonad((a) {
+                    .setMonad((Verb v, a) {
                         auto mem = a in unaryMemo;
                         if(mem !is null) {
                             return *mem;
@@ -759,7 +760,7 @@ Adjective getAdjective(InsName name) {
                             return unaryMemo[a] = v(a);
                         }
                     })
-                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setDyad((Verb v, _1, _2) => Nil.nilAtom)
                     .setMarkedArity(1)
                     .setChildren([v]);
             }
@@ -796,8 +797,8 @@ Conjunction getConjunction(InsName name) {
         
         conjunctions[InsName.Compose] = new Conjunction(
             (Verb f, Verb g) => new Verb("@")
-                .setMonad(a => f(g(a)))
-                .setDyad((a, b) => f(g(a, b)))
+                .setMonad((f, g, a) => f(g(a)))
+                .setDyad((f, g, a, b) => f(g(a, b)))
                 .setMarkedArity(g.markedArity)
                 .setChildren([f, g])
         );
@@ -810,8 +811,8 @@ Conjunction getConjunction(InsName name) {
             (Verb f, Verb g) {
                 assert(g.invertable(), "Cannot invert " ~ g.display);
                 return new Verb("&.")
-                    .setMonad(a => g.inverse(f(g(a))))
-                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setMonad((f, g, a) => g.inverse(f(g(a))))
+                    .setDyad((f, g, _1, _2) => Nil.nilAtom)
                     .setMarkedArity(1)
                     .setChildren([f, g]);
             }
@@ -819,7 +820,7 @@ Conjunction getConjunction(InsName name) {
         
         conjunctions[InsName.Scan] = new Conjunction(
             (Verb f, Verb seedFn) => new Verb("\\:")
-                .setMonad(a => a.match!(
+                .setMonad((f, g, a) => a.match!(
                     (Atom[] arr) {
                         // TODO: relegate a specific atom for
                         // using f's identity as seed?
@@ -828,7 +829,7 @@ Conjunction getConjunction(InsName name) {
                     },
                     _ => Nil.nilAtom,
                 ))
-                .setDyad((_1, _2) => Nil.nilAtom)
+                .setDyad((f, g, _1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
                 .setChildren([f, seedFn])
         );
@@ -848,14 +849,16 @@ MultiConjunction getMultiConjunction(InsName name) {
         multiConjunctions[InsName.SplitCompose] = new MultiConjunction(
             3,
             (Verb[] verbs) {
-                Verb f = verbs[0];
-                Verb g = verbs[1];
-                Verb h = verbs[2];
                 return new Verb("O")
                     .setMonad(_ => Nil.nilAtom)
-                    .setDyad((x, y) => g(f(x), h(y)))
-                    .setMarkedArity(f.niladic || h.niladic ? 1 : 2)
-                    .setChildren([f, g, h]);
+                    .setDyad((Verb[] verbs, x, y) {
+                        Verb f = verbs[0];
+                        Verb g = verbs[1];
+                        Verb h = verbs[2];
+                        return g(f(x), h(y));
+                    })
+                    .setMarkedArity(verbs[0].niladic || verbs[2].niladic ? 1 : 2)
+                    .setChildren(verbs);
             }
         );
         
@@ -863,16 +866,20 @@ MultiConjunction getMultiConjunction(InsName name) {
             0, // greedy
             (Verb[] verbs) {
                 if(verbs.length == 1) {
+                    // TODO: include information
                     return verbs[0];
                 }
                 assert(verbs.length > 1, "Cannot multi-compose with this many verbs");
-                // so that we fold from right to left
-                auto reversed = verbs.retro.array;
                 return new Verb("@.")
-                    .setMonad(y => reduce!((atom, v) => v(atom))(y, reversed))
-                    .setDyad((a, b) => reduce!((atom, v) => v(atom))(
-                        reversed[0](a, b), reversed[1..$]
-                    ))
+                    // reversed so that we fold from right to left
+                    // TODO: just implement a reduceRight function instead of this chicanery
+                    .setMonad((Verb[] verbs, y) => reduce!((atom, v) => v(atom))(y, verbs.retro.array))
+                    .setDyad((Verb[] verbs, a, b) {
+                        auto reversed = verbs.retro.array;
+                        return reduce!((atom, v) => v(atom))(
+                            reversed[0](a, b), reversed[1..$]
+                        );
+                    })
                     .setMarkedArity(1)
                     .setChildren(verbs);
             }
@@ -881,24 +888,25 @@ MultiConjunction getMultiConjunction(InsName name) {
         multiConjunctions[InsName.Ternary] = new MultiConjunction(
             3,
             (Verb[] verbs) {
-                Verb ifTrue = verbs[0];
-                Verb ifFalse = verbs[1];
-                Verb condition = verbs[2];
                 return new Verb("?")
-                    .setMonad((a) {
+                    .setMonad((Verb[] verbs, a) {
+                        Verb ifTrue = verbs[0];
+                        Verb ifFalse = verbs[1];
+                        Verb condition = verbs[2];
                         return condition(a).truthiness
                             ? ifTrue(a)
-                            : ifFalse(a)
-                            ;}
-                    )
-                    .setDyad((a, b) {
-                        Debugger.print("? ", a, " ; ", b);
+                            : ifFalse(a);
+                    })
+                    .setDyad((Verb[] verbs, a, b) {
+                        Verb ifTrue = verbs[0];
+                        Verb ifFalse = verbs[1];
+                        Verb condition = verbs[2];
                         return condition(a, b).truthiness
                             ? ifTrue(a, b)
                             : ifFalse(a, b);
                     })
-                    .setMarkedArity(condition.markedArity)
-                    .setChildren([ifTrue, ifFalse, condition]);
+                    .setMarkedArity(verbs[2].markedArity)
+                    .setChildren(verbs);
             }
         );
     }

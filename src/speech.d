@@ -360,15 +360,17 @@ struct Atom {
 alias VerbMonadSimple = Atom delegate(Atom);
 alias VerbMonadSelf = Atom delegate(Verb, Atom);
 alias VerbMonadConjunction = Atom delegate(Verb, Verb, Atom);
+alias VerbMonadMultiConjunction = Atom delegate(Verb[], Atom);
 alias VerbMonad = SumType!(
-    VerbMonadSimple, VerbMonadSelf, VerbMonadConjunction
+    VerbMonadSimple, VerbMonadSelf, VerbMonadConjunction, VerbMonadMultiConjunction
 );
 
 alias VerbDyadSimple = Atom delegate(Atom, Atom);
 alias VerbDyadSelf = Atom delegate(Verb, Atom, Atom);
 alias VerbDyadConjunction = Atom delegate(Verb, Verb, Atom, Atom);
+alias VerbDyadMultiConjunction = Atom delegate(Verb[], Atom, Atom);
 alias VerbDyad = SumType!(
-    VerbDyadSimple, VerbDyadSelf, VerbDyadConjunction
+    VerbDyadSimple, VerbDyadSelf, VerbDyadConjunction, VerbDyadMultiConjunction
 );
 
 alias AdjectiveMonad = Verb delegate(Verb);
@@ -491,6 +493,11 @@ class Verb {
         return this;
     }
     
+    Verb setMonad(VerbMonadMultiConjunction m) {
+        monad = m;
+        return this;
+    }
+    
     Verb setDyad(VerbDyadSimple d) {
         dyad = d;
         return this;
@@ -502,6 +509,11 @@ class Verb {
     }
     
     Verb setDyad(VerbDyadConjunction d) {
+        dyad = d;
+        return this;
+    }
+    
+    Verb setDyad(VerbDyadMultiConjunction d) {
         dyad = d;
         return this;
     }
@@ -540,16 +552,22 @@ class Verb {
     
     Atom monadic(Atom a) {
         return monad.match!(
+            f => f(children, a),
             f => f(children[0], children[1], a),
-            f => f(this, a),
+            f => children.length
+                ? f(children[0], a)
+                : f(this, a),
             f => f(a)
         );
     }
     
     Atom dyadic(Atom a, Atom b) {
         return dyad.match!(
+            f => f(children, a, b),
             f => f(children[0], children[1], a, b),
-            f => f(this, a, b),
+            f => children.length
+                ? f(children[0], a, b)
+                : f(this, a, b),
             f => f(a, b)
         );
     }
@@ -625,8 +643,18 @@ class Verb {
     
     static Verb fork(Verb f, Verb g, Verb h) {
         return new Verb("Ψ")
-            .setMonad(a => g(f(a), h(a)))
-            .setDyad((a, b) => g(f(a, b), h(a, b)))
+            .setMonad((Verb[] verbs, a) {
+                Verb f = verbs[0];
+                Verb g = verbs[1];
+                Verb h = verbs[2];
+                return g(f(a), h(a));
+            })
+            .setDyad((Verb[] verbs, a, b) {
+                Verb f = verbs[0];
+                Verb g = verbs[1];
+                Verb h = verbs[2];
+                return g(f(a, b), h(a, b));
+            })
             .setMarkedArity(f.niladic || h.niladic ? 1 : 2)
             .setChildren([f, g, h]);
     }

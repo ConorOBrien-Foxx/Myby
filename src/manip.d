@@ -139,19 +139,19 @@ Atom exit(BigInt code = 0) {
 
 Verb filterFor(Verb v) {
     return new Verb("₁\\")
-        .setMonad(a => a.match!(
+        .setMonad((Verb v, a) => a.match!(
             (Atom[] a) =>
                 Atom(a.filter!(a => v(a).truthiness).array),
             _ => Nil.nilAtom,
         ))
-        .setDyad((a, b) => Nil.nilAtom)
+        .setDyad((Verb v, a, b) => Nil.nilAtom)
         .setMarkedArity(1)
         .setChildren([v]);
 }
 
 Verb foldFor(Verb v) {
     import myby.debugger;
-    Atom reduceHelper(T)(T arr) {
+    Atom reduceHelper(T)(Verb v, T arr) {
         // TODO: I don't like that this conditional is checked every time
         // find a way to eliminate it
         Debugger.print("Reducing: ", arr);
@@ -160,12 +160,12 @@ Verb foldFor(Verb v) {
             : reduce!v(v.identity, arr);
     }
     return new Verb("₂\\")
-        .setMonad(a => a.match!(
+        .setMonad((Verb v, a) => a.match!(
             (Atom[] arr) {
                 Debugger.print("Fold for  ", v);
                 Debugger.print("Identity: ", v.identity);
                 Debugger.print("Array:    ", arr);
-                return reduceHelper(arr);
+                return reduceHelper(v, arr);
             },
             // TODO: it might be more useful to special case filter when called on integers
             // like, who's gonna use ^\ ????
@@ -173,15 +173,16 @@ Verb foldFor(Verb v) {
                 auto start = v.rangeStart.as!(typeof(n));
                 if(start > n) {
                     // iota doesn't correctly handle reals creating an empty range
-                    return reduceHelper(cast(Atom[]) []);
+                    return reduceHelper(v, cast(Atom[]) []);
                 }
                 else {
-                    return reduceHelper(iota(start, n + 1).map!Atom);
+                    return reduceHelper(v, iota(start, n + 1).map!Atom);
                 }
             },
             _ => Nil.nilAtom,
         ))
-        .setDyad((a, b) => match!(
+        .setDyad((Verb v, a, b) => match!(
+            // TODO:
             (BigInt a, BigInt b) => Atom(BigInt("234")),
             // table
             (Atom[] a, Atom[] b) =>
@@ -194,7 +195,7 @@ Verb foldFor(Verb v) {
 
 Verb powerFor(Verb f, Verb g) {
     return new Verb("^:")
-        .setMonad((a) {
+        .setMonad((f, g, a) {
             Atom times = g(a);
             return times.match!(
                 (Infinity i) => assert(0, "TODO: Fixpoint"),
@@ -208,7 +209,7 @@ Verb powerFor(Verb f, Verb g) {
                 _ => Nil.nilAtom,
             );
         })
-        .setDyad((_1, _2) => Nil.nilAtom)
+        .setDyad((f, g, _1, _2) => Nil.nilAtom)
         .setMarkedArity(1)
         .setChildren([f, g]);
 }
