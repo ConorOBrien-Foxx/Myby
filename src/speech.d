@@ -428,6 +428,7 @@ class Verb {
         res.dyadSelf = dyadSelf;
         res.inverse = inverse;
         res.info = info;
+        res.niladic = niladic;
         res.markedArity = markedArity;
         res.rangeStart = rangeStart;
         res.identity = identity;

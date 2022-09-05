@@ -785,9 +785,8 @@ Conjunction getConjunction(InsName name) {
                             ? f(a, g())
                             : f(g(a)))
                 // TODO: niladic as per above
-                // .setDyad((f, g, a, b) =>
-                    // f(g(a), g(b)))
-                .setDyad((a, b) => Nil.nilAtom)
+                .setDyad((f, g, a, b) =>
+                    f(g(a), g(b)))
                 .setMarkedArity(
                     f.niladic || g.niladic
                         ? 1
