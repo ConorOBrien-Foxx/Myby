@@ -81,6 +81,7 @@ enum InsName {
     NextPrime,              //FE77
     FirstNPrimes,           //FE78
     Benil,                  //FE80
+    Memoize,                //FE81
     Break,                  //FF
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -172,6 +173,7 @@ enum InsInfo[InsName] Info = [
     InsName.NextPrime:              InsInfo("nextp",   0xFE77,    SpeechPart.Verb),
     InsName.FirstNPrimes:           InsInfo("prims",   0xFE78,    SpeechPart.Verb),
     InsName.Benil:                  InsInfo("benil",   0xFE80,    SpeechPart.Adjective),
+    InsName.Memoize:                InsInfo("M.",      0xFE81,    SpeechPart.Adjective),
     InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
 ];
 
@@ -408,14 +410,14 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.LessEqual] = new Verb("<:")
             // Decrement
-            .setMonad(a => a - 1)
+            .setMonad(a => a.decrement())
             // Less than or equal to
             .setDyad((a, b) => Atom(a <= b))
             .setMarkedArity(2);
         
         verbs[InsName.GreaterEqual] = new Verb(">:")
             // Increment. TODO: Successor
-            .setMonad(a => a + 1)
+            .setMonad(a => a.increment())
             // Greater than or equal to
             .setDyad((a, b) => Atom(a >= b))
             .setMarkedArity(2);
@@ -709,15 +711,35 @@ Adjective getAdjective(InsName name) {
             }
         );
         
+        // Benil
         adjectives[InsName.Benil] = new Adjective(
+            (Verb v) => new Verb("benil")
+                .setMonad((a) {
+                    if(a.isNil) {
+                        return v(a);
+                    }
+                    else {
+                        return a;
+                    }
+                })
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+                .setChildren([v])
+        );
+        
+        // Memoize
+        adjectives[InsName.Memoize] = new Adjective(
             (Verb v) {
-                return new Verb("benil")
+                import myby.memo;
+                FixedMemo!(Atom[Atom], 600) unaryMemo;
+                return new Verb("M.")
                     .setMonad((a) {
-                        if(a.isNil) {
-                            return v(a);
+                        auto mem = a in unaryMemo;
+                        if(mem !is null) {
+                            return *mem;
                         }
                         else {
-                            return a;
+                            return unaryMemo[a] = v(a);
                         }
                     })
                     .setDyad((_1, _2) => Nil.nilAtom)

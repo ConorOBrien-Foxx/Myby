@@ -526,7 +526,7 @@ NB.=> 5555
 
 ### `>.` - Maximum
 
-### `$<` - Last Chain
+### `$^` - Last Chain
 
 
 | Statistic | Value |
@@ -534,7 +534,7 @@ NB.=> 5555
 | Speech Part | Verb |
 | Hex Representation | `F10` |
 | Nibble Cost | 3 |
-| Symbolic Usage | `$<a`; `x$<y` |
+| Symbolic Usage | `$^a`; `x$^y` |
 | Marked Arity | 1 (Subject to change) |
 
 | Signature | Explanation |
@@ -546,7 +546,7 @@ NB.=> 5555
 ```myby
 NB. full program
 # + 5       NB. add 5
-$< ^ 2      NB. square first line
+$^ ^ 2      NB. square first line
 NB. equivalent to
 NB.=> (#+5)^2
 ```

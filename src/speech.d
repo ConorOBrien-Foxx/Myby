@@ -34,6 +34,10 @@ class Nil {
         return false;
     }
     
+    override size_t toHash() const {
+        return 0;
+    }
+    
     static Nil nil() {
         static Nil n;
         
@@ -87,6 +91,10 @@ class Infinity {
 
     bool opEquals(T)(T o) {
         return opCmp(o) == 0;
+    }
+    
+    override size_t toHash() const {
+        return isPositive;
     }
     
     static Infinity positive() {
@@ -218,8 +226,22 @@ struct Atom {
     }
     
     Atom opBinary(string op, T)(T rhs)
-    if(!is(T == Atom)) {
+    if(!is(T == Atom) && op != "in") {
         return opBinary!op(Atom(rhs));
+    }
+    
+    Atom increment() {
+        return value.match!(
+            (a) => Atom(a + cast(typeof(a))1),
+            _ => Nil.nilAtom,
+        );
+    }
+    
+    Atom decrement() {
+        return value.match!(
+            (a) => Atom(a - cast(typeof(a))1),
+            _ => Nil.nilAtom,
+        );
     }
     
     enum mathOps = ["+", "-", "/", "*", "%", "^^"];
@@ -311,6 +333,23 @@ struct Atom {
             // if a == b does not compile for a and b, then they cannot be equal
             (_1, _2) => false,
         )(value, other.value);
+    }
+    
+    // below two methods for hashes
+    bool opEquals(ref const Atom other) const {
+        return match!(
+            (a, b) => a == b,
+            (_1, _2) => false,
+        )(value, other.value);
+    }
+    
+    size_t toHash() const nothrow @safe {
+        return value.match!(
+            a => a.toHash(),
+            (real r) => r.hashOf(),
+            (string s) => s.hashOf(),
+            (const Atom[] a) => a.map!"a.toHash".sum,
+        );
     }
     
     // trick learned from https://stackoverflow.com/a/73351663/4119004
