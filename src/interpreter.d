@@ -307,6 +307,7 @@ class Interpreter {
                             
                         case InsName.Break:
                             flushOpStack();
+                            parenStackArity = [0];
                             stack ~= token;
                             break;
                         
@@ -440,6 +441,8 @@ class Interpreter {
                     break;
                     
                 case SpeechPart.Adjective:
+                    // TODO: using filter as a separator is fundamentally flawed
+                    // e.g.: =&2\ 0&;
                     if(state == NiladParseState.LastWasNilad && token.name == InsName.Filter) {
                         Debugger.print("Nilad separator!");
                         if(listBuild.length == 0) {
