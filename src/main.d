@@ -9,7 +9,6 @@ import std.sumtype;
 
 // TODO: remove superfluous headers
 import myby.debugger;
-import myby.format;
 import myby.instructions;
 import myby.integer;
 import myby.interpreter;
@@ -36,17 +35,21 @@ int main(string[] args) {
     bool compile;
     bool literate;
     bool useDebug;
+    bool useRuntimeDebug;
+    bool dispTree;
     string outfile;
     string fpath;
     string code;
     auto info = getoptSafeError(
         args,
+        "tree|t", "Display tree-form", &dispTree,
         "compile|c", "Compile literate program", &compile,
         "outfile|o", "Outputs relevant data to specified file", &outfile,
         "literate|l", "Input source is a literate program", &literate,
         "file|f", "Uses named file", &fpath,
         "execute|e", "Executes provided code", &code,
         "debug|d", "Prints debug information", &useDebug,
+        "runDebug|r", "Runtime debug information", &useRuntimeDebug,
     );
     
     if(useDebug) {
@@ -126,6 +129,14 @@ int main(string[] args) {
             res ~= cast(char)(i);
         }
         stderr.writeln("Converted bytes: ", nibs.byteNibbleFmt);
+        if(dispTree) {
+            Interpreter i = new Interpreter(nibs);
+            i.shunt;
+            foreach(chainIndex, v; i.condense) {
+                stderr.writeln("Chain ", chainIndex, ":");
+                stderr.writeln(v.treeDisplay());
+            }
+        }
         output(res);
         return 0;
     }
@@ -150,11 +161,26 @@ int main(string[] args) {
     
     Verb mainVerb = chains[$ - 1];
     
-    if(Debugger.printing) {
+    /*
+    void debugInfo(Verb v, int index = 0) {
+        string rep="";foreach(i;0..index)rep~=' ';
+        writeln(rep,v.inlineDisplay, "'s info:");
+        writeln(rep,v.info);
+        foreach(child; v.children) {
+            debugInfo(child, index + 4);
+        }
+    }
+    */
+    if(Debugger.printing || dispTree) {
         foreach(chainIndex, v; chains) {
             writeln("Chain ", chainIndex, ":");
-            writeln(treeToBoxedString(v));
+            writeln(v.treeDisplay());
+            // debugInfo(v);
         }
+    }
+    
+    if(useRuntimeDebug) {
+        Debugger.enable();
     }
     
     Atom[] verbArgs = args[fileName ? 2 : 1..$]

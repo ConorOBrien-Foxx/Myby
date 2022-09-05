@@ -306,6 +306,7 @@ class Interpreter {
                             break;
                             
                         case InsName.Break:
+                            flushOpStack();
                             stack ~= token;
                             break;
                         
@@ -340,8 +341,8 @@ class Interpreter {
                 f = verbs[$-3];
                 g = verbs[$-2];
                 h = verbs[$-1];
-                verbs.popBackN(2);
-                verbs[$-1] = Verb.fork(f, g, h);
+                verbs.popBackN(3);
+                verbs ~= Verb.fork(f, g, h);
             }
             else if(verbs.length == 2) {
                 Debugger.print("Atop");
@@ -349,13 +350,13 @@ class Interpreter {
                 Verb f, g;
                 f = verbs[$-2];
                 g = verbs[$-1];
-                verbs.popBack;
+                verbs.popBackN(2);
                 if(g.niladic && f.markedArity == 2 || f.niladic && g.markedArity == 2) {
                     Debugger.print("Atop redirected to Bind");
-                    verbs[$-1] = bind(f, g);
+                    verbs ~= bind(f, g);
                 }
                 else {
-                    verbs[$-1] = compose(f, g);
+                    verbs ~= compose(f, g);
                 }
             }
             else {
@@ -453,7 +454,9 @@ class Interpreter {
                             ~ to!string(token.name));
                         Adjective adj = getAdjective(token.name);
                         finishListBuild;
-                        verbs[$-1] = adj.transform(verbs[$-1]);
+                        Verb u = verbs[$-1];
+                        verbs.popBack;
+                        verbs ~= adj.transform(u);
                     }
                     break;
                 
@@ -464,8 +467,8 @@ class Interpreter {
                     finishListBuild;
                     Verb f = verbs[$-2];
                     Verb g = verbs[$-1];
-                    verbs.popBack;
-                    verbs[$-1] = con.transform(f, g);
+                    verbs.popBackN(2);
+                    verbs ~= con.transform(f, g);
                     break;
                 
                 case SpeechPart.MultiConjunction:
@@ -501,9 +504,9 @@ class Interpreter {
                     auto amount = to!int(token.big);
                     finishListBuild;
                     auto last = verbs[$-amount..$];
-                    verbs.popBackN(amount-1);
+                    verbs.popBackN(amount);
                     condenseVerbChain(last);
-                    verbs[$-1] = last[$-1];
+                    verbs ~= last[$-1];
                     break;
             }
             state = nextState;
@@ -529,10 +532,11 @@ class Interpreter {
             Debugger.print("CHAIN:");
             Debugger.print("   ",chain);
             Verb chainVerb = condenseTokenChain(chain);
-            chains ~= chainVerb;
+            chains ~= chainVerb.dup;
         }
         // assign links
         foreach(i, ref chain; chains) {
+            Debugger.print("=== ", i, " ===");
             auto info = ChainInfo(i, chains);
             chain.setChains(info);
         }

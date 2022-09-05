@@ -553,13 +553,30 @@ Verb getVerb(InsName name) {
             
         verbs[InsName.LastChain] = new Verb("$^")
             // Last Chain
-            .setMonad((Verb v, a) => v.info.last(a))
-            .setDyad((Verb v, a, b) => v.info.last(a, b))
+            .setMonad((Verb v, a) {
+                Debugger.print("-- CALLING $^(1) --");
+                Debugger.print("Info: ", v.info);
+                Debugger.print("Last is self? ", v.info.last == v);
+                if(v.info.index) {
+                    Debugger.print("Last is correct? ", v.info.last == v.info.chains[v.info.index - 1]);
+                    Debugger.print("Last: ", v.info.last);
+                    Debugger.print("Last info: ", v.info.last.info);
+                }
+                return v.info.last(a);
+            })
+            .setDyad((Verb v, a, b) {
+                Debugger.print("-- CALLING $^(2) --");
+                Debugger.print("Info: ", v.info);
+                Debugger.print("Last is self? ", v.info.last == v);
+                if(v.info.index) {
+                    Debugger.print("Last is correct? ", v.info.last == v.info.chains[v.info.index - 1]);
+                }
+                return v.info.last(a, b);})
             // TODO: copy last chains' marked arity
             .setMarkedArity(1);
             
         verbs[InsName.ThisChain] = new Verb("$:")
-            // Last Chain
+            // Self Chain
             .setMonad((Verb v, a) => v.info.self(a))
             .setDyad((Verb v, a, b) => v.info.self(a, b))
             // TODO: copy this chains' marked arity
@@ -760,15 +777,16 @@ Conjunction getConjunction(InsName name) {
     if(!conjunctions) {
          conjunctions[InsName.Bond] = new Conjunction(
             (Verb f, Verb g) => new Verb("&")
-                .setMonad(a => 
+                .setMonad((f, g, a) =>
                     f.niladic
                         ? g(f(), a)
                         : g.niladic
                             ? f(a, g())
                             : f(g(a)))
                 // TODO: niladic as per above
-                .setDyad((a, b) =>
-                    f(g(a), g(b)))
+                // .setDyad((f, g, a, b) =>
+                    // f(g(a), g(b)))
+                .setDyad((a, b) => Nil.nilAtom)
                 .setMarkedArity(
                     f.niladic || g.niladic
                         ? 1
@@ -873,11 +891,12 @@ MultiConjunction getMultiConjunction(InsName name) {
                             : ifFalse(a)
                             ;}
                     )
-                    .setDyad((a, b) =>
-                        condition(a, b).truthiness
+                    .setDyad((a, b) {
+                        Debugger.print("? ", a, " ; ", b);
+                        return condition(a, b).truthiness
                             ? ifTrue(a, b)
-                            : ifFalse(a, b)
-                    )
+                            : ifFalse(a, b);
+                    })
                     .setMarkedArity(condition.markedArity)
                     .setChildren([ifTrue, ifFalse, condition]);
             }

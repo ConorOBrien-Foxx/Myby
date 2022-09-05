@@ -11,6 +11,7 @@ import std.range;
 import std.sumtype;
 
 import myby.debugger;
+import myby.format;
 import myby.nibble;
 import myby.manip;
 
@@ -356,22 +357,34 @@ struct Atom {
     alias value this;
 }
 
-alias VerbMonad = Atom delegate(Atom);
+alias VerbMonadSimple = Atom delegate(Atom);
 alias VerbMonadSelf = Atom delegate(Verb, Atom);
-alias VerbDyad = Atom delegate(Atom, Atom);
+alias VerbMonadConjunction = Atom delegate(Verb, Verb, Atom);
+alias VerbMonad = SumType!(
+    VerbMonadSimple, VerbMonadSelf, VerbMonadConjunction
+);
+
+alias VerbDyadSimple = Atom delegate(Atom, Atom);
 alias VerbDyadSelf = Atom delegate(Verb, Atom, Atom);
+alias VerbDyadConjunction = Atom delegate(Verb, Verb, Atom, Atom);
+alias VerbDyad = SumType!(
+    VerbDyadSimple, VerbDyadSelf, VerbDyadConjunction
+);
+
 alias AdjectiveMonad = Verb delegate(Verb);
 alias ConjunctionDyad = Verb delegate(Verb, Verb);
 alias MultiConjunctionFunction = Verb delegate(Verb[]);
 
 struct ChainInfo {
+    size_t index;
     Verb last;
     Verb next;
     Verb self;
-    Verb[] stack;
+    Verb[] chains;
     
     this(T)(T index, Verb[] chains) {
         assert(index < chains.length, "Must be constructed from an existing chain");
+        this.index = index;
         // TODO: circular?
         if(index > 0) {
             last = chains[index - 1];
@@ -380,15 +393,15 @@ struct ChainInfo {
         if(index + 1 < chains.length) {
             next = chains[index + 1];
         }
-        stack = chains;
+        this.chains = chains;
     }
 }
 
 class Verb {
+    //!!!! NOTE: ADD ANY PROPERTY ADDED TO .dup !!!!
     string display;
     // TODO: display niladic as repr (e.g. "asdf" not asdf)
     VerbMonad monad;
-    VerbMonadSelf monadSelf;
     VerbDyad dyad;
     VerbDyadSelf dyadSelf;
     Verb inverse; // TODO: figure this out idfk
@@ -399,16 +412,53 @@ class Verb {
     Atom rangeStart = BigInt(0);
     Atom identity;
     Verb[] children;
+    //!!!! NOTE: ADD ANY PROPERTY ADDED TO .dup !!!!
     
     this(string di) {
         display = di;
         identity = Nil.nilAtom;
     }
     
+    Verb dup() {
+        Verb res = new Verb(display);
+        res.monad = monad;
+        res.dyad = dyad;
+        res.dyadSelf = dyadSelf;
+        res.inverse = inverse;
+        res.info = info;
+        res.markedArity = markedArity;
+        res.rangeStart = rangeStart;
+        res.identity = identity;
+        // TODO: this might need to be called recursively
+        res.children = children.map!(a => a.dup).array;
+        // res.setChains(info);
+        return res;
+    }
+    
     void setChains(ChainInfo i) {
+        Debugger.print("Setting ", display, " info:");
+        Debugger.print("  Info: ", i);
         info = i;
         foreach(ref v; children) {
+            Debugger.print("Child ", v.display, ":");
             v.setChains(i);
+        }
+    }
+    
+    string treeDisplay() {
+        return treeToBoxedString(this);
+    }
+    
+    string inlineDisplay() {
+        switch(children.length) {
+            case 0:
+                return display;
+            case 1:
+                return children[0].inlineDisplay ~ display;
+            case 2:
+                return children[0].inlineDisplay ~ display ~ children[1].inlineDisplay;
+            default:
+                return children.map!(a => a.inlineDisplay).join(" ") ~ display;
         }
     }
     
@@ -420,23 +470,39 @@ class Verb {
         return display;
     }
     
-    Verb setMonad(VerbMonad m) {
+    // Note: Below cannot be setMonad(T)(T m)
+    // I'm not sure why, something to do with the fact that
+    // the arguments are deduced to be functions.
+    // This fact cannot be fixed by an appropriate call to
+    // toDelegate, and I'm also not sure why.
+    // Also applies to setDyad
+    Verb setMonad(VerbMonadSimple m) {
         monad = m;
         return this;
     }
     
-    Verb setMonad(VerbMonadSelf ms) {
-        monadSelf = ms;
+    Verb setMonad(VerbMonadSelf m) {
+        monad = m;
         return this;
     }
     
-    Verb setDyad(VerbDyad d) {
+    Verb setMonad(VerbMonadConjunction m) {
+        monad = m;
+        return this;
+    }
+    
+    Verb setDyad(VerbDyadSimple d) {
         dyad = d;
         return this;
     }
     
-    Verb setDyad(VerbDyadSelf ds) {
-        dyadSelf = ds;
+    Verb setDyad(VerbDyadSelf d) {
+        dyad = d;
+        return this;
+    }
+    
+    Verb setDyad(VerbDyadConjunction d) {
+        dyad = d;
         return this;
     }
     
@@ -451,7 +517,8 @@ class Verb {
     }
     
     @property bool initialized() {
-        return (!!monad ^ !!monadSelf) && (!!dyad ^ !!dyadSelf);
+        return monad.match!(v => v !is null)
+            && dyad.match!(v => v !is null);
     }
     
     Verb setMarkedArity(uint ma) {
@@ -472,24 +539,34 @@ class Verb {
     }
     
     Atom monadic(Atom a) {
-        return monadSelf
-            ? monadSelf(this, a)
-            : monad(a);
+        return monad.match!(
+            f => f(children[0], children[1], a),
+            f => f(this, a),
+            f => f(a)
+        );
     }
     
     Atom dyadic(Atom a, Atom b) {
-        return dyadSelf
-            ? dyadSelf(this, a, b)
-            : dyad(a, b);
+        return dyad.match!(
+            f => f(children[0], children[1], a, b),
+            f => f(this, a, b),
+            f => f(a, b)
+        );
     }
     
     Atom evaluate() {
         assert(initialized, "Cannot call uninitialized Verb " ~ display);
+        Debugger.print();
+        Debugger.print("Calling ", inlineDisplay);
+        Debugger.print("with 0 args: nil");
         return monadic(Nil.nilAtom);
     }
     
     Atom evaluate(Atom a) {
         assert(initialized, "Cannot call uninitialized Verb " ~ display);
+        Debugger.print();
+        Debugger.print("Calling ", inlineDisplay);
+        Debugger.print("with 1 arg: ", a);
         return monadic(a);
     }
     Atom evaluate(T)(T a)
@@ -499,6 +576,9 @@ class Verb {
     
     Atom evaluate(Atom l, Atom r) {
         assert(initialized, "Cannot call uninitialized Verb " ~ display);
+        Debugger.print();
+        Debugger.print("Calling ", inlineDisplay);
+        Debugger.print("with 2 args: ", l, " and ", r);
         return dyadic(l, r);
     }
     Atom evaluate(T, S)(T l, S r)
@@ -574,7 +654,10 @@ class Conjunction {
     }
     
     Verb transform(Verb l, Verb r) {
-        return transformer(l, r);
+        Verb result = transformer(l, r);
+        //todo: assert correct monad/dyad
+        // assert(result.monad.match!(), "Must have a conjunction monad handler");
+        return result;
     }
 }
 
