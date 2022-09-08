@@ -226,6 +226,13 @@ struct Atom {
         );
     }
     
+    size_t as(Type : size_t)() {
+        return value.match!(
+            (a) => a.to!size_t,
+            (a) => assert(0, "Cannot convert " ~ readableTypeName(a) ~ " to " ~ typeid(Type).toString()),
+        );
+    }
+    
     Atom opBinary(string op, T)(T rhs)
     if(!is(T == Atom) && op != "in") {
         return opBinary!op(Atom(rhs));
@@ -272,6 +279,8 @@ struct Atom {
     Atom binaryFallback(string op : "*")(Atom rhs) {
         return match!(
             (Atom[] a, string b) => Atom(a.map!(to!string).join(b)),
+            (string a, n) => Atom(a.repeat(rhs.as!size_t).joinToString),
+            (n, string a) => Atom(a.repeat(this.as!size_t).joinToString),
             (_1, _2) => Nil.nilAtom,
         )(this, rhs);
     }

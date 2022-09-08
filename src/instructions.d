@@ -82,6 +82,7 @@ enum InsName {
     FirstNPrimes,           //FE78
     Benil,                  //FE80
     Memoize,                //FE81
+    Keep,                   //FE82
     Break,                  //FF
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -174,6 +175,7 @@ enum InsInfo[InsName] Info = [
     InsName.FirstNPrimes:           InsInfo("prims",   0xFE78,    SpeechPart.Verb),
     InsName.Benil:                  InsInfo("benil",   0xFE80,    SpeechPart.Adjective),
     InsName.Memoize:                InsInfo("M.",      0xFE81,    SpeechPart.Adjective),
+    InsName.Keep:                   InsInfo("keep",    0xFE82,    SpeechPart.Adjective),
     InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
 ];
 
@@ -270,6 +272,11 @@ Verb getVerb(InsName name) {
             .setMonad((Atom a) => a.match!(
                 // Sort
                 (Atom[] a) => Atom(a.sort.array),
+                // Ord
+                (string s) => Atom(BigInt(cast(long) s[0])),
+                // Chr
+                (BigInt b) => Atom(a.as!dchar.to!string),
+                (real r) => Atom(a.as!dchar.to!string),
                 _ => Nil.nilAtom,
             ))
             .setDyad((Atom a, Atom b) => a % b)
@@ -323,11 +330,6 @@ Verb getVerb(InsName name) {
             .setDyad((a, b) => a.linkWith(b))
             .setMarkedArity(2);
         
-        
-        auto a = BigInt(3);
-        auto b = BigInt(5);
-        Debugger.print("OWO: ", binomial(a, b));
-        
         verbs[InsName.Binomial] = new Verb("!")
             .setMonad(a => a.match!(
                 // Enumerate
@@ -363,11 +365,16 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.Last] = new Verb("}")
             // Last element
-            .setMonad(a => verbs[InsName.First](
-                Atom(BigInt(-1)),
-                atomFor(a)
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(a.toBase(2).map!Atom.array),
+                a => verbs[InsName.First](
+                    Atom(BigInt(-1)),
+                    atomFor(a)
+                ),
             ))
+            // Base conversion
             .setDyad((l, r) => match!(
+                (a, b) => Atom(a.toBase(b).map!Atom.array),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(1);
@@ -595,7 +602,7 @@ Verb getVerb(InsName name) {
         verbs[InsName.Empty].display = "E";
         
         verbs[InsName.Ascii] = Verb.nilad(Atom(
-            iota(128).map!(a => Atom("" ~ cast(char)a)).array
+            iota(95).map!(a => Atom("" ~ cast(char)(32 + a))).array
         ));
         verbs[InsName.Ascii].display = "A";
         
@@ -633,14 +640,29 @@ Adjective getAdjective(InsName name) {
                 // map
                 .setMonad((Verb v, a) => a.match!(
                     (Atom[] arr) => Atom(arr.map!v.array),
+                    (string str) => Atom(
+                        str.map!(to!string)
+                           .map!Atom
+                           .map!v
+                           // .map!(a => a.match!(
+                               // (Atom[] a) => a.joinToString,
+                               // _ => a.as!string,
+                           // ))
+                           .joinToString
+                    ),
                     _ => Nil.nilAtom,
                 ))
                 // zip
                 .setDyad((Verb v, a, b) => match!(
                     (Atom[] a, Atom[] b) => Atom(zip(a, b).map!(t => v(t[0], t[1])).array),
+                    (string a, string b) => Atom(
+                        zip(a, b).map!(t => v(t[0].to!string, t[1].to!string)).joinToString
+                    ),
                     // TODO: maybe don't call Atom every iteration?
                     (Atom[] a, b) => Atom(a.map!(t => v(t, Atom(b))).array),
+                    (string a, b) => Atom(a.map!(t => v(t.to!string, Atom(b))).joinToString),
                     (a, Atom[] b) => Atom(b.map!(t => v(Atom(a), t)).array),
+                    (a, string b) => Atom(b.map!(t => v(Atom(a), t.to!string)).joinToString),
                     (_1, _2) => Nil.nilAtom,
                 )(a, b))
                 .setMarkedArity(v.markedArity)
@@ -764,6 +786,32 @@ Adjective getAdjective(InsName name) {
                     .setMarkedArity(1)
                     .setChildren([v]);
             }
+        );
+        
+        adjectives[InsName.Vectorize] = new Adjective(
+            (Verb v) => new Verb("V")
+                .setMonad((Verb v, a) => vectorAt(v, a))
+                .setDyad((Verb v, a, b) => vectorAt(v, a, b))
+                .setMarkedArity(v.markedArity)
+                .setChildren([v])
+        );
+        
+        adjectives[InsName.Keep] = new Adjective(
+            (Verb v) => new Verb("keep")
+                .setMonad((Verb v, a) => a.match!(
+                    (Atom[] a) =>
+                        Atom(a.atomFilter!v.array),
+                    _ => Nil.nilAtom,
+                ))
+                .setDyad((Verb v, a, b) => match!(
+                    (Atom[] a, b) =>
+                        Atom(a.atomFilter!(t => v(t) == atomFor(b)).array),
+                    (a, Atom[] b) =>
+                        Atom(b.atomFilter!(t => atomFor(a) == v(t)).array),
+                    (_1, _2) => Nil.nilAtom,
+                )(a, b))
+                .setMarkedArity(2)
+                .setChildren([v])
         );
     }
     

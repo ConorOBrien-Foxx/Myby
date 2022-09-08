@@ -92,7 +92,7 @@ string atomUnords(Atom[] ords) {
     return res;
 }
 
-string joinToString(Atom[] arr) {
+string joinToString(T)(T arr) {
     string res;
     foreach(atom; arr) {
         res ~= to!string(atom);
@@ -137,14 +137,29 @@ Atom exit(BigInt code = 0) {
     core.stdc.stdlib.exit(to!uint(code));
 }
 
+auto atomFilter(alias fn, T)(T arr) {
+    static if(is(ReturnType!fn == Atom)) {
+        return arr.filter!(t => fn(t).truthiness);
+    }
+    else {
+        return arr.filter!fn;
+    }
+}
+
 Verb filterFor(Verb v) {
     return new Verb("₁\\")
         .setMonad((Verb v, a) => a.match!(
             (Atom[] a) =>
-                Atom(a.filter!(a => v(a).truthiness).array),
+                Atom(a.atomFilter!v.array),
             _ => Nil.nilAtom,
         ))
-        .setDyad((Verb v, a, b) => Nil.nilAtom)
+        .setDyad((Verb v, a, b) => match!(
+            (Atom[] a, b) => 
+                Atom(a.filter!(t => v(t, b).truthiness).array),
+            (a, Atom[] b) => 
+                Atom(b.filter!(t => v(a, t).truthiness).array),
+            (_1, _2) => Nil.nilAtom,
+        )(a, b))
         .setMarkedArity(1)
         .setChildren([v]);
 }
@@ -298,6 +313,41 @@ Atom[] scanThrough(Atom[] base, Verb fn, Atom seed) {
                 res ~= seed;
             },
         );
+    }
+    return res;
+}
+
+Atom vectorAt(Verb v, Atom a) {
+    return a.match!(
+        (Atom[] arr) => Atom(arr.map!(e => vectorAt(v, e)).array),
+        a => v(a),
+    );
+}
+
+Atom vectorAt(Verb v, Atom a, Atom b) {
+    return match!(
+        // TODO: replicate
+        (Atom[] a, Atom[] b) => Atom(
+            zip(a, b).map!(t => vectorAt(v, t[0], t[1])).array
+        ),
+        // TODO: maybe don't call atomFor each iteration
+        (Atom[] a, b) => Atom(a.map!(t => vectorAt(v, t, atomFor(b))).array),
+        (a, Atom[] b) => Atom(b.map!(t => vectorAt(v, atomFor(a), t)).array),
+        (a, b) => v(a, b),
+    )(a, b);
+}
+
+S[] toBase(S, T)(S a, T b) {
+    // special case: "unary"
+    if(b == 1) {
+        return (a/a).repeat(a.to!uint).array;
+    }
+    S[] res;
+    while(a != 0) {
+        S mod = a;
+        mod %= b;
+        res.insertInPlace(0, mod);
+        a /= b;
     }
     return res;
 }

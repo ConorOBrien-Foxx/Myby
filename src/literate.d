@@ -13,6 +13,8 @@ import myby.integer;
 import myby.nibble;
 import myby.string;
 
+enum UseFilterSeparators = false;
+
 enum NiladParseState {
     None,
     LastWasNilad,
@@ -59,6 +61,7 @@ Nibble[] parseLiterate(T)(T str) {
             Debugger.print("---> Number");
             if(state == NiladParseState.LastWasNiladSeparator) {
                 code ~= 0x2;
+                assert(UseFilterSeparators, "Adjacent numbers forming a list is disabled.");
             }
             BigInt parseNumber(bool reverse=false) {
                 int sign = 1;

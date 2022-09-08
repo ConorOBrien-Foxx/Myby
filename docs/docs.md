@@ -108,7 +108,9 @@ NB.=> 6 12 18 24 30 36
 | Signature | Explanation |
 |----|----|
 | verb(1) → (verb(1) : list → list) | Map over. (Applies `u` to each element of the list.) |
+| verb(1) → (verb(1) : string → string) | Map over. (Implicit join.) |
 | verb(2) → (verb(2) : list, list → list) | Zip with. (For elements `x` and `y` at corresponding indices from the lists, computes `x u y`. Truncates the resulting list to the length of the shorter input list.) |
+| verb(2) → (verb(2) : string, string → string) | Zip with. (Implicit join.) |
 
 #### Examples
 
@@ -240,6 +242,7 @@ NB.=> 6 12 18 24 30 36
 | number → number | Sign. (1 if positive, -1 if negative, 0 if zero.) |
 | list → list | Flatten |
 | number, number → number | Multiplication |
+| string, number → string; number, string → string | Repeat |
 | list, string → string | Join by |
 
 ### `/` - Division
