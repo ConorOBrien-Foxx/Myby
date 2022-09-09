@@ -101,6 +101,9 @@ string joinToString(T)(T arr) {
 }
 
 BigInt pow(BigInt base, BigInt exp) {
+    if(exp == 0 && base < 0) assert(0, "TODO: negative infinity");
+    // round down to 0
+    if(exp < 0 && base > 1) return BigInt("0");
     if(exp == 0) return BigInt("1");
     try {
         return base ^^ cast(ulong) exp;
@@ -119,6 +122,11 @@ BigInt pow(BigInt base, BigInt exp) {
         }
         return acc * base;
     }
+}
+
+auto pow(T, S)(T a, S b)
+if(__traits(compiles, a ^^ b)) {
+    return a ^^ b;
 }
 
 auto positiveMod(S, T)(S a, T b) {
@@ -350,4 +358,18 @@ S[] toBase(S, T)(S a, T b) {
         a /= b;
     }
     return res;
+}
+
+auto baseRange(S, T)(S n, T base) {
+    S min = n == 0
+        ? cast(S)1 // to make range empty
+        : n == 1
+            ? cast(S)0
+            : pow(base, n - 1);
+    S max = pow(base, n);
+    return iota(min, max);
+}
+
+auto baseRange(S)(S n) {
+    return baseRange(n, cast(S)10);
 }

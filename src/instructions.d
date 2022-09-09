@@ -71,6 +71,7 @@ enum InsName {
     Empty,                  //FE40
     Ascii,                  //FE41
     Alpha,                  //FE42
+    DigitRange,             //FE60
     NthPrime,               //FE70
     IsPrime,                //FE71
     PrimeFactors,           //FE72
@@ -164,6 +165,7 @@ enum InsInfo[InsName] Info = [
     InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
     InsName.Ascii:                  InsInfo("A",       0xFE41,    SpeechPart.Verb),
     InsName.Alpha:                  InsInfo("L",       0xFE42,    SpeechPart.Verb),
+    InsName.DigitRange:             InsInfo("R:",      0xFE60,    SpeechPart.Verb),
     InsName.NthPrime:               InsInfo("primn",   0xFE70,    SpeechPart.Verb),
     InsName.IsPrime:                InsInfo("primq",   0xFE71,    SpeechPart.Verb),
     InsName.PrimeFactors:           InsInfo("primf",   0xFE72,    SpeechPart.Verb),
@@ -597,6 +599,20 @@ Verb getVerb(InsName name) {
             // TODO: copy next chains' marked arity
             .setMarkedArity(1);
         
+        verbs[InsName.DigitRange] = new Verb("R:")
+            // Base 10 range
+            .setMonad(a => a.match!(
+                a => Atom(baseRange(a).map!Atom.array),
+                _ => Nil.nilAtom,
+            ))
+            // Base Range
+            .setDyad((n, base) => match!(
+                (n, base) => Atom(baseRange(n, base).map!Atom.array),
+                (_1, _2) => Nil.nilAtom,
+            )(n, base))
+            .setMarkedArity(1);
+            
+        
         // Nilads
         verbs[InsName.Empty] = Verb.nilad(Atom(cast(Atom[])[]));
         verbs[InsName.Empty].display = "E";
@@ -788,6 +804,7 @@ Adjective getAdjective(InsName name) {
             }
         );
         
+        // Vectorize
         adjectives[InsName.Vectorize] = new Adjective(
             (Verb v) => new Verb("V")
                 .setMonad((Verb v, a) => vectorAt(v, a))
@@ -796,6 +813,7 @@ Adjective getAdjective(InsName name) {
                 .setChildren([v])
         );
         
+        // Keep
         adjectives[InsName.Keep] = new Adjective(
             (Verb v) => new Verb("keep")
                 .setMonad((Verb v, a) => a.match!(
