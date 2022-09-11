@@ -98,6 +98,7 @@ Nibble[] parseLiterate(T)(T str) {
             // what else could two adjacent nilads indicate?
             if(state == NiladParseState.LastWasNiladSeparator) {
                 code ~= 0x2;
+                assert(UseFilterSeparators, "Adjacent numbers forming a list is disabled.");
             }
             string build = "";
             i++;

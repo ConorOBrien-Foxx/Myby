@@ -373,3 +373,36 @@ auto baseRange(S, T)(S n, T base) {
 auto baseRange(S)(S n) {
     return baseRange(n, cast(S)10);
 }
+
+int getch() {
+    import core.stdc.stdio;
+    return fgetc(stdin);
+}
+
+Atom atomGetch() {
+    return Atom(BigInt(getch));
+}
+
+bool putch(Atom a) {
+    import std.stdio;
+    return a.match!(
+        (Atom[] arr) {
+            foreach(a; arr) {
+                if(!putch(a)) {
+                    return false;
+                }
+            }
+            return true;
+        },
+        (a) {
+            //TODO: char
+            if(a < 0) {
+                return false;
+            }
+            char c = cast(char)a;
+            write(c);
+            return true;
+        },
+        _ => false
+    );
+}

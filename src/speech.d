@@ -155,6 +155,13 @@ string readableTypeName(T)(T value) {
 string readableTypeName(T, S)(T a, S b) {
     return readableTypeName(a) ~ " and " ~ readableTypeName(b);
 }
+
+alias exactly(T, alias fun) = function (arg)
+{
+    static assert(is(typeof(arg) == T));
+    return fun(arg);
+};
+
 struct Atom {
     _AtomValue value;
     this(T)(T v) {
@@ -182,7 +189,7 @@ struct Atom {
     
     bool isType(Type)() {
         return value.match!(
-            (Type _) => true,
+            exactly!(Type, _ => true),
             _ => false,
         );
     }
@@ -222,6 +229,7 @@ struct Atom {
     BigInt as(Type : BigInt)() {
         return value.match!(
             (a) => BigInt(a),
+            (bool b) => BigInt(b ? "1" : "0"),
             (a) => assert(0, "Cannot convert " ~ readableTypeName(a) ~ " to " ~ typeid(Type).toString()),
         );
     }
@@ -231,6 +239,10 @@ struct Atom {
             (a) => a.to!size_t,
             (a) => assert(0, "Cannot convert " ~ readableTypeName(a) ~ " to " ~ typeid(Type).toString()),
         );
+    }
+    
+    bool as(Type : bool)() {
+        return this.truthiness;
     }
     
     Atom opBinary(string op, T)(T rhs)
@@ -256,11 +268,21 @@ struct Atom {
     Atom opBinary(string op)(Atom rhs)
     if(mathOps.canFind(op)) {
         if(isNumeric && rhs.isNumeric) {
+            import std.meta : AliasSeq;
             // real casts all args to real
-            if(isType!real || rhs.isType!real) {
-                double a = this.as!real;
-                double b = rhs.as!real;
-                return Atom(mixin("a " ~ op ~ " b"));
+            alias IntegralTypes = AliasSeq!(real, BigInt, bool);
+            static foreach(Type; IntegralTypes) {
+                if(isType!Type || rhs.isType!Type) {
+                    Type a = this.as!Type;
+                    Type b = rhs.as!Type;
+                    static if(op == "%") {
+                        return Atom(positiveMod(a, b));
+                    }
+                    // TODO: what an ugly hack.
+                    else static if(!is(Type == BigInt) || op != "^^") {
+                        return Atom(mixin("a " ~ op ~ " b"));
+                    }
+                }
             }
         }
         return match!(
@@ -302,8 +324,12 @@ struct Atom {
         )(this, rhs);
     }
     Atom binaryFallback(string op : "^^")(Atom rhs) {
+        import std.algorithm.searching : countUntil;
         return match!(
             (BigInt a, BigInt b) => Atom(pow(a, b)),
+            // index of 
+            (Atom[] a, b) => Atom(a.countUntil(atomFor(b))),
+            (string a, string b) => Atom(BigInt(a.countUntil(b))),
             (_1, _2) => Nil.nilAtom,
         )(this, rhs);
     }
@@ -594,7 +620,7 @@ class Verb {
         assert(initialized, "Cannot call uninitialized Verb " ~ display);
         Debugger.print();
         Debugger.print("Calling ", inlineDisplay);
-        Debugger.print("with 1 arg: ", a);
+        Debugger.print("with 1 arg: ", a, "(", a.readableTypeName, ")");
         return monadic(a);
     }
     Atom evaluate(T)(T a)
@@ -606,7 +632,7 @@ class Verb {
         assert(initialized, "Cannot call uninitialized Verb " ~ display);
         Debugger.print();
         Debugger.print("Calling ", inlineDisplay);
-        Debugger.print("with 2 args: ", l, " and ", r);
+        Debugger.print("with 2 args: ", l, "(", l.readableTypeName, ") and ", r, "(", r.readableTypeName, ")");
         return dyadic(l, r);
     }
     Atom evaluate(T, S)(T l, S r)

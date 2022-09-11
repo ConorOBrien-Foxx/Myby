@@ -69,10 +69,13 @@ enum InsName {
     Reflex,                 //FD
     Exit,                   //FE00
     Put,                    //FE01
+    Putch,                  //FE02
+    Getch,                  //FE03
     Empty,                  //FE40
     Ascii,                  //FE41
     Alpha,                  //FE42
     DigitRange,             //FE60
+    Place,                  //FE61
     NthPrime,               //FE70
     IsPrime,                //FE71
     PrimeFactors,           //FE72
@@ -138,7 +141,7 @@ enum InsInfo[InsName] Info = [
     InsName.LastChain:              InsInfo("$^",      0xF10,     SpeechPart.Verb),
     InsName.ThisChain:              InsInfo("$:",      0xF11,     SpeechPart.Verb),
     InsName.NextChain:              InsInfo("$v",      0xF12,     SpeechPart.Verb),
-    InsName.NthChain:               InsInfo("$N",      0xF13,     SpeechPart.Verb),
+    InsName.NthChain:               InsInfo("$N",      0xF13,     SpeechPart.Adjective),
     // Unassigned: F14
     // Unassigned: F15
     InsName.Ternary:                InsInfo("?",       0xF16,     SpeechPart.MultiConjunction),
@@ -165,10 +168,12 @@ enum InsInfo[InsName] Info = [
     InsName.Reflex:                 InsInfo("~",       0xFD,      SpeechPart.Adjective),
     InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
     InsName.Put:                    InsInfo("put",     0xFE01,    SpeechPart.Verb),
+    InsName.Getch:                  InsInfo("getch",   0xFE02,    SpeechPart.Verb),
     InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
     InsName.Ascii:                  InsInfo("A",       0xFE41,    SpeechPart.Verb),
     InsName.Alpha:                  InsInfo("L",       0xFE42,    SpeechPart.Verb),
     InsName.DigitRange:             InsInfo("R:",      0xFE60,    SpeechPart.Verb),
+    InsName.Place:                  InsInfo("place",   0xFE61,    SpeechPart.Verb),
     InsName.NthPrime:               InsInfo("primn",   0xFE70,    SpeechPart.Verb),
     InsName.IsPrime:                InsInfo("primq",   0xFE71,    SpeechPart.Verb),
     InsName.PrimeFactors:           InsInfo("primf",   0xFE72,    SpeechPart.Verb),
@@ -302,6 +307,7 @@ Verb getVerb(InsName name) {
                         .map!(t => t[0])
                         .array
                 ),
+                (a, b) => Atom(reshape([atomFor(b)], a)),
                 (_1, _2) => Nil.nilAtom,
             )(a, b))
             .setMarkedArity(1);
@@ -435,10 +441,15 @@ Verb getVerb(InsName name) {
             .setDyad((a, b) => Atom(a >= b))
             .setMarkedArity(2);
         
+        import std.math.rounding;
         verbs[InsName.Minimum] = new Verb("<.")
-            // Minimum
             .setMonad(a => a.match!(
+                // Minimum
                 (Atom[] a) => foldFor(verbs[InsName.Minimum])(Atom(a)),
+                // Floor
+                (BigInt a) => Atom(a),
+                (bool a) => Atom(a),
+                (a) => Atom(BigInt(a.floor.to!string)),
                 _ => Nil.nilAtom,
             ))
             // Lesser of 2
@@ -448,7 +459,12 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.Maximum] = new Verb(">.")
             .setMonad(a => a.match!(
+                // Maximum
                 (Atom[] a) => foldFor(verbs[InsName.Maximum])(Atom(a)),
+                // Ceiling
+                (BigInt a) => Atom(a),
+                (bool a) => Atom(a),
+                (a) => Atom(BigInt(a.ceil.to!string)),
                 _ => Nil.nilAtom,
             ))
             // Greater of 2
@@ -484,6 +500,12 @@ Verb getVerb(InsName name) {
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
+        verbs[InsName.Put] = new Verb("putch")
+            // Putch
+            .setMonad(a => Atom(putch(a)))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
         verbs[InsName.Exit] = new Verb("exit")
             // Exit
             .setMonad(a => a.match!(
@@ -492,6 +514,22 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((_1, _2) => exit())
             .setMarkedArity(1);
+        
+        verbs[InsName.Place] = new Verb("place")
+            .setMonad(_ => Nil.nilAtom)
+            // Place
+            .setDyad((a, b) => match!(
+                (Atom[] arr, Atom[] keyValue) {
+                    Atom key = keyValue[0];
+                    Atom value = keyValue[1];
+                    uint intKey = key.as!uint;
+                    Atom[] copy = arr.dup;
+                    copy[intKey] = value;
+                    return Atom(copy);
+                },
+                (_1, _2) => Nil.nilAtom,
+            )(a, b))
+            .setMarkedArity(2);
             
         verbs[InsName.NthPrime] = new Verb("primn")
             // Nth prime
@@ -638,6 +676,11 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.Alpha] = Verb.nilad(Atom("abcdefghijklmnopqrstuvwxyz"));
         verbs[InsName.Alpha].display = "L";
+        
+        verbs[InsName.Getch] = new Verb("getch")
+            .setMonad(_ => atomGetch())
+            .setDyad((_1, _2) => atomGetch())
+            .setNiladic(true);
     }
     
     Verb* verb = name in verbs;
@@ -825,6 +868,22 @@ Adjective getAdjective(InsName name) {
                 .setDyad((Verb v, a, b) => vectorAt(v, a, b))
                 .setMarkedArity(v.markedArity)
                 .setChildren([v])
+        );
+        
+        // NthChain
+        adjectives[InsName.NthChain] = new Adjective(
+            (Verb v) => new Verb("$N")
+                .setMonad((Verb v, a) {
+                    auto info = v.info;
+                    auto chainNumberBig = v(a).as!BigInt;
+                    uint index = moldIndex(chainNumberBig, v.info.chains.length);
+                    Verb res = v.info.chains[index];
+                    return res(a);
+                })
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setChildren([v])
+                //TODO: adopt marked arity
+                .setMarkedArity(1)
         );
         
         // Keep
