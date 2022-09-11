@@ -68,6 +68,7 @@ enum InsName {
     SplitCompose,           //FC
     Reflex,                 //FD
     Exit,                   //FE00
+    Put,                    //FE01
     Empty,                  //FE40
     Ascii,                  //FE41
     Alpha,                  //FE42
@@ -84,6 +85,7 @@ enum InsName {
     Benil,                  //FE80
     Memoize,                //FE81
     Keep,                   //FE82
+    Loop,                   //FE83
     Break,                  //FF
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -162,6 +164,7 @@ enum InsInfo[InsName] Info = [
     // FC
     InsName.Reflex:                 InsInfo("~",       0xFD,      SpeechPart.Adjective),
     InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
+    InsName.Put:                    InsInfo("put",     0xFE01,    SpeechPart.Verb),
     InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
     InsName.Ascii:                  InsInfo("A",       0xFE41,    SpeechPart.Verb),
     InsName.Alpha:                  InsInfo("L",       0xFE42,    SpeechPart.Verb),
@@ -178,6 +181,7 @@ enum InsInfo[InsName] Info = [
     InsName.Benil:                  InsInfo("benil",   0xFE80,    SpeechPart.Adjective),
     InsName.Memoize:                InsInfo("M.",      0xFE81,    SpeechPart.Adjective),
     InsName.Keep:                   InsInfo("keep",    0xFE82,    SpeechPart.Adjective),
+    InsName.Loop:                   InsInfo("loop",    0xFE83,    SpeechPart.Adjective),
     InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
 ];
 
@@ -465,6 +469,16 @@ Verb getVerb(InsName name) {
             .setMonad((a) {
                 import std.stdio;
                 writeln(a.atomToString());
+                return a;
+            })
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.Put] = new Verb("put")
+            // Put
+            .setMonad((a) {
+                import std.stdio;
+                write(a.atomToString());
                 return a;
             })
             .setDyad((_1, _2) => Nil.nilAtom)
@@ -829,6 +843,20 @@ Adjective getAdjective(InsName name) {
                     (_1, _2) => Nil.nilAtom,
                 )(a, b))
                 .setMarkedArity(2)
+                .setChildren([v])
+        );
+        
+        // Loop
+        adjectives[InsName.Loop] = new Adjective(
+            (Verb v) => new Verb("loop")
+                .setMonad((Verb v, a) {
+                    while((a = v(a)).truthiness) {
+                        
+                    }
+                    return a;
+                })
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
                 .setChildren([v])
         );
     }
