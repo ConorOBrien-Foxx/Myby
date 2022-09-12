@@ -90,6 +90,7 @@ enum InsName {
     Memoize,                //FE81
     Keep,                   //FE82
     Loop,                   //FE83
+    While,                  //FE83
     Break,                  //FF
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -189,6 +190,7 @@ enum InsInfo[InsName] Info = [
     InsName.Memoize:                InsInfo("M.",      0xFE81,    SpeechPart.Adjective),
     InsName.Keep:                   InsInfo("keep",    0xFE82,    SpeechPart.Adjective),
     InsName.Loop:                   InsInfo("loop",    0xFE83,    SpeechPart.Adjective),
+    InsName.While:                  InsInfo("while",   0xFE84,    SpeechPart.Conjunction),
     InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
 ];
 
@@ -524,18 +526,24 @@ Verb getVerb(InsName name) {
             .setDyad((a, b) => match!(
                 // Place
                 (Atom[] arr, Atom[] keyValue) {
-                    Atom key = keyValue[0];
-                    Atom value = keyValue[1];
-                    uint intKey = moldIndex(key.as!BigInt, arr.length);
                     Atom[] copy = arr.dup;
-                    copy[intKey] = value;
+                    for(size_t i = 0; i < keyValue.length; i += 2) {
+                        assert(i + 1 < keyValue.length, "Expected adjacent pairs");
+                        Atom key = keyValue[i];
+                        Atom value = keyValue[i + 1];
+                        uint intKey = moldIndex(key.as!BigInt, arr.length);
+                        copy[intKey] = value;
+                    }
                     return Atom(copy);
                 },
                 (AVHash hash, Atom[] keyValue) {
-                    Atom key = keyValue[0];
-                    Atom value = keyValue[1];
                     AVHash copy = hash.dup;
-                    copy[key] = value;
+                    for(size_t i = 0; i < keyValue.length; i += 2) {
+                        assert(i + 1 < keyValue.length, "Expected adjacent pairs");
+                        Atom key = keyValue[i];
+                        Atom value = keyValue[i + 1];
+                        copy[key] = value;
+                    }
                     return Atom(copy);
                 },
                 (_1, _2) => Nil.nilAtom,
@@ -1043,6 +1051,24 @@ Conjunction getConjunction(InsName name) {
                 .setDyad((f, g, _1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
                 .setChildren([f, seedFn])
+        );
+        
+        conjunctions[InsName.While] = new Conjunction(
+            (Verb f, Verb g) => new Verb("while")
+                .setMonad((exec, cond, a) {
+                    while(cond(a).truthiness) {
+                        a = exec(a);
+                    }
+                    return a;
+                })
+                .setDyad((exec, cond, a, b) {
+                    while(cond(a, b).truthiness) {
+                        a = exec(a, b);
+                    }
+                    return a;
+                })
+                .setMarkedArity(1)
+                .setChildren([f, g])
         );
     }
     
