@@ -522,7 +522,7 @@ Verb getVerb(InsName name) {
                 (Atom[] arr, Atom[] keyValue) {
                     Atom key = keyValue[0];
                     Atom value = keyValue[1];
-                    uint intKey = key.as!uint;
+                    uint intKey = moldIndex(key.as!BigInt, arr.length);
                     Atom[] copy = arr.dup;
                     copy[intKey] = value;
                     return Atom(copy);
