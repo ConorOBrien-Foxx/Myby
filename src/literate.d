@@ -35,6 +35,12 @@ Nibble[] parseLiterate(T)(T str) {
     uint initialParenCount = 0;
     uint i = 0;
     
+    void readAlphabetic(ref string name) {
+        while(i < str.length && 'a' <= str[i] && str[i] <= 'z') {
+            name ~= str[i++];
+        }
+    }
+    
     Debugger.print("Parsing input literate code: <", str, ">");
     NiladParseState state = NiladParseState.None;
     bool lastWasConjunction = false;
@@ -129,12 +135,22 @@ Nibble[] parseLiterate(T)(T str) {
             code ~= stringToNibbles(build);
             nextState = NiladParseState.LastWasNilad;
         }
+        // access keys: $.key
+        else if(str[i] == '$' && i + 1 < str.length && str[i + 1] == '.') {
+            i += 2;
+            string name;
+            readAlphabetic(name);
+            // ( name & { )
+            code ~= Info[InsName.OpenParen].nibs;
+            code ~= stringToNibbles(name);
+            code ~= Info[InsName.Bond].nibs;
+            code ~= Info[InsName.First].nibs;
+            code ~= Info[InsName.CloseParen].nibs;
+        }
         else {
             char head = str[i];
             string name;
-            while(i < str.length && 'a' <= str[i] && str[i] <= 'z') {
-                name ~= str[i++];
-            }
+            readAlphabetic(name);
             if(name.length == 0) {
                 name ~= str[i];
             }
@@ -145,7 +161,7 @@ Nibble[] parseLiterate(T)(T str) {
             if(hasNext) {
                 i++;
                 if(head == '$') {
-                    name ~= str[i]; 
+                    name ~= str[i];
                 }
                 else if(str[i] == '.' || str[i] == ':') {
                     while(i < str.length && (str[i] == '.' || str[i] == ':')) {

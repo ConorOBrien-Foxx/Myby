@@ -76,6 +76,7 @@ enum InsName {
     Alpha,                  //FE42
     DigitRange,             //FE60
     Place,                  //FE61
+    Hash,                   //FE62
     NthPrime,               //FE70
     IsPrime,                //FE71
     PrimeFactors,           //FE72
@@ -174,6 +175,7 @@ enum InsInfo[InsName] Info = [
     InsName.Alpha:                  InsInfo("L",       0xFE42,    SpeechPart.Verb),
     InsName.DigitRange:             InsInfo("R:",      0xFE60,    SpeechPart.Verb),
     InsName.Place:                  InsInfo("place",   0xFE61,    SpeechPart.Verb),
+    InsName.Hash:                   InsInfo("hash",    0xFE62,    SpeechPart.Verb),
     InsName.NthPrime:               InsInfo("primn",   0xFE70,    SpeechPart.Verb),
     InsName.IsPrime:                InsInfo("primq",   0xFE71,    SpeechPart.Verb),
     InsName.PrimeFactors:           InsInfo("primf",   0xFE72,    SpeechPart.Verb),
@@ -367,10 +369,12 @@ Verb getVerb(InsName name) {
             )
             // Index
             .setDyad((l, r) => match!(
+                // TODO: index by real?
                 (BigInt b, Atom[] a) =>
                     a[moldIndex(b, a.length)],
                 (BigInt b, string a) =>
                     Atom(to!string(a[moldIndex(b, a.length)])),
+                (b, AVHash h) => Atom(h[_AtomValue(b)]),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(2);
@@ -671,6 +675,25 @@ Verb getVerb(InsName name) {
             )(n, base))
             .setMarkedArity(1);
             
+        verbs[InsName.Hash] = new Verb("hash")
+            .setMonad(a => a.match!(
+                (Atom[] a) {
+                    AVHash h;
+                    
+                    for(size_t i = 0; i < a.length; i += 2) {
+                        assert(i + 1 < a.length, "Expected two adjacent elements");
+                        Atom key = a[i];
+                        Atom value = a[i + 1];
+                        h[key.value] = value.value;
+                    }
+                    
+                    return Atom(h);
+                },
+                (AVHash h) => Atom(h.dup),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
         
         // Nilads
         verbs[InsName.Empty] = Verb.nilad(Atom(cast(Atom[])[]));
