@@ -239,13 +239,27 @@ class Interpreter {
             Debugger.print("  Paren stack: ", parenStackArity);
             Debugger.print("  opStack:     ", opStack);
             
+            /*
+            |=Barriers. V=Verb, A=Adjective, C=Conjunction.
+                )|(
+                V|(
+                A|(
+                )|V
+                V|V
+                A|V
+            */
+            // flush opStack if at barrier
+            // TODO: maybe there's a more sane to write the below line
+            if(token.speech == SpeechPart.Verb || (token.speech == SpeechPart.Syntax && token.name == InsName.OpenParen)) {
+                // NOTE: this will double flush '(' + 'V', but this should be fine
+                // TODO: fix?
+                if(previous == SpeechPart.Verb || previous == SpeechPart.Adjective || previous == SpeechPart.Syntax) {
+                    flushOpStack();
+                }
+            }
+            
             final switch(token.speech) {
                 case SpeechPart.Verb:
-                    // flush opStack if at barrier
-                    // TODO: maybe there's a more sane to write the below line
-                    if(previous == SpeechPart.Verb || previous == SpeechPart.Adjective || previous == SpeechPart.Syntax) {
-                        flushOpStack();
-                    }
                     thisIsNilad = token.isNilad;
                     stack ~= token;
                     parenStackArity[$-1]++;
