@@ -161,7 +161,9 @@ Nibble[] parseLiterate(T)(T str) {
             auto r = name in InstructionMap;
             if(r !is null) {
                 Debugger.print("---> Operator");
-                code ~= r.nibs;
+                if(code.length || name != "\n") {
+                    code ~= r.nibs;
+                }
                 thisIsConjuction = r.speech == SpeechPart.Conjunction;
                 // TODO: throw an actual syntax error.
                 assert(
