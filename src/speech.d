@@ -137,7 +137,8 @@ class Infinity {
     }
 }
 
-alias _AtomValue = SumType!(Nil, BigInt, real, Infinity, string, bool, Atom[]);
+alias _AtomValue = SumType!(Nil, BigInt, real, Infinity, string, bool, Atom[], This[This]);
+alias AVHash = _AtomValue[_AtomValue];
 string readableTypeName(_AtomValue value) {
     return value.match!(
         (Nil _) => "nil",
@@ -147,6 +148,7 @@ string readableTypeName(_AtomValue value) {
         (Infinity _) => "inf",
         (string _) => "str",
         (Atom[] _) => "arr",
+        (AVHash _) => "hash",
     );
 }
 string readableTypeName(T)(T value) {
@@ -385,6 +387,8 @@ struct Atom {
             (real r) => r.hashOf(),
             (string s) => s.hashOf(),
             (const Atom[] a) => a.map!"a.toHash".sum,
+            (const _AtomValue[const _AtomValue] h) =>
+                h.keys.map!"a.toHash".sum + h.values.map!"a.toHash".sum,
         );
     }
     
@@ -806,7 +810,13 @@ string arrayToString(Atom[] x, bool forceLinear=false) {
     return prepad.map!(a => a.join(" ")).join("\n");
 }
 
-string atomToString(Atom a, bool forceLinear=false) {
+string hashToString(AVHash x) {
+    return "[" ~ x.keys.map!(key =>
+        Atom(key).atomToString() ~ ": " ~ Atom(x[key]).atomToString()
+    ).join(", ") ~ "]";
+}
+
+string atomToString(_AtomValue a, bool forceLinear=false) {
     return a.match!(
         (Nil x) => x.toString(),
         (Infinity x) => x.toString(),
@@ -815,6 +825,7 @@ string atomToString(Atom a, bool forceLinear=false) {
         (real x) => to!string(x),
         (string x) => x,
         (Atom[] x) => arrayToString(x, forceLinear),
+        (AVHash x) => hashToString(x),
     );
 }
 

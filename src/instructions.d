@@ -517,14 +517,21 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.Place] = new Verb("place")
             .setMonad(_ => Nil.nilAtom)
-            // Place
             .setDyad((a, b) => match!(
+                // Place
                 (Atom[] arr, Atom[] keyValue) {
                     Atom key = keyValue[0];
                     Atom value = keyValue[1];
                     uint intKey = moldIndex(key.as!BigInt, arr.length);
                     Atom[] copy = arr.dup;
                     copy[intKey] = value;
+                    return Atom(copy);
+                },
+                (AVHash hash, Atom[] keyValue) {
+                    Atom key = keyValue[0];
+                    Atom value = keyValue[1];
+                    AVHash copy = hash.dup;
+                    copy[key] = value;
                     return Atom(copy);
                 },
                 (_1, _2) => Nil.nilAtom,
