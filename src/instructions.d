@@ -789,7 +789,36 @@ Adjective getAdjective(InsName name) {
                     ),
                     _ => Nil.nilAtom,
                 ))
-                .setDyad((Verb v, _1, _2) => Nil.nilAtom)
+                .setDyad((Verb v, a, b) => match!(
+                    // slices
+                    (BigInt a, Atom[] arr) {
+                        import std.math.rounding;
+                        bool discrete = a < 0;
+                        uint n = (discrete ? -a : a).to!uint;
+                        if(discrete) {
+                            uint size = 
+                                ceil(1.0 * arr.length / n).to!uint;
+                            return Atom(
+                                iota(size)
+                                    .map!(i => i * n)
+                                    .map!(i => arr[i..min($, i + n)])
+                                    .map!Atom
+                                    .map!v
+                                    .array
+                            );
+                        }
+                        else {
+                            return Atom(
+                                iota(arr.length + 1 - n)
+                                    .map!(i => arr[i..i + n])
+                                    .map!Atom
+                                    .map!v
+                                    .array
+                            );
+                        }
+                    },
+                    (_1, _2) => Nil.nilAtom,
+                )(a, b))
                 .setMarkedArity(1)
                 .setChildren([v])
         );
