@@ -1,0 +1,32 @@
+NB. brainfuck interpreter in Myby
+NB. -- helper functions --
+scan:   (# *" (1 + +\)\.) ('[]'&^{(1;_1;0))"@/
+left:   (# >" 0) *" R@+ +" (# ^ 1 - {)\:
+right:  (# <" 0) *" R@+ -" (- ^ 1 - })\.
+parens: (left >." right)@scan
+jumpx:  # place 'ip' ; $.ip { $.jtab
+cell:    $.tp { $.tape
+NB. -- commands switch --
+NB. +/-
+# place 'tape' #;;O $.tape place $.tp ; 256 %~ cell + (<: 2 * '+' = $.ip { $.code)
+NB. >/<
+# place 'tp' ; ((<: 2 * '>' = $.ip { $.code)) + $.tp
+NB. [
+# jumpx cell ?
+NB. ]
+jumpx # cell ?
+NB. ,
+# place 'tape' #;;O $.tape place $.tp ; 256 %~ 0 >. getch
+NB. .
+# #[ putch@cell
+NB. debug, ?
+echo
+NB. pick out the correct chain (+6 bc initial defs)
+(6 + (<. 2 /~ '+-<>[ ] , . ?' ^ $.ip { $.code)) $N
+NB. advance state
+(# place 'ip' ; 1 + $.ip)@$^
+NB. main loop
+$^ 0 ($.ip < (+$.code)) ? loop
+NB. initial information
+$^ hash@('ip';0;'code';#;'tp';0;'jtab';parens;'tape';;@(30000#0))
+exit@$^

@@ -1,0 +1,7 @@
+NB. given string `s`, yields list with the following property:
+NB.   for every index `i` where `i{s` is '(' or ')',
+NB.   `(i{a){s` is the matching ')' or '('
+scan:  (# *" (1 + +\)\.) ('()'&^{(1;_1;0))"@/
+left:  (# >" 0) *" R@+ +" (# ^ 1 - {)\:
+right: (# <" 0) *" R@+ -" (- ^ 1 - })\.
+(left >." right)@scan
