@@ -4,6 +4,7 @@ import std.bigint;
 import std.conv : to;
 import std.range : back, popBack, popBackN;
 
+import myby.condense;
 import myby.debugger;
 import myby.instructions;
 import myby.integer;
@@ -11,68 +12,7 @@ import myby.literate : NiladParseState, UseFilterSeparators;
 import myby.nibble;
 import myby.speech;
 import myby.string;
-
-struct Token {
-    SpeechPart speech;
-    InsName name;
-    union {
-        BigInt  big;
-        string  str;
-        real    dec;
-        Token[] arr;
-    };
-    int index = -1;
-    
-    bool isNilad() {
-        return name == InsName.Integer
-            || name == InsName.String
-            || name == InsName.Real
-            || name == InsName.ListLiteral;
-    }
-    
-    string toString() {
-        import std.algorithm.iteration : map;
-        import std.array : join;
-        
-        string addendum;
-        switch(name) {
-            case InsName.Integer:
-            case InsName.CloseParen:
-                addendum = to!string(big);
-                break;
-            case InsName.String:
-                addendum = str;
-                break;
-            case InsName.ListLiteral:
-                addendum = arr.map!(a => a.toString()).join(", ");
-                break;
-            case InsName.Real:
-                addendum = to!string(dec);
-                break;
-            case InsName.DefinedAlias:
-                addendum = big.toBase16.basicNibbleFmt;
-                break;
-            default:
-                break;
-        }
-        if(addendum) {
-            addendum = ' ' ~ addendum;
-        }
-        return "Token(" ~ to!string(speech)
-            ~ " `" ~ to!string(name) ~ "`"
-            ~ addendum
-            ~ " @" ~ to!string(index)
-            ~ ")";
-    }
-    
-    bool opEquals(Token other) {
-        return other.speech == speech && other.name == name && (
-            big == other.big || str == other.str
-        );
-    }
-    
-    static Token Break = Token(SpeechPart.Syntax, InsName.Break);
-}
+import myby.token;
 
 enum ConjunctionNibbles = [0xA, 0xD];
 enum TwoNibbleOverrides = [0xAC, 0xDC, 0xBA, 0xBC, 0xBD];
@@ -372,251 +312,20 @@ class Interpreter {
         // writeln("Shunted : ", stack);
     }
     
-    void condenseVerbChain(ref Verb[] verbs) {
-        while(verbs.length != 1) {
-            if(verbs.length >= 3) {
-                Debugger.print("Fork");
-                // remove a three train from the right
-                // combines into a fork
-                Verb f, g, h;
-                f = verbs[$-3];
-                g = verbs[$-2];
-                h = verbs[$-1];
-                verbs.popBackN(3);
-                verbs ~= Verb.fork(f, g, h);
-            }
-            else if(verbs.length == 2) {
-                Debugger.print("Atop");
-                // remove the two train, an atop
-                Verb f, g;
-                f = verbs[$-2];
-                g = verbs[$-1];
-                verbs.popBackN(2);
-                if(g.niladic && f.markedArity == 2 || f.niladic && g.markedArity == 2) {
-                    Debugger.print("Atop redirected to Bind");
-                    verbs ~= bind(f, g);
-                }
-                else {
-                    verbs ~= compose(f, g);
-                }
-            }
-            else {
-                // i don't know how we got here
-                Debugger.print("Huh? idk what to do with ", verbs.length, " verbs...");
-                assert(false);
-            }
-        }
-    }
-    
-    // TODO: split into its own function?
-    Verb condenseTokenChain(T, N)(ref uint[BigInt] chainAliases, T chain, N index) {
-        // first, produce a list of verbs
-        Verb[] verbs;
-        Atom[] listBuild;
-        NiladParseState state = NiladParseState.None;
-        NiladParseState nextState;
-        void finishListBuild() {
-            if(listBuild.length == 0) return;
-            
-            Debugger.print("Pushing list build: ", listBuild);
-            verbs ~= Verb.nilad(Atom(listBuild));
-            listBuild = [];
-        }
-        void addNilad(T)(T n) {
-            Debugger.print("Adding nilad to verb chain");
-            auto v = Verb.nilad(n);
-            verbs ~= v;
-        }
-        Atom handleVerb(Token token, bool mustBeNilad = false) {
-            assert(!mustBeNilad || token.isNilad, "Expected a nilad when forced");
-            
-            import std.algorithm.iteration : map;
-            import std.array : array;
-            
-            if(token.isNilad) {
-                nextState = NiladParseState.LastWasNilad;
-                Atom result;
-                switch(token.name) {
-                    // TODO: instruction name to atom function instead of
-                    // this wacky recursive function
-                    case InsName.Integer:
-                        result = token.big;
-                        break;
-                    
-                    case InsName.String:
-                        result = token.str;
-                        break;
-                    
-                    case InsName.Real:
-                        result = token.dec;
-                        break;
-                    
-                    case InsName.ListLiteral:
-                        result = token.arr.map!(a => handleVerb(a, true)).array;
-                        break;
-                    
-                    default:
-                        assert(0, "Unhandled nilad " ~ to!string(token.name));
-                }
-                if(mustBeNilad) {
-                    return result;
-                }
-                else {
-                    addNilad(result);
-                }
-            }
-            else {
-                finishListBuild;
-                if(token.name == InsName.DefinedAlias) {
-                    Debugger.print("Aliases: ", chainAliases);
-                    auto aliasIndex = chainAliases[token.big];
-                    // TODO: command line flag for debugging aliases
-                    verbs ~= new Verb("Alias#" ~ token.big.to!string)
-                        .setMonad((Verb v, a) {
-                            return v.info.chains[aliasIndex](a);
-                        })
-                        .setDyad((Verb v, a, b) {
-                            return v.info.chains[aliasIndex](a, b);
-                        })
-                        // TODO: ephemeral children for display purposes (╴╴a)
-                        // .setChildren([ v??? ], true)
-                        // TODO: copy marked arity
-                        .setMarkedArity(1);
-                }
-                else {
-                    verbs ~= getVerb(token.name);
-                }
-            }
-            return Nil.nilAtom;
-        }
-        foreach(token; chain) {
-            nextState = NiladParseState.None;
-            Debugger.print("==== step ====");
-            Debugger.print("state: ", state);
-            Debugger.print("token: ", token);
-            final switch(token.speech) {
-                case SpeechPart.Verb:
-                    handleVerb(token);
-                    break;
-                    
-                case SpeechPart.Adjective:
-                    // TODO: using filter as a separator is fundamentally flawed
-                    // e.g.: =&2\ 0&;
-                    if(state == NiladParseState.LastWasNilad && token.name == InsName.Filter) {
-                        Debugger.print("Nilad separator!");
-                        if(listBuild.length == 0) {
-                            Debugger.print("Initializing with top (niladic) verb");
-                            listBuild ~= verbs[$-1]();
-                            verbs.popBack;
-                        }
-                        nextState = NiladParseState.LastWasNiladSeparator;
-                    }
-                    else {
-                        assert(verbs.length >= 1, "Expected a verb for adjective "
-                            ~ to!string(token.name));
-                        Adjective adj = getAdjective(token.name);
-                        finishListBuild;
-                        Verb u = verbs[$-1];
-                        verbs.popBack;
-                        verbs ~= adj.transform(u);
-                    }
-                    break;
-                
-                case SpeechPart.Conjunction:
-                    assert(verbs.length >= 2, "Expected two verbs for conjunction "
-                        ~ to!string(token.name));
-                    Conjunction con = getConjunction(token.name);
-                    finishListBuild;
-                    Verb f = verbs[$-2];
-                    Verb g = verbs[$-1];
-                    verbs.popBackN(2);
-                    verbs ~= con.transform(f, g);
-                    break;
-                
-                case SpeechPart.MultiConjunction:
-                    MultiConjunction mc = getMultiConjunction(token.name);
-                    finishListBuild;
-                    Verb[] args;
-                    uint valence = to!uint(token.big);
-                    assert(valence, "Expected non-zero final valence for MultiConjunction");
-                    /*
-                    if(mc.valence == 0) {
-                        valence = verbs.length;
-                    }
-                    else {
-                        valence = mc.valence;
-                    }
-                    */
-                    assert(verbs.length >= valence,
-                        "Expected " ~ to!string(valence) ~ " verbs for multi-conjunction "
-                        ~ to!string(token.name));
-                    
-                    args = verbs[$-valence..$];
-                    verbs.popBackN(valence);
-                    // we cannot replace the back of the array,
-                    // since this would replace the front of args,
-                    // causing circular referencing
-                    verbs ~= mc.transform(args);
-                    break;
-                    
-                case SpeechPart.Syntax:
-                    switch(token.name) {
-                        case InsName.CloseParen:
-                            auto amount = to!int(token.big);
-                            finishListBuild;
-                            auto last = verbs[$-amount..$];
-                            verbs.popBackN(amount);
-                            condenseVerbChain(last);
-                            verbs ~= last[$-1];
-                            break;
-                        
-                        // TODO: allow aliases to be defined in the middle of the sentence
-                        case InsName.InitialAlias:
-                            chainAliases[token.big] = index;
-                            break;
-                        
-                        default:
-                            assert(0, "Unexpected syntax part: " ~ to!string(token.name));
-                    }
-                    break;
-            }
-            state = nextState;
-            Debugger.print("Verbs: ", verbs);
-            Debugger.print("");
-        }
-        Debugger.print("Final condensation:");
-        finishListBuild;
-        // second, condense the train down to a single verb
-        Debugger.print("Resulting verbs: ", verbs);
-        condenseVerbChain(verbs);
-        return verbs[0];
-    }
-    
     Verb[] condense() {
         import std.range : split;
+        import std.algorithm.iteration : each;
         
         Debugger.print("Initial stack:");
         Debugger.print(stack);
-        Verb[] chains;
-        uint[BigInt] chainAliases;
-        foreach(chain; stack.split(Token.Break)) {
-            if(chain.length == 0) continue;
-            Debugger.print("CHAIN:");
-            Debugger.print("   ",chain);
-            Verb chainVerb = condenseTokenChain(
-                chainAliases,
-                chain,
-                chains.length
-            );
-            chains ~= chainVerb.dup;
-        }
-        // assign links
-        foreach(i, ref chain; chains) {
-            Debugger.print("=== ", i, " ===");
-            auto info = ChainInfo(i, chains);
-            chain.setChains(info);
-        }
-        return chains;
+        Condenser c;
+        stack
+            .split(Token.Break)
+            .each!(chain => c.condense(chain));
+        
+        c.assignLinkInfo();
+        
+        return c.chains;
     }
     
     static Atom evaluate(string str, Atom[] args = []) {
