@@ -330,7 +330,7 @@ struct Atom {
         return match!(
             (BigInt a, BigInt b) => Atom(pow(a, b)),
             // index of 
-            (Atom[] a, b) => Atom(a.countUntil(atomFor(b))),
+            (Atom[] a, b) => Atom(BigInt(a.countUntil(atomFor(b)))),
             (string a, string b) => Atom(BigInt(a.countUntil(b))),
             (_1, _2) => Nil.nilAtom,
         )(this, rhs);

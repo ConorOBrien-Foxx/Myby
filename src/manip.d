@@ -403,6 +403,10 @@ bool putch(Atom a) {
             write(c);
             return true;
         },
+        (string s) {
+            write(s);
+            return true;
+        },
         _ => false
     );
 }

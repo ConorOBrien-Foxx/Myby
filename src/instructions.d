@@ -1,5 +1,7 @@
 module myby.instructions;
 
+import core.exception;
+
 import std.algorithm.comparison;
 import std.algorithm.iteration;
 import std.algorithm.searching;
@@ -174,7 +176,8 @@ enum InsInfo[InsName] Info = [
     InsName.Reflex:                 InsInfo("~",       0xFD,      SpeechPart.Adjective),
     InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
     InsName.Put:                    InsInfo("put",     0xFE01,    SpeechPart.Verb),
-    InsName.Getch:                  InsInfo("getch",   0xFE02,    SpeechPart.Verb),
+    InsName.Putch:                  InsInfo("putch",   0xFE02,    SpeechPart.Verb),
+    InsName.Getch:                  InsInfo("getch",   0xFE03,    SpeechPart.Verb),
     InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
     InsName.Ascii:                  InsInfo("A",       0xFE41,    SpeechPart.Verb),
     InsName.Alpha:                  InsInfo("L",       0xFE42,    SpeechPart.Verb),
@@ -377,15 +380,22 @@ Verb getVerb(InsName name) {
                 verbs[InsName.First](atomFor(BigInt(0)), a)
             )
             // Index
-            .setDyad((l, r) => match!(
-                // TODO: index by real?
-                (BigInt b, Atom[] a) =>
-                    a[moldIndex(b, a.length)],
-                (BigInt b, string a) =>
-                    Atom(to!string(a[moldIndex(b, a.length)])),
-                (b, AVHash h) => Atom(h[_AtomValue(b)]),
-                (_1, _2) => Nil.nilAtom,
-            )(l, r))
+            .setDyad((l, r) {
+                try {
+                    return match!(
+                        // TODO: index by real?
+                        (BigInt b, Atom[] a) =>
+                            a[moldIndex(b, a.length)],
+                        (BigInt b, string a) =>
+                            Atom(to!string(a[moldIndex(b, a.length)])),
+                        (b, AVHash h) => Atom(h[_AtomValue(b)]),
+                        (_1, _2) => Nil.nilAtom,
+                    )(l, r);
+                }
+                catch(RangeError) {
+                    assert(0, "Runtime Error: Invalid index `" ~ l.atomToString() ~ "` into `" ~ r.atomToString() ~ "`");
+                }
+            })
             .setMarkedArity(2);
         
         verbs[InsName.Last] = new Verb("}")
@@ -513,7 +523,7 @@ Verb getVerb(InsName name) {
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
-        verbs[InsName.Put] = new Verb("putch")
+        verbs[InsName.Putch] = new Verb("putch")
             // Putch
             .setMonad(a => Atom(putch(a)))
             .setDyad((_1, _2) => Nil.nilAtom)
@@ -549,7 +559,12 @@ Verb getVerb(InsName name) {
                         assert(i + 1 < keyValue.length, "Expected adjacent pairs");
                         Atom key = keyValue[i];
                         Atom value = keyValue[i + 1];
-                        copy[key] = value;
+                        try {
+                            copy[key] = value;
+                        }
+                        catch(RangeError) {
+                            assert(0, "Cannot insert `" ~ key.atomToString ~ "` into `" ~ a.atomToString ~ "`");
+                        }
                     }
                     return Atom(copy);
                 },
