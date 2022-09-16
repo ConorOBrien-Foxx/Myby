@@ -52,13 +52,16 @@ hljs.registerLanguage("myby", (h) => {
                 ],
                 relevance: 0,
             },
+            // Adjective
             {
                 className: "literal",
                 variants: [
-                    { begin: /[\\G"\[\]]|!\./ },
+                    { begin: /^\s*[a-z]+:/ },
+                    { begin: /!\.|[\\][:.]|\\\.\.|\$N|[?\\G"\[\]]/ },
                 ],
                 relevance: 0,
             },
+            // Conjunction
             {
                 className: "title",
                 variants: [
@@ -70,6 +73,7 @@ hljs.registerLanguage("myby", (h) => {
                 className: "string",
                 variants: [
                     { begin: /'(?:[^']|'')+'/ },
+                    { begin: /\$\.[a-zA-Z]+/ },
                 ],
                 relevance: 0,
             }
