@@ -91,7 +91,10 @@ enum InsName {
     Keep,                   //FE82
     Loop,                   //FE83
     While,                  //FE83
+    InitialAlias,           //----
+    DefinedAlias,           //FEA0-FEBF
     Break,                  //FF
+    None,                   //----
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
 
@@ -191,6 +194,9 @@ enum InsInfo[InsName] Info = [
     InsName.Keep:                   InsInfo("keep",    0xFE82,    SpeechPart.Adjective),
     InsName.Loop:                   InsInfo("loop",    0xFE83,    SpeechPart.Adjective),
     InsName.While:                  InsInfo("while",   0xFE84,    SpeechPart.Conjunction),
+    InsName.DefinedAlias:           InsInfo("(n/a)",   0xFEA0,    SpeechPart.Verb),
+    //FEA0-FEBF reserved for aliases
+    //TODO: Conjunction/Adjective aliases?
     InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
 ];
 

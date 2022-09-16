@@ -31,6 +31,17 @@ int toHexDigit(char c) {
 Nibble[] parseLiterate(T)(T str) {
     str = str.strip;
     Nibble[] code;
+    Nibble[][string] aliases;
+    
+    Nibble[] aliasFor(uint index) {
+        // FEA0-FEBF
+        Nibble[] res = [0xF, 0xE, 0x0, 0x0];
+        res[2] = cast(Nibble)(0xA + index / 16);
+        res[3] = cast(Nibble)(index % 16);
+        assert(res[2] <= 0xB, "Out of room for aliases");
+        return res;
+    }
+    
     uint finalParenCount = 0;
     uint initialParenCount = 0;
     uint i = 0;
@@ -44,6 +55,7 @@ Nibble[] parseLiterate(T)(T str) {
     Debugger.print("Parsing input literate code: <", str, ">");
     NiladParseState state = NiladParseState.None;
     bool lastWasConjunction = false;
+    bool isLineStart = true;
     string lastConjunction;
     while(i < str.length) {
         bool thisIsConjuction = false;
@@ -175,8 +187,13 @@ Nibble[] parseLiterate(T)(T str) {
             }
             Debugger.print("Parsed name: ", name);
             auto r = name in InstructionMap;
+            auto aCode = name in aliases;
             if(r !is null) {
                 Debugger.print("---> Operator");
+                
+                if(name == "\n") {
+                    isLineStart = true;
+                }
                 if(code.length || name != "\n") {
                     code ~= r.nibs;
                 }
@@ -190,6 +207,10 @@ Nibble[] parseLiterate(T)(T str) {
                 );
                 lastConjunction = name;
             }
+            else if(aCode !is null) {
+                Debugger.print("Outputting known alias:", name, " -> ", (*aCode).basicNibbleFmt);
+                code ~= *aCode;
+            }
             else switch(head) {
                 case ' ':
                     if(state == NiladParseState.LastWasNilad) {
@@ -201,7 +222,17 @@ Nibble[] parseLiterate(T)(T str) {
                     // ignore
                     break;
                 default:
-                    assert(0, "Unhandled instruction: " ~ name);
+                    // aliases end with :
+                    if(name[$-1] == ':') {
+                        string finalName = name[0..$-1];
+                        uint index = aliases.length;
+                        Nibble[] aliasCode = aliasFor(index);
+                        aliases[finalName] = aliasCode;
+                        code ~= aliasCode;
+                    }
+                    else {
+                        assert(0, "Unhandled instruction: " ~ name);
+                    }
             }
             if(head == ')') {
                 finalParenCount++;

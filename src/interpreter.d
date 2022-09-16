@@ -49,6 +49,9 @@ struct Token {
             case InsName.Real:
                 addendum = to!string(dec);
                 break;
+            case InsName.DefinedAlias:
+                addendum = big.toBase16.basicNibbleFmt;
+                break;
             default:
                 break;
         }
@@ -135,7 +138,17 @@ Token[] tokenize(Nibble[] code) {
                 }
             }
             Debugger.print("Parsing instruction ", name.toBase16.nibbleFmt);
-            auto tup = name in NameMap;
+            auto indexName = name;
+            if(indexName / 256 == 0xFE) {
+                auto secondHalf = indexName % 256;
+                auto hex3 = secondHalf / 16;
+                auto hex4 = secondHalf % 16;
+                if(0xA <= hex3 && hex3 <= 0xB) {
+                    indexName = 0xFEA0;
+                }
+                token.big = name;
+            }
+            auto tup = indexName in NameMap;
             assert(tup, "Cannot find instruction corresponding to "
                 ~ name.toBase16.nibbleFmt);
             token.name = tup.name;
@@ -222,7 +235,8 @@ class Interpreter {
     void shunt() {
         Token[] opStack;
         uint[] parenStackArity = [0];
-        SpeechPart previous = SpeechPart.Syntax;
+        SpeechPart previousSpeech = SpeechPart.Syntax;
+        InsName previousName = InsName.None;
         bool previousWasNilad = false;
         
         void flushOpStack() {
@@ -232,12 +246,21 @@ class Interpreter {
             }
         }
         
+        bool[BigInt] seenAliases;
+        
         foreach(i, token; code.tokenize.autoCompleteParentheses) {
             bool thisIsNilad = false;
             Debugger.print("Token[", i , "]: ", token);
             Debugger.print("Before:");
             Debugger.print("  Paren stack: ", parenStackArity);
             Debugger.print("  opStack:     ", opStack);
+            
+            // handle case of first alias defining
+            if(token.name == InsName.DefinedAlias && token.big !in seenAliases) {
+                token.name = InsName.InitialAlias;
+                token.speech = SpeechPart.Syntax;
+                seenAliases[token.big] = true;
+            }
             
             /*
             |=Barriers. V=Verb, A=Adjective, C=Conjunction.
@@ -250,10 +273,8 @@ class Interpreter {
             */
             // flush opStack if at barrier
             // TODO: maybe there's a more sane to write the below line
-            if(token.speech == SpeechPart.Verb || (token.speech == SpeechPart.Syntax && token.name == InsName.OpenParen)) {
-                // NOTE: this will double flush '(' + 'V', but this should be fine
-                // TODO: fix?
-                if(previous == SpeechPart.Verb || previous == SpeechPart.Adjective || previous == SpeechPart.Syntax) {
+            if(token.speech == SpeechPart.Verb || token.name == InsName.OpenParen) {
+                if(previousSpeech == SpeechPart.Verb || previousSpeech == SpeechPart.Adjective || previousName == InsName.OpenParen) {
                     flushOpStack();
                 }
             }
@@ -297,7 +318,7 @@ class Interpreter {
                     switch(token.name) {
                         case InsName.OpenParen:
                             // flush if at barrier
-                            if(previous == SpeechPart.Verb) {
+                            if(previousSpeech == SpeechPart.Verb) {
                                 flushOpStack();
                             }
                             opStack ~= token;
@@ -325,6 +346,10 @@ class Interpreter {
                             stack ~= token;
                             break;
                         
+                        case InsName.InitialAlias:
+                            stack ~= token;
+                            break;
+                        
                         default:
                             //TODO: error
                             assert(false, "Received invalid Syntax part");
@@ -332,7 +357,8 @@ class Interpreter {
                     break;
             }
             
-            previous = token.speech;
+            previousSpeech = token.speech;
+            previousName = token.name;
             previousWasNilad = thisIsNilad;
             
             Debugger.print("After:");
@@ -382,7 +408,8 @@ class Interpreter {
         }
     }
     
-    Verb condenseTokenChain(T)(T chain) {
+    // TODO: split into its own function?
+    Verb condenseTokenChain(T, N)(ref uint[BigInt] chainAliases, T chain, N index) {
         // first, produce a list of verbs
         Verb[] verbs;
         Atom[] listBuild;
@@ -440,7 +467,25 @@ class Interpreter {
             }
             else {
                 finishListBuild;
-                verbs ~= getVerb(token.name);
+                if(token.name == InsName.DefinedAlias) {
+                    Debugger.print("Aliases: ", chainAliases);
+                    auto aliasIndex = chainAliases[token.big];
+                    // TODO: command line flag for debugging aliases
+                    verbs ~= new Verb("Alias#" ~ token.big.to!string)
+                        .setMonad((Verb v, a) {
+                            return v.info.chains[aliasIndex](a);
+                        })
+                        .setDyad((Verb v, a, b) {
+                            return v.info.chains[aliasIndex](a, b);
+                        })
+                        // TODO: ephemeral children for display purposes (╴╴a)
+                        // .setChildren([ v??? ], true)
+                        // TODO: copy marked arity
+                        .setMarkedArity(1);
+                }
+                else {
+                    verbs ~= getVerb(token.name);
+                }
             }
             return Nil.nilAtom;
         }
@@ -515,15 +560,24 @@ class Interpreter {
                     break;
                     
                 case SpeechPart.Syntax:
-                    // writeln("Unhandled: ", token);
-                    assert(token.name == InsName.CloseParen);
-                    // TODO: handle more syntax?
-                    auto amount = to!int(token.big);
-                    finishListBuild;
-                    auto last = verbs[$-amount..$];
-                    verbs.popBackN(amount);
-                    condenseVerbChain(last);
-                    verbs ~= last[$-1];
+                    switch(token.name) {
+                        case InsName.CloseParen:
+                            auto amount = to!int(token.big);
+                            finishListBuild;
+                            auto last = verbs[$-amount..$];
+                            verbs.popBackN(amount);
+                            condenseVerbChain(last);
+                            verbs ~= last[$-1];
+                            break;
+                        
+                        // TODO: allow aliases to be defined in the middle of the sentence
+                        case InsName.InitialAlias:
+                            chainAliases[token.big] = index;
+                            break;
+                        
+                        default:
+                            assert(0, "Unexpected syntax part: " ~ to!string(token.name));
+                    }
                     break;
             }
             state = nextState;
@@ -544,11 +598,16 @@ class Interpreter {
         Debugger.print("Initial stack:");
         Debugger.print(stack);
         Verb[] chains;
+        uint[BigInt] chainAliases;
         foreach(chain; stack.split(Token.Break)) {
             if(chain.length == 0) continue;
             Debugger.print("CHAIN:");
             Debugger.print("   ",chain);
-            Verb chainVerb = condenseTokenChain(chain);
+            Verb chainVerb = condenseTokenChain(
+                chainAliases,
+                chain,
+                chains.length
+            );
             chains ~= chainVerb.dup;
         }
         // assign links
