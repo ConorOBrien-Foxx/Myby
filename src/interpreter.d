@@ -212,7 +212,7 @@ class Interpreter {
             // flush opStack if at barrier
             // TODO: maybe there's a more sane to write the below line
             if(token.speech == SpeechPart.Verb || token.name == InsName.OpenParen) {
-                if(previousSpeech == SpeechPart.Verb || previousSpeech == SpeechPart.Adjective || previousName == InsName.OpenParen) {
+                if(previousSpeech == SpeechPart.Verb || previousSpeech == SpeechPart.Adjective || previousName == InsName.CloseParen) {
                     flushOpStack();
                 }
             }
