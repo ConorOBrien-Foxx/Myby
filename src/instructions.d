@@ -93,7 +93,8 @@ enum InsName {
     Memoize,                //FE81
     Keep,                   //FE82
     Loop,                   //FE83
-    While,                  //FE83
+    BLoop,                  //FE84
+    While,                  //FE85
     InitialAlias,           //----
     DefinedAlias,           //FEA0-FEBF
     Break,                  //FF
@@ -197,7 +198,8 @@ enum InsInfo[InsName] Info = [
     InsName.Memoize:                InsInfo("M.",      0xFE81,    SpeechPart.Adjective),
     InsName.Keep:                   InsInfo("keep",    0xFE82,    SpeechPart.Adjective),
     InsName.Loop:                   InsInfo("loop",    0xFE83,    SpeechPart.Adjective),
-    InsName.While:                  InsInfo("while",   0xFE84,    SpeechPart.Conjunction),
+    InsName.BLoop:                  InsInfo("bloop",   0xFE84,    SpeechPart.Conjunction),
+    InsName.While:                  InsInfo("while",   0xFE85,    SpeechPart.Conjunction),
     InsName.DefinedAlias:           InsInfo("(n/a)",   0xFEA0,    SpeechPart.Verb),
     //FEA0-FEBF reserved for aliases
     //TODO: Conjunction/Adjective aliases?
@@ -1107,6 +1109,22 @@ Conjunction getConjunction(InsName name) {
                     }
                     return a;
                 })
+                .setMarkedArity(1)
+                .setChildren([f, g])
+        );
+        
+        // BLoop
+        // aka: do while, but cute sounding
+        // bloop!
+        conjunctions[InsName.BLoop] = new Conjunction(
+            (Verb f, Verb g) => new Verb("bloop")
+                .setMonad((Verb v, Verb g, a) {
+                    while(g(a = v(a)).truthiness) {
+                        
+                    }
+                    return a;
+                })
+                .setDyad((_1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
                 .setChildren([f, g])
         );
