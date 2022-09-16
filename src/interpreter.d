@@ -164,8 +164,6 @@ class Interpreter {
     Token[] stack;
     this(Nibble[] c) {
         code = c;
-        // writeln(nibbleToCharCodes(code));
-        // writeln(code.tokenize);
     }
     this(T)(T str) {
         import myby.literate : parseLiterate;

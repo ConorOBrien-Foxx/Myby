@@ -31,10 +31,11 @@ enum InsName {
     Exponentiate,           //8
     Identity,               //9
     Bond,                   //A
-    LessEqual,              //AA
-    GreaterEqual,           //AD
+    OnPrefixes,             //AA
+    OnSuffixes,             //AC
+    SplitCompose,           //AD
     OpenParen,              //B
-    MemberIn,               //BA
+    ArityForce,             //BA
     Vectorize,              //BC
     CloseParen,             //C
     Compose,                //D
@@ -61,11 +62,11 @@ enum InsName {
     Equality,               //F4
     LessThan,               //F5
     GreaterThan,            //F6
-    ArityForce,             //F7
+    MemberIn,               //F7
     First,                  //F8
     Last,                   //F9
-    OnPrefixes,             //FA
-    SplitCompose,           //FC
+    LessEqual,              //FA
+    GreaterEqual,           //FB
     Reflex,                 //FD
     Exit,                   //FE00
     Put,                    //FE01
@@ -128,10 +129,10 @@ enum InsInfo[InsName] Info = [
     InsName.Exponentiate:           InsInfo("^",       0x8,       SpeechPart.Verb),
     InsName.Identity:               InsInfo("#",       0x9,       SpeechPart.Verb),
     InsName.Bond:                   InsInfo("&",       0xA,       SpeechPart.Conjunction),
-    // Unassigned: AC       NB: `&)` has no meaning
     InsName.OnPrefixes:             InsInfo("\\.",     0xAA,      SpeechPart.Adjective),
+    InsName.OnSuffixes:             InsInfo("\\:",     0xAC,      SpeechPart.Adjective),
     InsName.SplitCompose:           InsInfo("O",       0xAD,      SpeechPart.MultiConjunction),
-    // Unassigned (maybe): AAAA, AADD, ...etc.
+    // Unassigned (maybe): ADAD
     InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
     InsName.ArityForce:             InsInfo("`",       0xBA,      SpeechPart.Adjective),
     InsName.Vectorize:              InsInfo("V",       0xBC,      SpeechPart.Adjective),
@@ -158,7 +159,7 @@ enum InsInfo[InsName] Info = [
     InsName.Inverse:                InsInfo("!.",      0xF1C,     SpeechPart.Adjective),
     InsName.Power:                  InsInfo("^:",      0xF1D,     SpeechPart.Conjunction),
     InsName.Print:                  InsInfo("echo",    0xF1E,     SpeechPart.Verb),
-    InsName.Scan:                   InsInfo("\\:",     0xF1F,     SpeechPart.Conjunction),
+    InsName.Scan:                   InsInfo("\\..",    0xF1F,     SpeechPart.Conjunction),
     InsName.Pair:                   InsInfo(";",       0xF2,      SpeechPart.Verb),
     InsName.Binomial:               InsInfo("!",       0xF3,      SpeechPart.Verb),
     InsName.Equality:               InsInfo("=",       0xF4,      SpeechPart.Verb),
@@ -860,6 +861,24 @@ Adjective getAdjective(InsName name) {
                 .setChildren([v])
         );
         
+        // OnSuffixes
+        adjectives[InsName.OnSuffixes] = new Adjective(
+            (Verb v) => new Verb("\\:")
+                .setMonad((Verb v, a) => a.match!(
+                    (Atom[] a) => Atom(
+                        iota(a.length)
+                            .map!(i => a[i..$])
+                            .map!Atom
+                            .map!v
+                            .array
+                        ),
+                    _ => Nil.nilAtom,
+                ))
+                .setDyad((Verb v, a, b) => Nil.nilAtom)
+                .setMarkedArity(1)
+                .setChildren([v])
+        );
+        
         // Reflex
         adjectives[InsName.Reflex] = new Adjective(
             (Verb v) => new Verb("~")
@@ -1044,7 +1063,7 @@ Conjunction getConjunction(InsName name) {
         );
         
         conjunctions[InsName.Scan] = new Conjunction(
-            (Verb f, Verb seedFn) => new Verb("\\:")
+            (Verb f, Verb seedFn) => new Verb("\\..")
                 .setMonad((f, g, a) => a.match!(
                     (Atom[] arr) {
                         // TODO: relegate a specific atom for
