@@ -250,7 +250,7 @@ NB.=> 5 6 7 8
 |----|----|
 | verb(N) → verb(3-N) | Invert marked arity. (If `u` has marked arity `N`, then returns a verb that is identical to `u`, but with marked arity `3-N`; that is, dyadic if marked monadic, and monadic if marked dyadic.) |
 
-### `benil`
+### `benil` - Nil replacement
 
 | Statistic | Value |
 |----|----|
@@ -281,9 +281,9 @@ NB.=> 5 6 7 8
 | Statistic | Value |
 |----|----|
 | Speech Part | Adjective |
-| Hex Representation | `FE81` |
+| Hex Representation | `FE86` |
 | Nibble Cost | 4 |
-| Symbolic Usage | `uM.` |
+| Symbolic Usage | `uT.` |
 
 | Signature | Explanation |
 |----|----|
@@ -416,6 +416,7 @@ NB.=>   2.76366 1000000
 
 | Signature | Explanation |
 |----|----|
+| string → string | Uppercase |
 | number → list(number) | Inclusive range starting at 1 |
 | duration → real | Number of seconds |
 | number, number → number | Exponentiation |
@@ -448,6 +449,7 @@ NB.=>   2.76366 1000000
 
 | Signature | Explanation |
 |----|----|
+| string → string | Lowercase |
 | number → list(number) | Range \[0,a). (Reversed if a < 0.) |
 | number, number → list(number) | Range [x,y] |
 | list, list → list; string, string → string | Multi Range. (Treats `x` as the minimums and `y` as the maximums of a mixed base system, and generates all the entries from `x` to `y`. See the Examples below.) |

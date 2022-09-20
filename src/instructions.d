@@ -12,6 +12,7 @@ import std.datetime;
 import std.range;
 import std.sumtype;
 import std.typecons;
+import std.uni;
 
 import myby.debugger;
 import myby.interpreter : Interpreter;
@@ -293,6 +294,8 @@ Verb getVerb(InsName name) {
                 // OneRange
                 (a) =>
                     verbs[InsName.Range](cast(typeof(a)) 1, a),
+                // Uppercase
+                (string s) => Atom(s.map!toUpper.joinToString),
                 _ => Nil.nilAtom,
             ))
             // Exponentiation
@@ -342,6 +345,8 @@ Verb getVerb(InsName name) {
                         ? iota(-n).map!(a => Atom(-n - 1 - a)).array
                         : iota(n).map!Atom.array
                 ),
+                // Lowercase
+                (string s) => Atom(s.map!toLower.joinToString),
                 _ => Nil.nilAtom
             ))
             .setDyad((l, r) => match!(
