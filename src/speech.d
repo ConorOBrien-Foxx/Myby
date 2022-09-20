@@ -7,6 +7,8 @@ import std.algorithm.sorting;
 import std.array;
 import std.bigint;
 import std.conv : to;
+import std.datetime;
+import std.meta : AliasSeq;
 import std.range;
 import std.sumtype;
 
@@ -137,13 +139,16 @@ class Infinity {
     }
 }
 
-alias _AtomValue = SumType!(Nil, BigInt, real, Infinity, string, bool, Atom[], This[This]);
+alias _AtomValue = SumType!(
+    Nil, BigInt, real, Duration, Infinity, string, bool, Atom[], This[This]
+);
 alias AVHash = _AtomValue[_AtomValue];
 string readableTypeName(_AtomValue value) {
     return value.match!(
         (Nil _) => "nil",
         (bool _) => "bool",
         (real _) => "real",
+        (Duration _) => "dur",
         (BigInt _) => "int",
         (Infinity _) => "inf",
         (string _) => "str",
@@ -209,6 +214,16 @@ struct Atom {
     real as(Type : real)() {
         return value.match!(
             (a) => cast(real) a,
+            (Duration d) {
+                // seconds, with fractional seconds
+                enum Units = AliasSeq!("seconds", "msecs", "usecs", "hnsecs");
+                auto ds = d.split!Units;
+                real r = 0;
+                static foreach(unit; Units) {
+                    r += ds.secondsFraction!unit;
+                }
+                return r;
+            },
             // _ => 0.0,
             (a) => assert(0, "Cannot convert " ~ readableTypeName(a) ~ " to " ~ typeid(Type).toString()),
         );
@@ -270,7 +285,6 @@ struct Atom {
     Atom opBinary(string op)(Atom rhs)
     if(mathOps.canFind(op)) {
         if(isNumeric && rhs.isNumeric) {
-            import std.meta : AliasSeq;
             // real casts all args to real
             alias IntegralTypes = AliasSeq!(real, BigInt, bool);
             static foreach(Type; IntegralTypes) {
@@ -386,6 +400,7 @@ struct Atom {
             a => a.toHash(),
             (real r) => r.hashOf(),
             (string s) => s.hashOf(),
+            (Duration d) => d.toString().hashOf(),
             (const Atom[] a) => a.map!"a.toHash".sum,
             (const _AtomValue[const _AtomValue] h) =>
                 h.keys.map!"a.toHash".sum + h.values.map!"a.toHash".sum,
@@ -702,6 +717,19 @@ class Verb {
     static Verb nilad(T)(T t) {
         return Verb.nilad(Atom(t));
     }
+    
+    @property static Verb unimplemented() {
+        Verb un;
+        if(!un) {
+            enum msg = "Unimplemented behavior";
+            un = new Verb("!unimplemented!")
+                .setMonad(a => assert(0, msg))
+                .setDyad((a, b) => assert(0, msg))
+                .setMarkedArity(1);
+            un.setInverse(un);
+        }
+        return un;
+    }
 }
 
 class Adjective {
@@ -823,6 +851,7 @@ string atomToString(_AtomValue a, bool forceLinear=false) {
         (BigInt x) => to!string(x),
         (bool x) => x ? "1b" : "0b",
         (real x) => to!string(x),
+        (Duration x) => x.toString(),
         (string x) => x,
         (Atom[] x) => arrayToString(x, forceLinear),
         (AVHash x) => hashToString(x),

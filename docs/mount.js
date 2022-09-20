@@ -29,7 +29,7 @@ hljs.registerLanguage("myby", (h) => {
             {
                 className: "comment",
                 variants: [
-                    { begin: `NB.=>` },
+                    { begin: /NB.<?=>/ },
                 ],
                 relevance: 10,
             },
@@ -47,8 +47,7 @@ hljs.registerLanguage("myby", (h) => {
                 className: "number",
                 variants: [
                     { begin: `[01]+b` },
-                    { begin: `[0-9]+\\.[0-9]+` },
-                    { begin: `[0-9]+` },
+                    { begin: `[0-9]+(\\.[0-9]+)?(e[+-]?[0-9]+)?` },
                 ],
                 relevance: 0,
             },
@@ -57,7 +56,7 @@ hljs.registerLanguage("myby", (h) => {
                 className: "literal",
                 variants: [
                     { begin: /^\s*[a-z]+:/ },
-                    { begin: /!\.|[\\][:.]|\\\.\.|\$N|[?\\G"\[\]]/ },
+                    { begin: /[!TM]\.|[\\][:.]|\\\.\.|\$N|[?\\G"\[\]]/ },
                 ],
                 relevance: 0,
             },
@@ -65,7 +64,7 @@ hljs.registerLanguage("myby", (h) => {
             {
                 className: "title",
                 variants: [
-                    { begin: /[&@\\]\.|[&@O~]|^:/ },
+                    { begin: /while|b?loop|benil|[&@\\]\.|[&@O~]|^:/ },
                 ],
                 relevance: 0,
             },

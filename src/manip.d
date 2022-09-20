@@ -7,6 +7,7 @@ import std.algorithm.sorting;
 import std.array;
 import std.bigint;
 import std.conv : to, ConvOverflowException;
+import std.datetime;
 import std.range;
 import std.sumtype;
 import std.traits;
@@ -409,4 +410,11 @@ bool putch(Atom a) {
         },
         _ => false
     );
+}
+
+real secondsFraction(alias unit, T)(T ds) {
+    enum sf = 1.seconds.total!unit;
+    real res = mixin("ds." ~ unit);
+    res /= sf;
+    return res;
 }

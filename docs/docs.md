@@ -31,6 +31,7 @@ The various properties of manipulatable parts of speech.
   - **number**: Meta-type referring to either an int or a real
 - **verb**: Represents any verb
   - **verb(N)**: Represents a verb whose Marked Arity is N
+  - **verb/N**: Represents a verb when it is called with N arguments
   
 ## Signatures
 
@@ -45,6 +46,7 @@ To describe the behavior of commands, the format **A** → **B** is used to deno
 - verb(2) → verb(1) - *input is a verb whose marked arity is 2, returns a verb whose marked arity is 1*
 - verb(N) → verb(3-N) - *input is a verb whose marked arity is N, returns a verb whose marked arity is 3-N*
 - verb → (verb(1) : list → list) - *input is a verb, returns a verb whose marked arity is 1, which itself takes as input a list and returns a list*
+- verb → (verb(2)/1 : any → any) - *input is a verb, returns a verb whose marked arity is 2, but nonetheless when called with 1 argument, takes any argument and returns some argument*
 
 # Commands
 
@@ -147,15 +149,106 @@ NB.=> 6 12 18 24 30 36
 |----|----|
 | verb(1) → verb(2) | Left application. (With arguments `x` and `y`, computes `u@y`.) |
 
+### `\.` - On Prefixes
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `AA` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `u\.` |
+
+| Signature | Explanation |
+|----|----|
+| verb(1) → (verb(1) : list → list) | Apply to prefixes. (For each non-empty prefix list `h` of `a`, from smallest to largest, compute `u@h`.) |
+| verb(1) → (verb(1)/2 : int, list → list) | Apply to slices. (If `x` is positive, applies `u` to each moving window `w` of size `x` of `y`. If negative, applies `u` to each consecutive chunk `w` of size no greater than `x` of `y`.) |
+
+### `\:` - On Prefixes
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `AC` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `u\:` |
+
+| Signature | Explanation |
+|----|----|
+| verb(1) → (verb(1) : list → list) | Apply to suffixes. (For each non-empty suffix list `h` of `a`, from largest to smallest, compute `u@h`.) |
+
 ### `!.` - Inverse
 
 **NOTE:** Limited implementation at this stage.
 
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `F1C` |
+| Nibble Cost | 3 |
+| Symbolic Usage | `u!.` |
+
+| Signature | Explanation |
+|----|----|
+| verb(N) → verb(1) | Transforms to the pre-defined inverse of `u` if it has one. |
+
 ### `G` - Generate
+
+**NOTE:** The behavior of this command is subject to change to be more useful in the future.
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `F1B` |
+| Nibble Cost | 3 |
+| Symbolic Usage | `uG` |
+
+| Signature | Explanation |
+|----|----|
+| verb(2) → verb(1) | Generate integer matching. (Given an integer `a`, starting with an integer `i=0`, increment `i` until `i u a` is false.) |
+| verb(2) → verb(1)/2 | Generate integer matching. (Same as above, but starting with `i=y`.) |
+
+#### Examples
+
+```myby
+nextprime: (> * primq[) G
+```
 
 ### `~` - Reflex
 
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `FD` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `u~` |
+
+| Signature | Explanation |
+|----|----|
+| verb → verb(2)/1 | Reflex. (Computes `a u a`.) |
+| verb → verb(2) | Commute. (Computes `y u x`.) |
+
+#### Examples
+
+```myby
++\~ ^@4         NB.<=> (^@4) +\ (^@4)
+NB.=> 2 3 4 5
+NB.=> 3 4 5 6
+NB.=> 4 5 6 7
+NB.=> 5 6 7 8
+```
+
 ### `` ` `` - Arity Force
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `BA` |
+| Nibble Cost | 2 |
+| Symbolic Usage | ``u` `` |
+
+| Signature | Explanation |
+|----|----|
+| verb(N) → verb(3-N) | Invert marked arity. (If `u` has marked arity `N`, then returns a verb that is identical to `u`, but with marked arity `3-N`; that is, dyadic if marked monadic, and monadic if marked dyadic.) |
 
 ### `benil`
 
@@ -170,6 +263,51 @@ NB.=> 6 12 18 24 30 36
 |----|----|
 | verb(0) → verb(1) | Nil defaulting. (Returns argument `a` if not `nil`. Otherwise, returns `u@a`, aka, niladic value of `u`.) |
 
+### `M.` - Memoize
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `FE81` |
+| Nibble Cost | 4 |
+| Symbolic Usage | `uM.` |
+
+| Signature | Explanation |
+|----|----|
+| verb(1) → verb(1) | Memoize. (Caches the input/output pairs to save computation.) |
+
+### `T.` - Time
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `FE81` |
+| Nibble Cost | 4 |
+| Symbolic Usage | `uM.` |
+
+| Signature | Explanation |
+|----|----|
+| verb(N) → verb(N) | Time operation |
+
+#### Examples
+
+```myby
+1 >:[ while < T." (10 ^" ^@6)
+NB.=>                    46 μs and 8 hnsecs      10
+NB.=>                   280 μs and 2 hnsecs     100
+NB.=>             2 ms, 893 μs, and 1 hnsec    1000
+NB.=>           32 ms, 915 μs, and 3 hnsecs   10000
+NB.=>          293 ms, 121 μs, and 3 hnsecs  100000
+NB.=>  2 secs, 786 ms, 419 μs, and 7 hnsecs 1000000
+1 ^;#O\@(>:[ while < T.)" (10 ^" ^@6)
+NB.=>  3.76e-05      10
+NB.=> 0.0002594     100
+NB.=> 0.0028898    1000
+NB.=> 0.0291495   10000
+NB.=>  0.277542  100000
+NB.=>   2.76366 1000000
+```
+
 ## Conjunctions and Multi Conjunctions
 
 ### `&` - Bond
@@ -181,8 +319,6 @@ NB.=> 6 12 18 24 30 36
 ### `@.` - Monad Chain
 
 ### `^:` - Power
-
-### `\.` - On Prefixes
 
 ### `O` - Split Compose
 
@@ -281,6 +417,7 @@ NB.=> 6 12 18 24 30 36
 | Signature | Explanation |
 |----|----|
 | number → list(number) | Inclusive range starting at 1 |
+| duration → real | Number of seconds |
 | number, number → number | Exponentiation |
 
 ### `#` - Identity

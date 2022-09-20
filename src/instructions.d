@@ -8,6 +8,7 @@ import std.algorithm.searching;
 import std.algorithm.sorting;
 import std.bigint;
 import std.conv : to;
+import std.datetime;
 import std.range;
 import std.sumtype;
 import std.typecons;
@@ -95,6 +96,7 @@ enum InsName {
     Loop,                   //FE83
     BLoop,                  //FE84
     While,                  //FE85
+    Time,                   //FE86
     InitialAlias,           //----
     DefinedAlias,           //FEA0-FEBF
     Break,                  //FF
@@ -200,6 +202,7 @@ enum InsInfo[InsName] Info = [
     InsName.Loop:                   InsInfo("loop",    0xFE83,    SpeechPart.Adjective),
     InsName.BLoop:                  InsInfo("bloop",   0xFE84,    SpeechPart.Conjunction),
     InsName.While:                  InsInfo("while",   0xFE85,    SpeechPart.Conjunction),
+    InsName.Time:                   InsInfo("T.",      0xFE86,    SpeechPart.Adjective),
     InsName.DefinedAlias:           InsInfo("(n/a)",   0xFEA0,    SpeechPart.Verb),
     //FEA0-FEBF reserved for aliases
     //TODO: Conjunction/Adjective aliases?
@@ -228,6 +231,7 @@ Verb getVerb(InsName name) {
             // Absolute value/Length
             .setMonad((Atom a) => a.match!(
                 b => atomFor(b < 0 ? -b : b),
+                b => atomFor(b.isNegative ? -b : b),
                 s => Atom(BigInt(s.length)),
                 _ => Nil.nilAtom,
             ))
@@ -283,8 +287,10 @@ Verb getVerb(InsName name) {
             .setRangeStart(BigInt(1));
         
         verbs[InsName.Exponentiate] = new Verb("^")
-            // OneRange
             .setMonad((Atom a) => a.match!(
+                // Duration to Real
+                (Duration _) => Atom(a.as!real),
+                // OneRange
                 (a) =>
                     verbs[InsName.Range](cast(typeof(a)) 1, a),
                 _ => Nil.nilAtom,
@@ -806,10 +812,12 @@ Adjective getAdjective(InsName name) {
         
         // ArityForce
         adjectives[InsName.ArityForce] = new Adjective(
+            // TODO: copy better, e.g. inverse
             (Verb v) => new Verb("`")
                 .setMonad((Verb v, a) => v(a))
                 .setDyad((Verb v, a, b) => v(a, b))
                 .setMarkedArity(v.markedArity == 2 ? 1 : 2)
+                .setInverse(Verb.unimplemented)
                 .setChildren([v])
         );
         
@@ -910,12 +918,18 @@ Adjective getAdjective(InsName name) {
             (Verb v) => new Verb("G")
                 .setMonad((Verb v, a) {
                     auto ind = BigInt(0);
-                    while(!v(a, Atom(ind)).truthiness) {
+                    while(!v(Atom(ind), a).truthiness) {
                         ind++;
                     }
                     return Atom(ind);
                 })
-                .setDyad((Verb v, _1, _2) => Nil.nilAtom)
+                .setDyad((Verb v, i, a) {
+                    auto ind = i;
+                    while(!v(ind, a).truthiness) {
+                        ind = ind + 1;
+                    }
+                    return ind;
+                })
                 .setMarkedArity(1)
                 .setChildren([v])
         );
@@ -953,6 +967,7 @@ Adjective getAdjective(InsName name) {
         adjectives[InsName.Memoize] = new Adjective(
             (Verb v) {
                 import myby.memo;
+                // TODO: customize for size
                 FixedMemo!(Atom[Atom], 600) unaryMemo;
                 return new Verb("M.")
                     .setMonad((Verb v, a) {
@@ -966,6 +981,29 @@ Adjective getAdjective(InsName name) {
                     })
                     .setDyad((Verb v, _1, _2) => Nil.nilAtom)
                     .setMarkedArity(1)
+                    .setChildren([v]);
+            }
+        );
+        
+        adjectives[InsName.Time] = new Adjective(
+            (Verb v) {
+                import std.datetime.stopwatch : AutoStart, StopWatch;
+                return new Verb("T.")
+                    .setMonad((Verb v, a) {
+                        auto sw = StopWatch(AutoStart.yes);
+                        Atom res = v(a);
+                        sw.stop();
+                        auto dur = sw.peek();
+                        return Atom([ Atom(dur), res ]);
+                    })
+                    .setDyad((Verb v, a, b) {
+                        auto sw = StopWatch(AutoStart.yes);
+                        Atom res = v(a, b);
+                        sw.stop();
+                        auto dur = sw.peek();
+                        return Atom([ Atom(dur), res ]);
+                    })
+                    .setMarkedArity(v.markedArity)
                     .setChildren([v]);
             }
         );
