@@ -51,6 +51,8 @@ enum InsName {
     ThisChain,              //F11
     NextChain,              //F12
     NthChain,               //F13
+    Diagonal,               //F14
+    Oblique,                //F15
     Ternary,                //F16
     Minimum,                //F17
     Maximum,                //F18
@@ -154,8 +156,8 @@ enum InsInfo[InsName] Info = [
     InsName.ThisChain:              InsInfo("$:",      0xF11,     SpeechPart.Verb),
     InsName.NextChain:              InsInfo("$v",      0xF12,     SpeechPart.Verb),
     InsName.NthChain:               InsInfo("$N",      0xF13,     SpeechPart.Adjective),
-    // Unassigned: F14
-    // Unassigned: F15
+    InsName.Diagonal:               InsInfo("/:",      0xF14,     SpeechPart.Adjective),
+    InsName.Oblique:                InsInfo("/.",      0xF15,     SpeechPart.Adjective),
     InsName.Ternary:                InsInfo("?",       0xF16,     SpeechPart.MultiConjunction),
     InsName.Minimum:                InsInfo("<.",      0xF17,     SpeechPart.Verb),
     InsName.Maximum:                InsInfo(">.",      0xF18,     SpeechPart.Verb),
@@ -383,6 +385,7 @@ Verb getVerb(InsName name) {
                         ? iota(-n).map!(a => Atom(-n - 1 - a)).array
                         : iota(n).map!Atom.array
                 ),
+                (Atom[] a) => integers(a),
                 // Lowercase
                 (string s) => Atom(s.map!toLower.joinToString),
                 _ => Nil.nilAtom
@@ -1080,6 +1083,96 @@ Adjective getAdjective(InsName name) {
                 .setDyad((_1, _2) => Nil.nilAtom)
                 .setChildren([v])
                 //TODO: adopt marked arity
+                .setMarkedArity(1)
+        );
+        
+        // Diagonal
+        adjectives[InsName.Diagonal] = new Adjective(
+            (Verb v) => new Verb("/:")
+                .setMonad((Verb v, a) {
+                    // hack to make assert always happen but beyond the compiler
+                    // so we can return a
+                    if(a == a) {
+                        assert(0, "TODO: Diagonal + Inverse");
+                    }
+                    return a;
+                })
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setChildren([v])
+                .setMarkedArity(1)
+        );
+        
+        // Oblique
+        adjectives[InsName.Oblique] = new Adjective(
+            (Verb v) => new Verb("/.")
+                .setMonad((Verb v, a) => a.match!(
+                    (Atom[] a) {
+                        Atom[][] mat = a.map!(e => e.match!(
+                            (Atom[] a) => a,
+                            _ => assert(0, "Expected 2D array for Oblique")
+                        )).array;
+                        // TODO: handle ragged arrays better
+                        /*
+                          1   2   3   4       1/2/3/ 4/ 8/12/
+                          5   6   7   8   =>  /5/6/ 7/11/
+                          9  10  11  12        /9/10/
+                        */
+                        uint upper = mat.length + mat[0].length - 1;
+                        Atom[] result;
+                        for(uint o = 0; o < upper; o++) {
+                            Atom[] oblique;
+                            int j = min(o, mat[0].length - 1);
+                            int i = max(0, o - j);
+                            while(i < mat.length && j >= 0) {
+                                oblique ~= mat[i][j];
+                                i++;
+                                j--;
+                            }
+                            result ~= v(Atom(oblique));
+                        }
+                        return Atom(result);
+                    },
+                    (string s) => assert(0, "TODO: Oblique lines of string"),
+                    _ => Nil.nilAtom,
+                ))
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setInverse(new Verb("/.!.")
+                    .setMonad((Verb v, a) => a.match!(
+                        (Atom[] arr) {
+                            auto vInv = v.invert();
+                            Atom[][] mat;
+                            auto widthArr = arr.map!(a => a.match!(
+                                a => a.length,
+                                _ => 0,
+                            ));
+                            auto width = zip(widthArr.dropBackOne(), widthArr.dropOne())
+                                .countUntil!"a[0] > a[1]"
+                                + 1;
+                            foreach(d, oblique; arr) {
+                                int j = min(d, width - 1);
+                                int i = max(d - j, 0);
+                                vInv(oblique).match!(
+                                    (Atom[] oblique) {
+                                        foreach(k, cell; oblique) {
+                                            setFill(mat, i + k);
+                                            setFill(mat[i + k], j - k);
+                                            mat[i + k][j - k] = cell;
+                                        }
+                                    },
+                                    _ => assert(0, "Cannot reconstruct matrix with non-array elements"),
+                                );
+                            }
+                            Debugger.print("Returning: ", mat);
+                            return Atom(mat.map!Atom.array);
+                        },
+                        (string s) => assert(0, "TODO: Un-Oblique liens of string"),
+                        _ => Nil.nilAtom,
+                    ))
+                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setChildren([v])
+                    .setMarkedArity(1)
+                )
+                .setChildren([v])
                 .setMarkedArity(1)
         );
         

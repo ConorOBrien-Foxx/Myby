@@ -418,3 +418,23 @@ real secondsFraction(alias unit, T)(T ds) {
     res /= sf;
     return res;
 }
+
+Atom integers(Atom[] dim) {
+    uint counter = 0;
+    Atom helper(Atom[] dim) {
+        if(dim.empty) {
+            return Atom(BigInt(counter++));
+        }
+        Atom[] res = [];
+        uint max = dim[0].as!uint;
+        for(uint i = 0; i < max; i++) {
+            res ~= helper(dim[1..$]);
+        }
+        return Atom(res);
+    }
+    return helper(dim);
+}
+
+void setFill(T, N)(ref T[] arr, N index) {
+    if(index >= arr.length) arr.length = index + 1;
+}
