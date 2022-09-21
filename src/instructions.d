@@ -238,6 +238,11 @@ Verb getVerb(InsName name) {
             ))
             // Addition
             .setDyad((Atom a, Atom b) => a + b)
+            .setInverse(new Verb("+!.")
+                .setMonad(b => Nil.nilAtom)
+                .setDyad((a, b) => a - b)
+                .setMarkedArity(2) // TODO: check if this is a bad idea
+            )
             .setIdentity(Atom(BigInt(0)))
             .setMarkedArity(2);
         
@@ -256,6 +261,12 @@ Verb getVerb(InsName name) {
             ))
             // Subtraction
             .setDyad((Atom a, Atom b) => a - b)
+            .setInverseMutual(new Verb("-!.")
+                // Self Inverse
+                .setMonad((Verb v, a) => v.inverse(a))
+                .setDyad((a, b) => a + b)
+                .setMarkedArity(1)
+            )
             .setIdentity(Atom(BigInt(0)))
             .setMarkedArity(2);
         
@@ -269,6 +280,11 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((Atom a, Atom b) => a * b)
             .setMarkedArity(2)
+            .setInverse(new Verb("*!.")
+                .setMonad(a => Nil.nilAtom)
+                .setDyad((a, b) => a / b)
+                .setMarkedArity(2)
+            )
             .setIdentity(Atom(BigInt(1)))
             .setRangeStart(BigInt(1));
         
@@ -284,6 +300,17 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((Atom a, Atom b) => a / b)
             .setMarkedArity(2)
+            .setInverse(new Verb("/!.")
+                .setMonad(a => a.match!(
+                    // Un-Characters (join)
+                    (Atom[] a) => Atom(a.joinToString),
+                    // Reciprocal (self inverse)
+                    n => Atom(1 / cast(real)n),
+                    _ => Nil.nilAtom,
+                ))
+                .setDyad((a, b) => a * b)
+                .setMarkedArity(1)
+            )
             .setIdentity(Atom(BigInt(1)))
             .setRangeStart(BigInt(1));
         
@@ -302,6 +329,7 @@ Verb getVerb(InsName name) {
             .setDyad((Atom a, Atom b) => a ^^ b)
             .setIdentity(Atom(BigInt(1)))
             .setRangeStart(BigInt(2))
+            // TODO: inverse (real to duration; last of onerange; lowercase?)
             .setMarkedArity(2);
         
         verbs[InsName.Modulus] = new Verb("%")
@@ -316,6 +344,11 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             .setDyad((Atom a, Atom b) => a % b)
+            .setInverseMutual(new Verb("!.")
+                .setMonadSelf((Verb v, a) => v.inverse(a))
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+            )
             .setMarkedArity(2);
         
         // Identity/Reshape
@@ -335,6 +368,11 @@ Verb getVerb(InsName name) {
                 (a, b) => Atom(reshape([atomFor(b)], a)),
                 (_1, _2) => Nil.nilAtom,
             )(a, b))
+            .setInverse(new Verb("#!.")
+                .setMonad(_ => _)
+                .setDyad((a, b) => b)
+                .setMarkedArity(1)
+            )
             .setMarkedArity(1);
         
         // Range (indices)
@@ -811,6 +849,21 @@ Adjective getAdjective(InsName name) {
                     (a, string b) => Atom(b.map!(t => v(Atom(a), t.to!string)).joinToString),
                     (_1, _2) => Nil.nilAtom,
                 )(a, b))
+                .setInverseMutual(new Verb("\"!.")
+                    .setMonadSelf((Verb v, a) {
+                        Debugger.print("v: ", v);
+                        // Debugger.print("children: ", v.children);
+                        // Debugger.print("inverse: ", v.f.invert());
+                        Debugger.print("v's inverse: ", v.inverse);
+                        Debugger.print("v's monad: ", v.inverse.monad);
+                        return v.inverse.monad.match!(
+                        t => t(v.f.invert(), a),
+                        _ => assert(0, "Improperly initialized `\"` Verb")
+                    );})
+                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setMarkedArity(1)
+                    .setChildren([v])
+                )
                 .setMarkedArity(v.markedArity)
                 .setChildren([v])
         );
@@ -941,15 +994,7 @@ Adjective getAdjective(InsName name) {
         
         // Inverse
         adjectives[InsName.Inverse] = new Adjective(
-            (Verb v) {
-                assert(v.invertable(), "Cannot invert " ~ v.display);
-                return new Verb("!.")
-                    .setMonad((Verb v, a) => v.inverse(a))
-                    .setDyad((Verb v, _1, _2) => Nil.nilAtom)
-                    .setInverse(v)
-                    .setMarkedArity(1)
-                    .setChildren([v]);
-            }
+            (Verb v) => v.invert()
         );
         
         // Benil
@@ -1082,21 +1127,37 @@ Conjunction getConjunction(InsName name) {
     
     if(!conjunctions) {
          conjunctions[InsName.Bond] = new Conjunction(
-            (Verb f, Verb g) => new Verb("&")
-                .setMonad((f, g, a) =>
-                    f.niladic
-                        ? g(f(), a)
-                        : g.niladic
-                            ? f(a, g())
-                            : f(g(a)))
-                // TODO: niladic as per above
-                .setDyad((f, g, a, b) =>
-                    f(g(a), g(b)))
-                .setMarkedArity(
+            (Verb f, Verb g) {
+                auto markedArity = 
                     f.niladic || g.niladic
                         ? 1
-                        : g.markedArity)
-                .setChildren([f, g])
+                        : g.markedArity;
+                return new Verb("&")
+                    .setMonad((f, g, a) =>
+                        f.niladic
+                            ? g(f(), a)
+                            : g.niladic
+                                ? f(a, g())
+                                : f(g(a)))
+                    // TODO: niladic as per above
+                    .setDyad((f, g, a, b) =>
+                        f(g(a), g(b)))
+                    .setMarkedArity(markedArity)
+                    .setInverseMutual(new Verb("!.")
+                        // (f&n)!. => f!.&n
+                        // (n&g)!. => n&(g!.)
+                        .setMonadSelf((Verb v, a) {
+                            return v.inverse.monad.match!(
+                                t => t(v.f.invert(), v.g.invert(), a),
+                                _ => assert(0, "Improperly initialized `&` Verb")
+                            );
+                        })
+                        .setDyad((f, g, _1, _2) => Nil.nilAtom)
+                        .setMarkedArity(markedArity)
+                        .setChildren([f, g])
+                    )
+                    .setChildren([f, g]);
+            }
         );
         
         conjunctions[InsName.Compose] = new Conjunction(
@@ -1104,6 +1165,17 @@ Conjunction getConjunction(InsName name) {
                 .setMonad((f, g, a) => f(g(a)))
                 .setDyad((f, g, a, b) => f(g(a, b)))
                 .setMarkedArity(g.markedArity)
+                .setInverse(new Verb("!.")
+                    // (f@g)!. <=> g!.@(f!.)
+                    .setMonad((f, g, a) {
+                        auto gInv = g.invert();
+                        auto fInv = f.invert();
+                        return gInv(fInv(a));
+                    })
+                    .setDyad((f, g, _1, _2) => Nil.nilAtom)
+                    .setMarkedArity(g.markedArity)
+                    .setChildren([f, g])
+                )
                 .setChildren([f, g])
         );
         

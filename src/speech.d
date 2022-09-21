@@ -465,6 +465,7 @@ class Verb {
     
     uint markedArity = 2;
     bool niladic = false;
+    bool inferSelf = true;
     Atom rangeStart = BigInt(0);
     Atom identity;
     Verb[] children;
@@ -483,6 +484,7 @@ class Verb {
         res.inverse = inverse;
         res.info = info;
         res.niladic = niladic;
+        res.inferSelf = inferSelf;
         res.markedArity = markedArity;
         res.rangeStart = rangeStart;
         res.identity = identity;
@@ -492,13 +494,32 @@ class Verb {
         return res;
     }
     
+    @property Verb f() {
+        return children[0];
+    }
+    
+    @property Verb g() {
+        return children[1];
+    }
+    
+    @property Verb h() {
+        return children[2];
+    }
+    
     void setChains(ChainInfo i) {
+        if(info == i) {
+            Debugger.print("Already set info.");
+            return;
+        }
         Debugger.print("Setting ", display, " info:");
         Debugger.print("  Info: ", i);
         info = i;
         foreach(ref v; children) {
             Debugger.print("Child ", v.display, ":");
             v.setChains(i);
+        }
+        if(inverse) {
+            inverse.setChains(i);
         }
     }
     
@@ -540,6 +561,13 @@ class Verb {
     
     Verb setMonad(VerbMonadSelf m) {
         monad = m;
+        inferSelf = true;
+        return this;
+    }
+    
+    Verb setMonadSelf(VerbMonadSelf m) {
+        monad = m;
+        inferSelf = false;
         return this;
     }
     
@@ -578,6 +606,12 @@ class Verb {
         return this;
     }
     
+    Verb setInverseMutual(Verb i) {
+        inverse = i;
+        i.inverse = this;
+        return this;
+    }
+    
     Verb setChildren(Verb[] c) {
         children = c;
         return this;
@@ -605,11 +639,25 @@ class Verb {
         return this;
     }
     
+    Verb invert() {
+        assert(invertable(), "Cannot invert " ~ display);
+        // return inverse;
+        // /*
+        return new Verb("!.")
+            .setMonad((Verb v, a) => v.inverse(a))
+            .setDyad((Verb v, a, b) => v.inverse(a, b))
+            .setInverse(this)
+            .setMarkedArity(1)
+            .setNiladic(niladic)
+            .setChildren([this]);
+        // */
+    }
+    
     Atom monadic(Atom a) {
         return monad.match!(
             f => f(children, a),
             f => f(children[0], children[1], a),
-            f => children.length
+            f => children.length && inferSelf
                 ? f(children[0], a)
                 : f(this, a),
             f => f(a)
@@ -620,7 +668,7 @@ class Verb {
         return dyad.match!(
             f => f(children, a, b),
             f => f(children[0], children[1], a, b),
-            f => children.length
+            f => children.length && inferSelf
                 ? f(children[0], a, b)
                 : f(this, a, b),
             f => f(a, b)
@@ -690,10 +738,12 @@ class Verb {
     }
     
     static Verb nilad(Atom constant) {
-        return new Verb(to!string(constant))
+        auto res = new Verb(to!string(constant))
             .setMonad(_ => constant)
             .setDyad((_1, _2) => constant)
             .setNiladic(true);
+        res.setInverse(res);
+        return res;
     }
     
     static Verb fork(Verb f, Verb g, Verb h) {
