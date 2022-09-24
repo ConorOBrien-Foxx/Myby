@@ -623,7 +623,7 @@ Verb getVerb(InsName name) {
                         Atom key = keyValue[i];
                         Atom value = keyValue[i + 1];
                         try {
-                            copy[key] = value;
+                            copy[key.value] = value.value;
                         }
                         catch(RangeError) {
                             assert(0, "Cannot insert `" ~ key.atomToString ~ "` into `" ~ a.atomToString ~ "`");
@@ -794,11 +794,24 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             .setDyad((_1, _2) => Nil.nilAtom)
+            .setInverse(new Verb("unjson!.")
+                .setMonad(a => Atom(atomToJson(a)))
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+            )
             .setMarkedArity(1);
         
         verbs[InsName.ToJSON] = new Verb("json")
             .setMonad(a => Atom(atomToJson(a)))
             .setDyad((_1, _2) => Nil.nilAtom)
+            .setInverse(new Verb("json!.")
+                .setMonad(a => a.match!(
+                    (string s) => jsonToAtom(s),
+                    _ => Nil.nilAtom,
+                ))
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+            )
             .setMarkedArity(1);
         
         // Nilads

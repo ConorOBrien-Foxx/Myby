@@ -15,7 +15,6 @@ Atom jsonToAtom(string s) {
 }
 
 Atom jsonToAtom(JSONValue j) {
-    
     final switch(j.type) {
         case JSONType.null_:
             return Nil.nilAtom;
@@ -24,10 +23,10 @@ Atom jsonToAtom(JSONValue j) {
             return Atom(j.str);
             
         case JSONType.integer:
-            return Atom(j.integer);
+            return Atom(BigInt(j.integer));
         
         case JSONType.uinteger:
-            return Atom(j.uinteger);
+            return Atom(BigInt(j.uinteger));
         
         case JSONType.float_:
             return Atom(cast(real)j.floating);
