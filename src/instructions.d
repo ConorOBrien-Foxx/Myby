@@ -16,6 +16,7 @@ import std.uni;
 
 import myby.debugger;
 import myby.interpreter : Interpreter;
+import myby.json;
 import myby.manip;
 import myby.nibble;
 import myby.prime;
@@ -81,6 +82,10 @@ enum InsName {
     Empty,                  //FE40
     Ascii,                  //FE41
     Alpha,                  //FE42
+    ToJSON,                 //FE50
+    FromJSON,               //FE51
+    ReadFile,               //FE52
+    WriteFile,              //FE53
     DigitRange,             //FE60
     Place,                  //FE61
     Hash,                   //FE62
@@ -187,6 +192,10 @@ enum InsInfo[InsName] Info = [
     InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
     InsName.Ascii:                  InsInfo("A",       0xFE41,    SpeechPart.Verb),
     InsName.Alpha:                  InsInfo("L",       0xFE42,    SpeechPart.Verb),
+    InsName.ToJSON:                 InsInfo("json",    0xFE50,    SpeechPart.Verb),
+    InsName.FromJSON:               InsInfo("unjson",  0xFE51,    SpeechPart.Verb),
+    InsName.ReadFile:               InsInfo("read",    0xFE52,    SpeechPart.Verb),
+    InsName.WriteFile:              InsInfo("write",   0xFE53,    SpeechPart.Verb),
     InsName.DigitRange:             InsInfo("R:",      0xFE60,    SpeechPart.Verb),
     InsName.Place:                  InsInfo("place",   0xFE61,    SpeechPart.Verb),
     InsName.Hash:                   InsInfo("hash",    0xFE62,    SpeechPart.Verb),
@@ -776,6 +785,19 @@ Verb getVerb(InsName name) {
                 (AVHash h) => Atom(h.dup),
                 _ => Nil.nilAtom
             ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.FromJSON] = new Verb("unjson")
+            .setMonad(a => a.match!(
+                (string s) => jsonToAtom(s),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.ToJSON] = new Verb("json")
+            .setMonad(a => Atom(atomToJson(a)))
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
