@@ -1089,15 +1089,72 @@ Adjective getAdjective(InsName name) {
         // Diagonal
         adjectives[InsName.Diagonal] = new Adjective(
             (Verb v) => new Verb("/:")
-                .setMonad((Verb v, a) {
-                    // hack to make assert always happen but beyond the compiler
-                    // so we can return a
-                    if(a == a) {
-                        assert(0, "TODO: Diagonal + Inverse");
-                    }
-                    return a;
-                })
+                .setMonad((Verb v, a) => a.match!(
+                    (Atom[] a) {
+                        Atom[][] mat = matrixFor(a);
+                        /*
+                          1   2   3   4        \ 1\ 2\3\4
+                          5   6   7   8   => \ 5\ 6\ 7\8\
+                          9  10  11  12      9\10\11\12\
+                          [[4], [3, 8], [2, 7, 12], [1, 6, 11], [5, 10], [9]]
+                        */
+
+                        uint upper = mat.length + mat[0].length - 1;
+                        Atom[] result;
+                        // int for signed arithmetic below
+                        int width = mat[0].length;
+                        for(int o = 0; o < upper; o++) {
+                            Atom[] oblique;
+                            int j = max(0, width - 1 - o);
+                            int i = max(0, o - width + 1);
+                            while(j < width && i < mat.length) {
+                                oblique ~= mat[i][j];
+                                i++;
+                                j++;
+                            }
+                            result ~= v(Atom(oblique));
+                        }
+                        return Atom(result);
+                    },
+                    (string s) => assert(0, "TODO: Diagonal lines of string"),
+                    _ => Nil.nilAtom,
+                ))
                 .setDyad((_1, _2) => Nil.nilAtom)
+                .setInverse(new Verb("/:!.")
+                    .setMonad((Verb v, a) => a.match!(
+                        (Atom[] arr) {
+                            auto vInv = v.invert();
+                            Atom[][] mat;
+                            auto widthArr = arr.map!(a => a.match!(
+                                a => a.length,
+                                _ => 0,
+                            ));
+                            int width = zip(widthArr.dropBackOne(), widthArr.dropOne())
+                                .countUntil!"a[0] > a[1]"
+                                + 1;
+                            foreach(d, diagonal; arr) {
+                                int j = max(0, width - 1 - cast(int)d);
+                                int i = max(0, cast(int)d - width + 1);
+                                vInv(diagonal).match!(
+                                    (Atom[] diagonal) {
+                                        foreach(k, cell; diagonal) {
+                                            setFill(mat, i + k);
+                                            setFill(mat[i + k], j + k);
+                                            mat[i + k][j + k] = cell;
+                                        }
+                                    },
+                                    _ => assert(0, "Cannot reconstruct matrix with non-array elements"),
+                                );
+                            }
+                            return Atom(mat.map!Atom.array);
+                        },
+                        (string s) => assert(0, "TODO: Un-Diagonal liens of string"),
+                        _ => Nil.nilAtom,
+                    ))
+                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setChildren([v])
+                    .setMarkedArity(1)
+                )
                 .setChildren([v])
                 .setMarkedArity(1)
         );
@@ -1107,10 +1164,7 @@ Adjective getAdjective(InsName name) {
             (Verb v) => new Verb("/.")
                 .setMonad((Verb v, a) => a.match!(
                     (Atom[] a) {
-                        Atom[][] mat = a.map!(e => e.match!(
-                            (Atom[] a) => a,
-                            _ => assert(0, "Expected 2D array for Oblique")
-                        )).array;
+                        Atom[][] mat = matrixFor(a);
                         // TODO: handle ragged arrays better
                         /*
                           1   2   3   4       1/2/3/ 4/ 8/12/
@@ -1162,10 +1216,9 @@ Adjective getAdjective(InsName name) {
                                     _ => assert(0, "Cannot reconstruct matrix with non-array elements"),
                                 );
                             }
-                            Debugger.print("Returning: ", mat);
                             return Atom(mat.map!Atom.array);
                         },
-                        (string s) => assert(0, "TODO: Un-Oblique liens of string"),
+                        (string s) => assert(0, "TODO: Un-Oblique lines of string"),
                         _ => Nil.nilAtom,
                     ))
                     .setDyad((_1, _2) => Nil.nilAtom)

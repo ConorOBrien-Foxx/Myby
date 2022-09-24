@@ -438,3 +438,17 @@ Atom integers(Atom[] dim) {
 void setFill(T, N)(ref T[] arr, N index) {
     if(index >= arr.length) arr.length = index + 1;
 }
+
+Atom[][] matrixFor(Atom[] a) {
+    return a.map!(e => e.match!(
+        (Atom[] a) => a,
+        _ => assert(0, "Cannot convert to matrix")
+    )).array;
+}
+
+Atom[][] matrixFor(Atom a) {
+    return a.match!(
+        (Atom[] a) => matrixFor(a),
+        _ => assert(0, "Cannot convert to array")
+    );
+}
