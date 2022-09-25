@@ -361,6 +361,19 @@ S[] toBase(S, T)(S a, T b) {
     return res;
 }
 
+Atom fromBase(B)(Atom[] n, B base) {
+    // TODO: floating point??
+    BigInt sum;
+    // TODO: better approach to indexing an array nicely?
+    foreach(i, e; zip(n.length.iota, n.retro)) {
+        e.match!(
+            (BigInt e) => sum += base^^i * e,
+            _ => assert(0, "Invalid base digit: " ~ e.atomToString)
+        );
+    }
+    return Atom(sum);
+}
+
 auto baseRange(S, T)(S n, T base) {
     S min = n == 0
         ? cast(S)1 // to make range empty

@@ -475,6 +475,17 @@ Verb getVerb(InsName name) {
                 (a, b) => Atom(a.toBase(b).map!Atom.array),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
+            .setInverse(new Verb("}!.")
+                .setMonad(a => a.match!(
+                    (Atom[] a) => fromBase(a, 2),
+                    _ => Nil.nilAtom,
+                ))
+                .setDyad((a, b) => match!(
+                    (Atom[] a, b) => fromBase(a, b),
+                    (_1, _2) => Nil.nilAtom,
+                )(a, b))
+                .setMarkedArity(1)
+            )
             .setMarkedArity(1);
         
         verbs[InsName.Equality] = new Verb("=")
@@ -1369,7 +1380,7 @@ Conjunction getConjunction(InsName name) {
                 assert(g.invertable(), "Cannot invert " ~ g.display);
                 return new Verb("&.")
                     .setMonad((f, g, a) => g.inverse(f(g(a))))
-                    .setDyad((f, g, _1, _2) => Nil.nilAtom)
+                    .setDyad((f, g, a, b) => g.inverse(f(g(a), g(b))))
                     .setMarkedArity(1)
                     .setChildren([f, g]);
             }
