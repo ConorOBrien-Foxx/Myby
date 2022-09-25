@@ -761,6 +761,7 @@ class Verb {
                 return g(f(a, b), h(a, b));
             })
             .setMarkedArity(f.niladic || h.niladic ? 1 : 2)
+            .setNiladic(f.niladic && h.niladic || g.niladic)
             .setChildren([f, g, h]);
     }
     
