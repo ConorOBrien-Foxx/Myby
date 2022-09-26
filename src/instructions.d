@@ -42,6 +42,7 @@ enum InsName {
     OpenParen,              //B
     ArityForce,             //BA
     Vectorize,              //BC
+    Reflex,                 //BD
     CloseParen,             //C
     Compose,                //D
     Under,                  //DA
@@ -74,7 +75,7 @@ enum InsName {
     Last,                   //F9
     LessEqual,              //FA
     GreaterEqual,           //FB
-    Reflex,                 //FD
+    Inequality,             //FC
     Exit,                   //FE00
     Put,                    //FE01
     Putch,                  //FE02
@@ -142,18 +143,26 @@ enum InsInfo[InsName] Info = [
     InsName.Exponentiate:           InsInfo("^",       0x8,       SpeechPart.Verb),
     InsName.Identity:               InsInfo("#",       0x9,       SpeechPart.Verb),
     InsName.Bond:                   InsInfo("&",       0xA,       SpeechPart.Conjunction),
+    // AA: `&&` has no meaning
     InsName.OnPrefixes:             InsInfo("\\.",     0xAA,      SpeechPart.Adjective),
+    // AC: `&)` has no meanings
     InsName.OnSuffixes:             InsInfo("\\:",     0xAC,      SpeechPart.Adjective),
+    // AD: `&D` has no meaning
     InsName.SplitCompose:           InsInfo("O",       0xAD,      SpeechPart.MultiConjunction),
-    // Unassigned (maybe): ADAD
+    // Unassigned (maybe): ADAD/ACAC/etc
     InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
+    // BA: `(` followed by A... (A `&` AA `\.` AC `\: AD `O`) has no meaning
     InsName.ArityForce:             InsInfo("`",       0xBA,      SpeechPart.Adjective),
+    // BC: `()` has no meaning
     InsName.Vectorize:              InsInfo("V",       0xBC,      SpeechPart.Adjective),
-    // Unassigned: BD       NB: `(@` has no meaning
+    // BD: `(` followed by D... (D `@` DA `&.` DD `@.`) has no meaning
+    InsName.Reflex:                 InsInfo("~",       0xBD,      SpeechPart.Adjective),
     InsName.CloseParen:             InsInfo(")",       0xC,       SpeechPart.Syntax),
     InsName.Compose:                InsInfo("@",       0xD,       SpeechPart.Conjunction),
+    // DA: `@&` has no meaning
     InsName.Under:                  InsInfo("&.",      0xDA,      SpeechPart.Conjunction),
-    // Unassigned: DC       NB: `@)` has no meaning
+    // Unassigned: DC: `@)` has no meaning
+    // DD: `@@` has no meaning
     InsName.MonadChain:             InsInfo("@.",      0xDD,      SpeechPart.MultiConjunction),
     InsName.Range:                  InsInfo("R",       0xE,       SpeechPart.Verb),
     InsName.Modulus:                InsInfo("%",       0xF0,      SpeechPart.Verb),
@@ -183,8 +192,8 @@ enum InsInfo[InsName] Info = [
     InsName.Last:                   InsInfo("}",       0xF9,      SpeechPart.Verb),
     InsName.LessEqual:              InsInfo("<:",      0xFA,      SpeechPart.Verb),
     InsName.GreaterEqual:           InsInfo(">:",      0xFB,      SpeechPart.Verb),
-    // FC
-    InsName.Reflex:                 InsInfo("~",       0xFD,      SpeechPart.Adjective),
+    InsName.Inequality:             InsInfo("~:",      0xFC,      SpeechPart.Verb),
+    // Unassigned: FD
     InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
     InsName.Put:                    InsInfo("put",     0xFE01,    SpeechPart.Verb),
     InsName.Putch:                  InsInfo("putch",   0xFE02,    SpeechPart.Verb),
@@ -496,6 +505,12 @@ Verb getVerb(InsName name) {
             ))
             // Equal to
             .setDyad((a, b) => Atom(a == b))
+            .setMarkedArity(2);
+        
+        verbs[InsName.Inequality] = new Verb("=")
+            .setMonad(_ => Nil.nilAtom)
+            // Not equal to
+            .setDyad((a, b) => Atom(a != b))
             .setMarkedArity(2);
         
         verbs[InsName.LessThan] = new Verb("<")
