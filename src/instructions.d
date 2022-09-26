@@ -1175,6 +1175,9 @@ Adjective getAdjective(InsName name) {
                             }
                             result ~= v(Atom(oblique));
                         }
+                        if(!result.length) {
+                            result ~= Atom(cast(Atom[])[]);
+                        }
                         return Atom(result);
                     },
                     (string s) => assert(0, "TODO: Diagonal lines of string"),
@@ -1191,8 +1194,13 @@ Adjective getAdjective(InsName name) {
                                 _ => 0,
                             ));
                             int width = zip(widthArr.dropBackOne(), widthArr.dropOne())
-                                .countUntil!"a[0] > a[1]"
-                                + 1;
+                                .countUntil!"a[0] > a[1]";
+                            if(width < 0) {
+                                width = 1;
+                            }
+                            else {
+                                width++;
+                            }
                             foreach(d, diagonal; arr) {
                                 int j = max(0, width - 1 - cast(int)d);
                                 int i = max(0, cast(int)d - width + 1);
@@ -1206,6 +1214,9 @@ Adjective getAdjective(InsName name) {
                                     },
                                     _ => assert(0, "Cannot reconstruct matrix with non-array elements"),
                                 );
+                            }
+                            if(!mat.length) {
+                                mat ~= [[]];
                             }
                             return Atom(mat.map!Atom.array);
                         },
@@ -1245,6 +1256,9 @@ Adjective getAdjective(InsName name) {
                             }
                             result ~= v(Atom(oblique));
                         }
+                        if(!result.length) {
+                            result ~= Atom(cast(Atom[])[]);
+                        }
                         return Atom(result);
                     },
                     (string s) => assert(0, "TODO: Oblique lines of string"),
@@ -1276,6 +1290,9 @@ Adjective getAdjective(InsName name) {
                                     },
                                     _ => assert(0, "Cannot reconstruct matrix with non-array elements"),
                                 );
+                            }
+                            if(!mat.length) {
+                                mat ~= [[]];
                             }
                             return Atom(mat.map!Atom.array);
                         },
