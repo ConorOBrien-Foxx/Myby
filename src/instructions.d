@@ -1389,6 +1389,7 @@ Conjunction getConjunction(InsName name) {
                 .setMonad((f, g, a) => f(g(a)))
                 .setDyad((f, g, a, b) => f(g(a, b)))
                 .setMarkedArity(g.markedArity)
+                .setNiladic(f.niladic || g.niladic)
                 .setInverse(new Verb("!.")
                     // (f@g)!. <=> g!.@(f!.)
                     .setMonad((f, g, a) {
