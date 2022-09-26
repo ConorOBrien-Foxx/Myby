@@ -321,6 +321,13 @@ struct Atom {
             (Atom[] a, Atom[] b) => Atom(
                 a.filter!(e => !b.canFind(e)).array
             ),
+            // remove from
+            (Atom[] a, b) => Atom(
+                a.filter!(e => e != atomFor(b)).array
+            ),
+            (a, Atom[] b) => Atom(
+                b.filter!(e => e != atomFor(a)).array
+            ),
             (_1, _2) => Nil.nilAtom,
         )(this, rhs);
     }
