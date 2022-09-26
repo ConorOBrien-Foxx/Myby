@@ -368,6 +368,7 @@ Atom fromBase(B)(Atom[] n, B base) {
     foreach(i, e; zip(n.length.iota, n.retro)) {
         e.match!(
             (BigInt e) => sum += base^^i * e,
+            (bool b) => sum += b ? base^^i : 0,
             _ => assert(0, "Invalid base digit: " ~ e.atomToString)
         );
     }

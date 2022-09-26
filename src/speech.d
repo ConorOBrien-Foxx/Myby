@@ -281,12 +281,13 @@ struct Atom {
         );
     }
     
+    alias IntegralTypes = AliasSeq!(real, BigInt, bool);
+    
     enum mathOps = ["+", "-", "/", "*", "%", "^^"];
     Atom opBinary(string op)(Atom rhs)
     if(mathOps.canFind(op)) {
         if(isNumeric && rhs.isNumeric) {
             // real casts all args to real
-            alias IntegralTypes = AliasSeq!(real, BigInt, bool);
             static foreach(Type; IntegralTypes) {
                 if(isType!Type || rhs.isType!Type) {
                     Type a = this.as!Type;
@@ -362,6 +363,7 @@ struct Atom {
     
     // fall through
     Atom binaryFallback(string op)(Atom rhs) {
+        Debugger.print("Operator fallback not implemented: " ~ op);
         return Nil.nilAtom;
     }
     
@@ -373,17 +375,36 @@ struct Atom {
     }
     
     int opCmp(Atom other) {
+        int relComp(S, T)(S a, T b) {
+            return a < b ? -1 : a > b ? 1 : 0;
+        }
+        static foreach(Type; IntegralTypes) {
+            if(isType!Type && other.isNumeric
+            || other.isType!Type && isNumeric) {
+                Type a = this.as!Type;
+                Type b = other.as!Type;
+                return relComp(a, b);
+            }
+        }
         return match!(
-            (a, b) => a < b ? -1 : a > b ? 1 : 0,
+            (a, b) => relComp(a, b),
             (a, b) => assert(0, "Cannot compare " ~ readableTypeName(a, b)),
         )(value, other.value);
     }
     
     bool opEquals(Atom other) {
+        import core.exception : AssertError;
         return match!(
             (a, b) => a == b,
-            // if a == b does not compile for a and b, then they cannot be equal
-            (_1, _2) => false,
+            (a, b) {
+                try {
+                    return this.opCmp(other) == 0;
+                }
+                catch(AssertError) {
+                    // if no comparison features succeed, they cannot be equal
+                    assert(0, "Cannot compare " ~ readableTypeName(a, b));
+                }
+            },
         )(value, other.value);
     }
     
