@@ -12,6 +12,7 @@ import myby.debugger;
 import myby.instructions;
 import myby.integer;
 import myby.interpreter;
+import myby.json : atomToJson;
 import myby.literate;
 import myby.nibble;
 import myby.speech;
@@ -37,12 +38,14 @@ int main(string[] args) {
     bool useDebug;
     bool useRuntimeDebug;
     bool dispTree;
+    bool jsonOutput;
     string outfile;
     string fpath;
     string code;
     auto info = getoptSafeError(
         args,
         "tree|t", "Display tree-form", &dispTree,
+        "jsonout|j", "Outputs data in a JSON friendly format", &jsonOutput,
         "compile|c", "Compile literate program", &compile,
         "outfile|o", "Outputs relevant data to specified file", &outfile,
         "literate|l", "Input source is a literate program", &literate,
@@ -51,6 +54,15 @@ int main(string[] args) {
         "debug|d", "Prints debug information", &useDebug,
         "runDebug|r", "Runtime debug information", &useRuntimeDebug,
     );
+    
+    void writelnResult(Atom a) {
+        if(jsonOutput) {
+            writeln(a.atomToJson);
+        }
+        else {
+            writeln(a.atomToString);
+        }
+    }
     
     if(useDebug) {
         Debugger.enable();
@@ -190,12 +202,12 @@ int main(string[] args) {
     
     try {
         if(verbArgs.length > 0) {
-            writeln(mainVerb(verbArgs).atomToString());
+            writelnResult(mainVerb(verbArgs));
         }
         else {
             //TODO: For now, just call it without arguments.
             //In the future, probably read from STDIN
-            writeln(mainVerb().atomToString());
+            writelnResult(mainVerb());
         }
     }
     catch(AssertError e) {
