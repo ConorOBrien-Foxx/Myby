@@ -351,6 +351,10 @@ S[] toBase(S, T)(S a, T b) {
     if(b == 1) {
         return (a/a).repeat(a.to!uint).array;
     }
+    // special case: zero
+    if(a == 0) {
+        return [a-a];
+    }
     S[] res;
     while(a != 0) {
         S mod = a;
