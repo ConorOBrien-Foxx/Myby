@@ -315,6 +315,15 @@ struct Atom {
             (_1, _2) => Nil.nilAtom,
         )(this, rhs);
     }
+    Atom binaryFallback(string op : "-")(Atom rhs) {
+        return match!(
+            // setwise difference
+            (Atom[] a, Atom[] b) => Atom(
+                a.filter!(e => !b.canFind(e)).array
+            ),
+            (_1, _2) => Nil.nilAtom,
+        )(this, rhs);
+    }
     Atom binaryFallback(string op : "*")(Atom rhs) {
         return match!(
             (Atom[] a, string b) => Atom(a.map!(to!string).join(b)),
