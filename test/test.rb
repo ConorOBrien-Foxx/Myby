@@ -37,7 +37,17 @@ tests = [
         input: 'example/half-square-double.cmyby 10',
         output: "50\n",
         succeeds: true,
-    }
+    },
+    {
+        input: '-l -e "6/2"',
+        output: "3\n",
+        succeeds: true,
+    },
+    {
+        input: '-l -e "6/4"',
+        output: "1.5\n",
+        succeeds: true,
+    },
 ]
 
 def indent_all(str)
