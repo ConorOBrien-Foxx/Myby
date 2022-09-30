@@ -470,3 +470,13 @@ Atom[][] matrixFor(Atom a) {
         _ => assert(0, "Cannot convert to array")
     );
 }
+
+Atom[] duplicateEach(T)(Atom[] arr, T by) {
+    Atom[] res;
+    foreach(el; arr) {
+        foreach(i; by.iota) {
+            res ~= el;
+        }
+    }
+    return res;
+}

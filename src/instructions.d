@@ -99,6 +99,8 @@ enum InsName {
     PreviousPrime,          //FE76
     NextPrime,              //FE77
     FirstNPrimes,           //FE78
+    PrimesBelow,            //FE79
+    PrimesBelowCount,       //FE7A
     Benil,                  //FE80
     Memoize,                //FE81
     Keep,                   //FE82
@@ -217,6 +219,8 @@ enum InsInfo[InsName] Info = [
     InsName.PreviousPrime:          InsInfo("prevp",   0xFE76,    SpeechPart.Verb),
     InsName.NextPrime:              InsInfo("nextp",   0xFE77,    SpeechPart.Verb),
     InsName.FirstNPrimes:           InsInfo("prims",   0xFE78,    SpeechPart.Verb),
+    InsName.PrimesBelow:            InsInfo("primb",   0xFE79,    SpeechPart.Verb),
+    InsName.PrimesBelowCount:       InsInfo("primbo",  0xFE7A,    SpeechPart.Verb),
     InsName.Benil:                  InsInfo("benil",   0xFE80,    SpeechPart.Adjective),
     InsName.Memoize:                InsInfo("M.",      0xFE81,    SpeechPart.Adjective),
     InsName.Keep:                   InsInfo("keep",    0xFE82,    SpeechPart.Adjective),
@@ -341,6 +345,8 @@ Verb getVerb(InsName name) {
                 // OneRange
                 (a) =>
                     verbs[InsName.Range](cast(typeof(a)) 1, a),
+                // Transpose
+                (Atom[] a) => Atom(matrixFor(a).transposed.map!array.map!Atom.array),
                 // Uppercase
                 (string s) => Atom(s.map!toUpper.joinToString),
                 _ => Nil.nilAtom,
@@ -411,6 +417,8 @@ Verb getVerb(InsName name) {
             .setDyad((l, r) => match!(
                 (a, b) => Atom(iota(a, b + 1).map!Atom.array),
                 (Atom[] a, Atom[] b) => Atom(arrayRange(a, b).map!Atom.array),
+                (a, Atom[] b) => Atom(duplicateEach(b, a)),
+                (Atom[] a, b) => Atom(duplicateEach(a, b)),
                 (string a, string b) => Atom(
                     arrayRange(a.atomOrds, b.atomOrds)
                     .map!atomUnords
@@ -507,8 +515,9 @@ Verb getVerb(InsName name) {
             .setDyad((a, b) => Atom(a == b))
             .setMarkedArity(2);
         
-        verbs[InsName.Inequality] = new Verb("=")
-            .setMonad(_ => Nil.nilAtom)
+        verbs[InsName.Inequality] = new Verb("~:")
+            // Halve
+            .setMonad(a => a / Atom(BigInt(2)))
             // Not equal to
             .setDyad((a, b) => Atom(a != b))
             .setMarkedArity(2);
@@ -585,7 +594,7 @@ Verb getVerb(InsName name) {
             .setMarkedArity(2);
         
         verbs[InsName.MemberIn] = new Verb("e.")
-            .setMonad(a => Nil.nilAtom)
+            .setMonad(_ => Nil.nilAtom)
             .setDyad((a, b) => match!(
                 (a, Atom[] b) => Atom(b.canFind(atomFor(a))),
                 (_1, _2) => Nil.nilAtom,
@@ -719,6 +728,25 @@ Verb getVerb(InsName name) {
             // First N Primes
             .setMonad(a => a.match!(
                 (BigInt a) => Atom(firstNPrimes(a).map!Atom.array),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        // TODO: abstract prime object
+        verbs[InsName.PrimesBelow] = new Verb("primb")
+            // Primes below
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(primesBelow(a).map!Atom.array),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.PrimesBelowCount] = new Verb("primbo")
+            // Primes below count
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(primesBelowCount(a)),
                 _ => Nil.nilAtom,
             ))
             .setDyad((_1, _2) => Nil.nilAtom)

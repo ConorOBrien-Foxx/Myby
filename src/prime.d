@@ -155,6 +155,30 @@ auto primeSieveContaining(T)(T index) {
     return primes;
 }
 
+auto primeSieveOver(T)(T max) {
+    import std.math : log;
+    import std.array : array;
+    import std.range : back;
+    uint sizeFactor = 2;
+    BigInt upper;
+    // x / ln(x) is a strict lowerbound for x>10
+    if(max <= 10) {
+        upper = 5;
+    }
+    else {
+        real rmax = cast(real)max;
+        upper = cast(T)(cast(long)(rmax / log(rmax)));
+    }
+    
+    BitArray primes;
+    while(!primes.count || primes.bitsSet.array.back < max) {
+        upper *= sizeFactor;
+        primes = sievePrimes(upper);
+        sizeFactor++;
+    }
+    return primes;
+}
+
 enum BigInt[] FirstPrimes = [
     2, 3, 5, 7, 11, 13, 17, 19, 23,                               
     29, 31, 37, 41, 43, 47, 53, 59, 61,                           
@@ -364,6 +388,45 @@ BigInt[] firstNPrimes(T)(T index) {
         }
         if(count == index) {
             return primes;
+        }
+    }
+    
+    assert(0, "Unable to generate all requested primes");
+}
+
+BigInt[] primesBelow(T)(T max) {
+    BigInt[] primes;
+    
+    if(max <= 0) {
+        return primes;
+    }
+    
+    auto sieve = primeSieveOver(max);
+    
+    T count = 0;
+    foreach(j, bit; sieve) {
+        if(bit) {
+            if(j >= max) return primes;
+            count++;
+            primes ~= BigInt(j);
+        }
+    }
+    
+    assert(0, "Unable to generate all requested primes");
+}
+
+BigInt primesBelowCount(T)(T max) {
+    if(max <= 0) {
+        return BigInt(0);
+    }
+    
+    auto sieve = primeSieveOver(max);
+    
+    T count = 0;
+    foreach(j, bit; sieve) {
+        if(bit) {
+            if(j >= max) return BigInt(count);
+            count++;
         }
     }
     
