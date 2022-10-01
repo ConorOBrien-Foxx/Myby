@@ -120,8 +120,18 @@ Nibble[] parseLiterate(T)(T str) {
             }
             string build = "";
             i++;
-            while(i < str.length && str[i] != '\'') {
-                if(str[i] == '\\' && i + 1 < str.length) {
+            while(i < str.length) {
+                // termination condition
+                if(str[i] == '\'') {
+                    // doubling up on '' is another way to escape a quote
+                    if(i + 1 < str.length && str[i + 1] == '\'') {
+                        build ~= str[++i];
+                    }
+                    else {
+                        break;
+                    }
+                }
+                else if(str[i] == '\\' && i + 1 < str.length) {
                     switch(str[++i]) {
                         case 'n':  build ~= '\n'; break;
                         case 't':  build ~= '\t'; break;
