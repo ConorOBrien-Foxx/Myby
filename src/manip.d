@@ -480,3 +480,11 @@ Atom[] duplicateEach(T)(Atom[] arr, T by) {
     }
     return res;
 }
+
+T[] rotate(T, S)(T[] arr, S modBy) {
+    T[] res;
+    uint by = moldIndex(modBy, arr.length);
+    res ~= arr[by..$];
+    res ~= arr[0..by];
+    return res;
+}

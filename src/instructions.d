@@ -65,7 +65,7 @@ enum InsName {
     Power,                  //F1D
     Print,                  //F1E
     Scan,                   //F1F
-    Pair,                   //F2
+    Link,                   //F2
     Binomial,               //F3
     Equality,               //F4
     LessThan,               //F5
@@ -76,6 +76,7 @@ enum InsName {
     LessEqual,              //FA
     GreaterEqual,           //FB
     Inequality,             //FC
+    Pair,                   //FD
     Exit,                   //FE00
     Put,                    //FE01
     Putch,                  //FE02
@@ -184,7 +185,7 @@ enum InsInfo[InsName] Info = [
     InsName.Power:                  InsInfo("^:",      0xF1D,     SpeechPart.Conjunction),
     InsName.Print:                  InsInfo("echo",    0xF1E,     SpeechPart.Verb),
     InsName.Scan:                   InsInfo("\\..",    0xF1F,     SpeechPart.Conjunction),
-    InsName.Pair:                   InsInfo(";",       0xF2,      SpeechPart.Verb),
+    InsName.Link:                   InsInfo(";",       0xF2,      SpeechPart.Verb),
     InsName.Binomial:               InsInfo("!",       0xF3,      SpeechPart.Verb),
     InsName.Equality:               InsInfo("=",       0xF4,      SpeechPart.Verb),
     InsName.LessThan:               InsInfo("<",       0xF5,      SpeechPart.Verb),
@@ -195,7 +196,7 @@ enum InsInfo[InsName] Info = [
     InsName.LessEqual:              InsInfo("<:",      0xFA,      SpeechPart.Verb),
     InsName.GreaterEqual:           InsInfo(">:",      0xFB,      SpeechPart.Verb),
     InsName.Inequality:             InsInfo("~:",      0xFC,      SpeechPart.Verb),
-    // Unassigned: FD
+    InsName.Pair:                   InsInfo(",",       0xFD,      SpeechPart.Verb),
     InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
     InsName.Put:                    InsInfo("put",     0xFE01,    SpeechPart.Verb),
     InsName.Putch:                  InsInfo("putch",   0xFE02,    SpeechPart.Verb),
@@ -429,11 +430,21 @@ Verb getVerb(InsName name) {
             )(l, r))
             .setMarkedArity(1);
         
-        verbs[InsName.Pair] = new Verb(";")
+        verbs[InsName.Link] = new Verb(";")
             // Wrap
             .setMonad(a => Atom([a]))
-            // Pair
+            // Link
             .setDyad((a, b) => a.linkWith(b))
+            .setMarkedArity(2);
+        
+        verbs[InsName.Pair] = new Verb(",")
+            .setMonad(a => a.match!(
+                // Evaluate
+                (string s) => Interpreter.evaluate(s),
+                _ => Nil.nilAtom,
+            ))
+            // Pair
+            .setDyad((a, b) => Atom([a, b]))
             .setMarkedArity(2);
         
         verbs[InsName.Binomial] = new Verb("!")
@@ -588,8 +599,26 @@ Verb getVerb(InsName name) {
                 (a) => Atom(BigInt(a.ceil.to!string)),
                 _ => Nil.nilAtom,
             ))
-            // Greater of 2
-            .setDyad((l, r) => max(l, r))
+            .setDyad((l, r) {
+                import core.exception : AssertError;
+                // Greater of 2
+                try {
+                    return max(l, r);
+                }
+                catch(AssertError e) {
+                    return match!(
+                        // rotate right
+                        (BigInt i, Atom[] a) => Atom(rotate(a, i)),
+                        (Atom[] a, BigInt i) => Atom(rotate(a, i)),
+                        (BigInt i, string s) => Atom(rotate(s, i)),
+                        (string s, BigInt i) => Atom(rotate(s, i)),
+                        (_1, _2) {
+                            throw e;
+                            return Nil.nilAtom;
+                        }
+                    )(l, r);
+                }
+            })
             .setIdentity(Infinity.negativeAtom)
             .setMarkedArity(2);
         
