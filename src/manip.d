@@ -482,6 +482,9 @@ Atom[] duplicateEach(T)(Atom[] arr, T by) {
 }
 
 T[] rotate(T, S)(T[] arr, S modBy) {
+    if(arr.empty) {
+        return [];
+    }
     T[] res;
     uint by = moldIndex(modBy, arr.length);
     res ~= arr[by..$];

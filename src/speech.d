@@ -270,6 +270,8 @@ struct Atom {
     Atom increment() {
         return value.match!(
             (a) => Atom(a + cast(typeof(a))1),
+            // behead
+            (a) => Atom(a[1..$]),
             _ => Nil.nilAtom,
         );
     }
@@ -277,6 +279,8 @@ struct Atom {
     Atom decrement() {
         return value.match!(
             (a) => Atom(a - cast(typeof(a))1),
+            // betail
+            (a) => Atom(a[0..$-1]),
             _ => Nil.nilAtom,
         );
     }
@@ -335,6 +339,7 @@ struct Atom {
     Atom binaryFallback(string op : "*")(Atom rhs) {
         return match!(
             (Atom[] a, string b) => Atom(a.map!(to!string).join(b)),
+            (string b, Atom[] a) => Atom(a.map!(to!string).join(b)),
             (string a, n) => Atom(a.repeat(rhs.as!size_t).joinToString),
             (n, string a) => Atom(a.repeat(this.as!size_t).joinToString),
             (_1, _2) => Nil.nilAtom,
