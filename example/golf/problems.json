@@ -79,5 +79,117 @@
             {"x":[0,0,1,1,2,2,3],"result":4},
             {"x":[1,0,7,6,3,11,15,1,9,2,3,1,5,2,3,4,6,8,1,18],"result":10}
         ]
+    },
+    {
+        "id": 106149,
+        "name": "compute-the-median",
+        "tests": [
+            {"x":[1,2,3,4,5,6,7,8,9], "result":5},
+            {"x":[1,4,3,2], "result": 2.5},
+            {"x":[1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,-5,100000,1.3,1.4], "result": 1.5},
+            {"x":[1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,1.5,-5,100000,1.3,1.4], "result": 1.5}
+        ]
+    },
+    {
+        "id": 251594,
+        "name": "find-the-nth-mersenne-prime",
+        "tests": [
+            {"x":0, "result":3},
+            {"x":1, "result":7},
+            {"x":2, "result":31},
+            {"x":3, "result":127},
+            {"x":4, "result":8191}
+        ]
+    },
+    {
+        "id": 130454,
+        "name": "product-of-divisors",
+        "tests": [
+            {"x":1, "result":1},
+            {"x":2, "result":2},
+            {"x":3, "result":3},
+            {"x":4, "result":8},
+            {"x":5, "result":5},
+            {"x":6, "result":36},
+            {"x":7, "result":7},
+            {"x":8, "result":64},
+            {"x":9, "result":27},
+            {"x":10, "result":100},
+            {"x":12, "result":1728},
+            {"x":14, "result":196},
+            {"x":24, "result":331776},
+            {"x":25, "result":125},
+            {"x":28, "result":21952},
+            {"x":30, "result":810000} 
+        ]
+    },
+    {
+        "id": 208982,
+        "name": "antisymmetry-of-a-matrix",
+        "tests": [
+            {"x":[[0,2,-1],[-2,0,0],[1,0,0]], "result":true}
+        ]
+    },
+    {
+        "id": 5977,
+        "name": "list-of-primes-under-a-million",
+        "tests": []
+    },
+    {
+        "id": 1744,
+        "name": "mathematical-combination",
+        "tests": [
+            {"x":"5,2", "result":10},
+            {"x":"14,10", "result":1001},
+            {"x":"10,1", "result":10},
+            {"x":"10,2", "result":45},
+            {"x":"0,0", "result":1},
+            {"x":"5,3", "result":10}
+        ]
+    },
+    {
+        "id": 185674,
+        "name": "pwas-eht-tirsf-dna-tasl-setterl-fo-hace-dorw",
+        "tests": [
+            {
+                "x":"swap the first and last letters of each word",
+                "result":"pwas eht tirsf dna tasl setterl fo hace dorw"
+            },
+            {
+                "x": "hello world",
+                "result": "oellh dorlw"
+            },
+            {
+                "x": "test cases",
+                "result": "test sasec"
+            },
+            {
+                "x": "programming puzzles and code golf",
+                "result": "grogramminp suzzlep dna eodc folg"
+            },
+            {
+                "x": "in a green meadow",
+                "result": "ni a nreeg weadom"
+            },
+            {
+                "x": "yay racecar",
+                "result": "yay racecar"
+            }
+        ]
+    },
+    {
+        "id": 252189,
+        "name": "carryless-factors",
+        "tests": [
+            {"x":2,"result":[1,2]},
+            {"x":4,"result":[1,2,4]},
+            {"x":5,"result":[1,3,5]},
+            {"x":6,"result":[1,2,3,6]},
+            {"x":25,"result":[1,25]},
+            {"x":39,"result":[1,3,5,11,29,39]},
+            {"x":42,"result":[1,2,7,14,21,42]},
+            {"x":100,"result":[1,2,4,25,50,100]}
+        ],
+        "note": "Too long for x=574,5040,848640."
     }
 ]
