@@ -11,12 +11,12 @@ string nibbleFmt(Nibble[] arr) {
     res ~= "]";
     return res;
 }
-string basicNibbleFmt(Nibble[] arr) {
+string basicNibbleFmt(Nibble[] arr, string joinWith=" ") {
     import std.algorithm : map;
     import std.array : join, array;
     return arr.map!(a => HEX_DIGITS[a..a+1])
         .array
-        .join(" ");
+        .join(joinWith);
 }
 string byteNibbleFmt(Nibble[] arr) {
     import std.algorithm : map;

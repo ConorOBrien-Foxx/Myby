@@ -3,6 +3,7 @@ module myby.interpreter;
 import std.bigint;
 import std.conv : to;
 import std.range : back, popBack, popBackN;
+import std.typecons;
 
 import myby.condense;
 import myby.debugger;
@@ -118,11 +119,75 @@ Token[] tokenize(Nibble[] code) {
     return tokens;
 }
 
+string toLiterateAligned(Nibble[] nibs) {
+    return toLiterateAligned(nibs, nibs.tokenize);
+}
+
+string toLiterateAligned(Nibble[] nibs, Token[] tokens) {
+    import std.array : join;
+    import std.range : lockstep, empty, padRight;
+    import std.algorithm.comparison : max;
+    auto lb = toLiterateBuilder(nibs, tokens);
+    string[] lines;
+    string[] guide;
+    string[] reps;
+    
+    void finishSection() {
+        if(guide.empty || reps.empty) {
+            return;
+        }
+        Debugger.print(guide);
+        Debugger.print(reps);
+        string[] upper;
+        string[] lower;
+        foreach(g, r; lockstep(guide, reps)) {
+            uint longer = max(g.length, r.length);
+            upper ~= g.padRight(' ', longer).to!string;
+            lower ~= r.padRight(' ', longer).to!string;
+        }
+        lines ~= upper.join("│");
+        lines ~= lower.join("│");
+        lines ~= "";
+        guide = [];
+        reps = [];
+    }
+    
+    // Debugger.print("=== literate aligned ===");
+    foreach(i, rep; lb.reps) {
+        // Debugger.print("Rep:  ", rep);
+        Token tok = tokens[i];
+        int nextIndex = i + 1 < tokens.length
+            ? tokens[i + 1].index
+            : nibs.length;
+        Debugger.print("Tok: ", tok);
+        if(tok.name == InsName.Break) {
+            finishSection();
+        }
+        else {
+            reps ~= rep;
+            Nibble[] slice = nibs[tok.index..nextIndex];
+            guide ~= slice.basicNibbleFmt("");
+        }
+    }
+    finishSection();
+    return lines.join('\n');
+}
+
 string toLiterate(Nibble[] nibs) {
     return toLiterate(nibs, nibs.tokenize.autoCompleteParentheses);
 }
 
 string toLiterate(Nibble[] nibs, Token[] tokens) {
+    auto lb = toLiterateBuilder(nibs, tokens);
+    string res;
+    foreach(i, rep; lb.reps) {
+        res ~= rep ~ lb.joins[i];
+    }
+    return res;
+}
+
+alias LiterateBuilder = Tuple!(string[], "reps", string[], "joins");
+LiterateBuilder toLiterateBuilder(Nibble[] nibs, Token[] tokens) {
     string[] reps;
     string[] joins;
     reps.length = joins.length = tokens.length;
@@ -133,7 +198,7 @@ string toLiterate(Nibble[] nibs, Token[] tokens) {
         Debugger.print("Name: ", tok.name);
         auto info = tok.name in Info;
         if(info !is null) {
-            reps[i] = Info[tok.name].name;
+            reps[i] = info.name;
         }
         else {
             switch(tok.name) {
@@ -170,11 +235,11 @@ string toLiterate(Nibble[] nibs, Token[] tokens) {
         lastWasNumber = thisIsNumber;
     }
     joins[$-1] = "";
-    string res;
-    foreach(i, rep; reps) {
-        res ~= rep ~ joins[i];
-    }
-    return res;
+    
+    LiterateBuilder lb;
+    lb.reps = reps;
+    lb.joins = joins;
+    return lb;
 }
 
 bool isMain(SpeechPart speech) {
