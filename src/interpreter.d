@@ -118,6 +118,65 @@ Token[] tokenize(Nibble[] code) {
     return tokens;
 }
 
+string toLiterate(Nibble[] nibs) {
+    return toLiterate(nibs, nibs.tokenize.autoCompleteParentheses);
+}
+
+string toLiterate(Nibble[] nibs, Token[] tokens) {
+    string[] reps;
+    string[] joins;
+    reps.length = joins.length = tokens.length;
+    bool lastWasNumber = false;
+    foreach(i, tok; tokens) {
+        bool thisIsNumber = false;
+        Debugger.print("Token: ", tok);
+        Debugger.print("Name: ", tok.name);
+        auto info = tok.name in Info;
+        if(info !is null) {
+            reps[i] = Info[tok.name].name;
+        }
+        else {
+            switch(tok.name) {
+                case InsName.Integer:
+                    reps[i] = tok.big.to!string;
+                    thisIsNumber = true;
+                    break;
+                
+                default:
+                    assert(0, "Unhandled: " ~ tok.name.to!string);
+            }
+        }
+        joins[i] = " ";
+        if(tok.name == InsName.Break
+        || tok.speech == SpeechPart.Conjunction) {
+            joins[i] = "";
+            if(i > 0) {
+                joins[i - 1] = "";
+            }
+        }
+        else if(
+            (
+                tok.speech == SpeechPart.Adjective
+                && (!lastWasNumber || reps[i][0] < 'a' || reps[i][0] > 'z')
+            )
+            || tok.name == InsName.CloseParen) {
+            if(i > 0) {
+                joins[i - 1] = "";
+            }
+        }
+        else if(tok.name == InsName.OpenParen) {
+            joins[i] = "";
+        }
+        lastWasNumber = thisIsNumber;
+    }
+    joins[$-1] = "";
+    string res;
+    foreach(i, rep; reps) {
+        res ~= rep ~ joins[i];
+    }
+    return res;
+}
+
 bool isMain(SpeechPart speech) {
     return speech == SpeechPart.Verb || speech == SpeechPart.Adjective;
 }

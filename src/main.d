@@ -39,6 +39,7 @@ int main(string[] args) {
     bool useRuntimeDebug;
     bool dispTree;
     bool jsonOutput;
+    bool decompile;
     string outfile;
     string fpath;
     string code;
@@ -47,6 +48,7 @@ int main(string[] args) {
         "tree|t", "Display tree-form", &dispTree,
         "jsonout|j", "Outputs data in a JSON friendly format", &jsonOutput,
         "compile|c", "Compile literate program", &compile,
+        "uncompile|u", "Uncompile (decompile) compiled program", &decompile,
         "outfile|o", "Outputs relevant data to specified file", &outfile,
         "literate|l", "Input source is a literate program", &literate,
         "file|f", "Uses named file", &fpath,
@@ -150,6 +152,12 @@ int main(string[] args) {
             }
         }
         output(res);
+        return 0;
+    }
+    
+    if(decompile) {
+        Nibble[] nibs = getNibbles(code);
+        writeln(toLiterate(nibs));
         return 0;
     }
     
