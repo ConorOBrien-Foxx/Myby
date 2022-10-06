@@ -1478,7 +1478,7 @@ Conjunction getConjunction(InsName name) {
         
         conjunctions[InsName.Scan] = new Conjunction(
             (Verb f, Verb seedFn) => new Verb("\\..")
-                .setMonad((f, g, a) => a.match!(
+                .setMonad((f, seedFn, a) => a.match!(
                     (Atom[] arr) {
                         // TODO: relegate a specific atom for
                         // using f's identity as seed?
