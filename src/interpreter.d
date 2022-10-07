@@ -127,6 +127,7 @@ string toLiterateAligned(Nibble[] nibs, Token[] tokens) {
     import std.array : join;
     import std.range : lockstep, empty, padRight;
     import std.algorithm.comparison : max;
+    import std.algorithm.iteration : map;
     auto lb = toLiterateBuilder(nibs, tokens);
     string[] lines;
     string[] guide;
@@ -145,9 +146,12 @@ string toLiterateAligned(Nibble[] nibs, Token[] tokens) {
             upper ~= g.padRight(' ', longer).to!string;
             lower ~= r.padRight(' ', longer).to!string;
         }
-        lines ~= upper.join("│");
-        lines ~= lower.join("│");
-        lines ~= "";
+        auto mids = upper.map!(a => "".padRight('─', a.length)).map!(to!string);
+        lines ~= "┌" ~ mids .join("┬") ~ "┐";
+        lines ~= "│" ~ upper.join("│") ~ "│";
+        lines ~= "├" ~ mids .join("┼") ~ "┤";
+        lines ~= "│" ~ lower.join("│") ~ "│";
+        lines ~= "└" ~ mids .join("┴") ~ "┘";
         guide = [];
         reps = [];
     }

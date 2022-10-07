@@ -46,6 +46,7 @@ int main(string[] args) {
     string code;
     auto info = getoptSafeError(
         args,
+        std.getopt.config.bundling,
         "tree|t", "Display tree-form", &dispTree,
         "jsonout|j", "Outputs data in a JSON friendly format", &jsonOutput,
         "compile|c", "Compile literate program", &compile,
@@ -158,13 +159,25 @@ int main(string[] args) {
     }
     
     if(decompile) {
-        Nibble[] nibs = getNibbles(code);
+        Nibble[] nibs;
+        if(literate) {
+            nibs = parseLiterate(code);
+        }
+        else {
+            nibs = getNibbles(code);
+        }
         writeln(toLiterate(nibs));
         return 0;
     }
     
     if(decompileAlign) {
-        Nibble[] nibs = getNibbles(code);
+        Nibble[] nibs;
+        if(literate) {
+            nibs = parseLiterate(code);
+        }
+        else {
+            nibs = getNibbles(code);
+        }
         writeln(toLiterateAligned(nibs));
         return 0;
     }
