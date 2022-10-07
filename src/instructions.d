@@ -475,8 +475,9 @@ Verb getVerb(InsName name) {
                 try {
                     return match!(
                         // TODO: index by real?
-                        (BigInt b, Atom[] a) =>
-                            a[moldIndex(b, a.length)],
+                        (BigInt b, Atom[] a) => a.length
+                            ? a[moldIndex(b, a.length)]
+                            : Nil.nilAtom,
                         (BigInt b, string a) =>
                             Atom(to!string(a[moldIndex(b, a.length)])),
                         (b, AVHash h) => Atom(h[_AtomValue(b)]),
@@ -498,8 +499,10 @@ Verb getVerb(InsName name) {
                     atomFor(a)
                 ),
             ))
-            // Base conversion
             .setDyad((l, r) => match!(
+                // multiset subtraction
+                (Atom[] a, Atom[] b) => Atom(multisetDifference(a, b)),
+                // Base conversion
                 (a, b) => Atom(a.toBase(b).map!Atom.array),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))

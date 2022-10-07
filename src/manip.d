@@ -514,3 +514,29 @@ Atom[] padLeftInfer(Atom[] arr, Atom by) {
     }
     return arr;
 }
+
+Atom[] multisetDifference(Atom[] as, Atom[] bs) {
+    import std.bitmanip;
+    BitArray amask, bmask;
+    amask.length = as.length;
+    bmask.length = bs.length;
+
+    foreach(i, a; as) {
+        foreach(j, b; bs) {
+            if(a == b && !bmask[j]) {
+                bmask[j] = amask[i] = true;
+            }
+        }
+    }
+
+    Atom[] res;
+    res.length = amask.length - amask.count;
+    uint i = 0;
+    foreach(j, a; as) {
+        if(!amask[j]) {
+            res[i++] = a;
+        }
+    }
+    
+    return res;
+}
