@@ -802,12 +802,13 @@ class Verb {
                 return g(f(a), h(a));
             })
             .setDyad((Verb[] verbs, a, b) {
+                // TODO: use markedArity for calls to f/h?
                 Verb f = verbs[0];
                 Verb g = verbs[1];
                 Verb h = verbs[2];
                 return g(f(a, b), h(a, b));
             })
-            .setMarkedArity(f.niladic || h.niladic ? 1 : 2)
+            .setMarkedArity(f.niladic || h.niladic || (f.markedArity == 1 && h.markedArity == 1) ? 1 : 2)
             .setNiladic(f.niladic && h.niladic || g.niladic)
             .setChildren([f, g, h]);
     }

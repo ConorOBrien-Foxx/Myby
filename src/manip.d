@@ -540,3 +540,29 @@ Atom[] multisetDifference(Atom[] as, Atom[] bs) {
     
     return res;
 }
+
+Atom generate(Verb v, Atom a) {
+    if(v.markedArity <= 1) {
+        return generate(v, Nil.nilAtom, a);
+    }
+    else {
+        return generate(v, a, Atom(BigInt(1)));
+    }
+}
+
+Atom generate(Verb v, Atom x, Atom n) {
+    Atom[] args = [Atom(BigInt(0))];
+    if(v.markedArity >= 2) {
+        args ~= x;
+    }
+    BigInt count = n.as!BigInt;
+    while(count > 0) {
+        if(v(args).truthiness) {
+            count--;
+        }
+        if(count > 0) {
+            args[0] = args[0].increment();
+        }
+    }
+    return args[0];
+}

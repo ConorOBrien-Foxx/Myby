@@ -112,6 +112,7 @@ enum InsName {
     Time,                   //FE86
     InitialAlias,           //----
     DefinedAlias,           //FEA0-FEBF
+    VerbDiagnostic,         //FEC0
     Break,                  //FF
     None,                   //----
 }
@@ -235,6 +236,7 @@ enum InsInfo[InsName] Info = [
     InsName.DefinedAlias:           InsInfo("(n/a)",   0xFEA0,    SpeechPart.Verb),
     //FEA0-FEBF reserved for aliases
     //TODO: Conjunction/Adjective aliases?
+    InsName.VerbDiagnostic:         InsInfo("?:",      0xFEC0,    SpeechPart.Adjective),
     InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
 ];
 
@@ -629,7 +631,10 @@ Verb getVerb(InsName name) {
             .setMarkedArity(2);
         
         verbs[InsName.MemberIn] = new Verb("e.")
-            .setMonad(_ => Nil.nilAtom)
+            .setMonad(a => a.match!(
+                (Atom[] a) => Atom(a.nub.length <= 1),
+                _ => Nil.nilAtom,
+            ))
             .setDyad((a, b) => match!(
                 (a, Atom[] b) => Atom(b.canFind(atomFor(a))),
                 (_1, _2) => Nil.nilAtom,
@@ -1101,20 +1106,8 @@ Adjective getAdjective(InsName name) {
         // Generate
         adjectives[InsName.Generate] = new Adjective(
             (Verb v) => new Verb("G")
-                .setMonad((Verb v, a) {
-                    auto ind = BigInt(0);
-                    while(!v(Atom(ind), a).truthiness) {
-                        ind++;
-                    }
-                    return Atom(ind);
-                })
-                .setDyad((Verb v, i, a) {
-                    auto ind = i;
-                    while(!v(ind, a).truthiness) {
-                        ind = ind + 1;
-                    }
-                    return ind;
-                })
+                .setMonad((Verb v, a) => generate(v, a))
+                .setDyad((Verb v, a, n) => generate(v, a, n))
                 .setMarkedArity(1)
                 .setChildren([v])
         );
@@ -1399,6 +1392,26 @@ Adjective getAdjective(InsName name) {
                     return a;
                 })
                 .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+                .setChildren([v])
+        );
+        
+        // Verb Diagnostic
+        adjectives[InsName.VerbDiagnostic] = new Adjective(
+            (Verb v) => new Verb("?:")
+                .setMonad((Verb v, a) {
+                    AVHash data;
+                    data[_AtomValue("ma")] = BigInt(v.markedArity);
+                    data[_AtomValue("disp")] = v.display;
+                    data[_AtomValue("rep")] = v.treeDisplay;
+                    data[_AtomValue("inv")] = !!v.inverse;
+                    data[_AtomValue("nilad")] = v.niladic;
+                    data[_AtomValue("rs")] = v.rangeStart.value;
+                    data[_AtomValue("id")] = v.identity.value;
+                    return Atom(data);
+                })
+                // TODO: set dyadic case
+                .setDyad((Verb v, x, y) => Nil.nilAtom)
                 .setMarkedArity(1)
                 .setChildren([v])
         );

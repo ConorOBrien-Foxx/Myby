@@ -259,7 +259,8 @@ struct Condenser {
                 f = verbs[$-2];
                 g = verbs[$-1];
                 verbs.popBackN(2);
-                if(g.niladic && f.markedArity == 2 || f.niladic && g.markedArity == 2) {
+                // monad-noun is valid; noun-monad is rare
+                if(g.niladic && f.markedArity == 2 || f.niladic) {
                     Debugger.print("Atop redirected to Bind");
                     verbs ~= bind(f, g);
                 }
