@@ -268,9 +268,7 @@ struct Condenser {
                 }
             }
             else {
-                // i don't know how we got here
-                Debugger.print("Huh? idk what to do with ", verbs.length, " verbs...");
-                assert(false);
+                assert(0, "Invalid verb condense count: " ~ verbs.length.to!string);
             }
         }
     }
