@@ -491,3 +491,26 @@ T[] rotate(T, S)(T[] arr, S modBy) {
     res ~= arr[0..by];
     return res;
 }
+
+Atom blankFor(Atom a) {
+    return a.match!(
+        (Duration d) => Atom(d - d),
+        (BigInt b) => Atom(b - b),
+        (bool b) => Atom(false),
+        (Infinity i) => Atom(0.0),
+        (real r) => Atom(0.0),
+        (string s) => Atom(" "),
+        (Atom[] a) => a.length ? blankFor(a[0]) : Atom(BigInt(0)),
+        (AVHash h) { AVHash r; return Atom(r); },
+        (Nil n) => Nil.nilAtom,
+    );
+}
+
+Atom[] padLeftInfer(Atom[] arr, Atom by) {
+    Atom padWith = blankFor(atomFor(arr));
+    uint max = by.as!uint;
+    while(arr.length < max) {
+        arr = [padWith] ~ arr;
+    }
+    return arr;
+}
