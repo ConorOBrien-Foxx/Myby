@@ -46,6 +46,7 @@ enum InsName {
     CloseParen,             //C
     Compose,                //D
     Under,                  //DA
+    Hook,                   //DC
     MonadChain,             //DD
     Range,                  //E
     Modulus,                //F0
@@ -154,6 +155,7 @@ enum InsInfo[InsName] Info = [
     InsName.SplitCompose:           InsInfo("O",       0xAD,      SpeechPart.MultiConjunction),
     // Unassigned (maybe): ADAD/ACAC/etc
     InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
+    // Unassigned *AND* Unimplemented: B2 `(\` and B3 `("`
     // BA: `(` followed by A... (A `&` AA `\.` AC `\: AD `O`) has no meaning
     InsName.ArityForce:             InsInfo("`",       0xBA,      SpeechPart.Adjective),
     // BC: `()` has no meaning
@@ -164,7 +166,8 @@ enum InsInfo[InsName] Info = [
     InsName.Compose:                InsInfo("@",       0xD,       SpeechPart.Conjunction),
     // DA: `@&` has no meaning
     InsName.Under:                  InsInfo("&.",      0xDA,      SpeechPart.Conjunction),
-    // Unassigned: DC: `@)` has no meaning
+    // DC: `@)` has no meaning
+    InsName.Hook:                   InsInfo("H",       0xDC,      SpeechPart.MultiConjunction),
     // DD: `@@` has no meaning
     InsName.MonadChain:             InsInfo("@.",      0xDD,      SpeechPart.MultiConjunction),
     InsName.Range:                  InsInfo("R",       0xE,       SpeechPart.Verb),
@@ -1553,6 +1556,21 @@ MultiConjunction getMultiConjunction(InsName name) {
                         return g(f(x), h(y));
                     })
                     .setMarkedArity(verbs[0].niladic || verbs[2].niladic ? 1 : 2)
+                    .setChildren(verbs);
+            }
+        );
+        
+        //   (f g H) a <-> a f (g a)
+        // x (f g H) y <-> x f (g y)
+        multiConjunctions[InsName.Hook] = new MultiConjunction(
+            2,
+            (Verb[] verbs) {
+                return new Verb("H")
+                    .setMonad((Verb[] verbs, a) => verbs[0](a, verbs[1](a)))
+                    .setDyad((Verb[] verbs, x, y) =>
+                        verbs[0](x, verbs[1].markedArity == 1 ? verbs[1](y) : verbs[1](x, y))
+                    )
+                    .setMarkedArity(2)
                     .setChildren(verbs);
             }
         );
