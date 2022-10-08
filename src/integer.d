@@ -15,29 +15,29 @@ import myby.nibble;
  *    | 3 | 3
  *    | 4 | 4
  *    | 5 | 5
- *    | 6 | 6
- *    | 7 | 7
- *    | 8 | 8
- *    | 9 | 9
- *    | a | 10
+ *    | 6 | 7
+ *    | 7 | 8
+ *    | 8 | 9
+ *    | 9 | 10
+ *    | a | A pair of numbers
  *    | b | A real number encoded using the next two integers
  *    | cw | A special constant encoded using the next nibble
- *    | c0 | 1000
- *    | c1 | 16
- *    | c2 | 32
- *    | c3 | 64
- *    | c4 | 128
- *    | c5 | 256
- *    | c6 | 512
- *    | c7 | 1024
- *    | c8 | 100
- *    | c9 | 255
- *    | ca | 65
- *    | cb | 97
- *    | cc | 1000000
- *    | cd | 48
- *    | ce | -2
- *    | cf | -1
+ *    | c0 | 6
+ *    | c1 | 1000
+ *    | c2 | 16
+ *    | c3 | 32
+ *    | c4 | 64
+ *    | c5 | 128
+ *    | c6 | 256
+ *    | c7 | 512
+ *    | c8 | 1024
+ *    | c9 | 100
+ *    | ca | 255
+ *    | cb | 1000000
+ *    | cc | -2
+ *    | cd | -1
+ *    | ce | A triple of numbers
+ *    | cfq* | A series of q numbers in a row
  *    | dww | A number encoded using the next two nibbles
  *    |     | (The first 256 integers not otherwise encoded above)
  *    | eqw* | A negative number encoding the next q nibbles
@@ -46,17 +46,17 @@ import myby.nibble;
 
 enum BaseConstants = [
     0, 1, 2, 3,
-    4, 5, 6, 7,
-    8, 9, 10
+    4, 5, 7, 8,
+    9, 10
 ];
 
 enum OneMillionPlaceholder = -3; // limits inferred cache size
 enum OneMillion = 1000000;
 enum ExtraConstants = [
-    1000, 16, 32, 64,
+    6, 1000, 16, 32, 64,
     128, 256, 512, 1024,
-    100, 255, 65, 97,
-    OneMillionPlaceholder, 48, -2, -1
+    100, 255,
+    OneMillionPlaceholder, -2, -1
 ];
 enum HIGHEST_NEGATIVE = -3;
 
@@ -104,6 +104,66 @@ BigInt getExtraCacheUpper(T)(T n) {
         if(res >= OneMillion) res++;
         return res;
     }
+}
+
+// TODO: specific function for integerToNibbles[1..$]
+Nibble[] numberListToNibbles(T)(T[] ns) {
+    Nibble[] arr = [0x0];
+    if(ns.length == 2) {
+        arr ~= 0xA;
+        static foreach(i; 0 .. 2) {
+            arr ~= integerToNibbles(ns[i])[1..$];
+        }
+    }
+    else if(ns.length == 3) {
+        arr ~= [0xC, 0xE];
+        static foreach(i; 0 .. 3) {
+            arr ~= integerToNibbles(ns[i])[1..$];
+        }
+    }
+    else {
+        arr ~= [0xC, 0xF];
+        arr ~= integerToNibbles(ns.length);
+        foreach(n; ns) {
+            arr ~= integerToNibbles(n)[1..$];
+        }
+    }
+    return arr;
+}
+
+BigInt[] nibblesToNumberList(Nibble[] nibbles, ref uint i) {
+    // TODO: mixed list of numbers and reals
+    import std.range : retro;
+    
+    assert(nibbles[i] == 0x0, "Trying to parse non-list as list");
+    
+    i++;
+    BigInt[] result;
+    
+    if(nibbles[i] == 0xA) {
+        i++;
+        result ~= nibblesToInteger(nibbles, i, true);
+        result ~= nibblesToInteger(nibbles, i, true);
+    }
+    else if(nibbles[i] == 0xC && nibbles[i + 1] == 0xE) {
+        i += 2;
+        result ~= nibblesToInteger(nibbles, i, true);
+        result ~= nibblesToInteger(nibbles, i, true);
+        result ~= nibblesToInteger(nibbles, i, true);
+    }
+    else if(nibbles[i] == 0xC && nibbles[i + 1] == 0xF) {
+        i += 2;
+        BigInt count = nibblesToInteger(nibbles, i, true);
+        while(count > 0) {
+            count--;
+            result ~= nibblesToInteger(nibbles, i, true);
+        }
+    }
+    else {
+        assert(0, "Trying to parse non-list as list");
+    }
+    
+    return result;
 }
 
 Nibble[] integerToNibbles(T)(T n) {
@@ -164,7 +224,12 @@ Nibble[] integerToNibbles(T)(T n) {
 
 enum REPEAT_FLAG = BigInt("0xFFFFFFFFFFFFFFF");
 BigInt nibblesToInteger(Nibble[] nibbles, ref uint i, bool isExtra = false) {
-    // import std.stdio;
+    // TODO: only modify i after successful parse.
+    // right now, the current behavior is, on a failed assertion,
+    // the program will crash. trying to recover from this crash
+    // will leave i modified. this is undesirable for a theoretical
+    // smart recovery.
+    
     if(!isExtra) {
         assert(nibbles[i] == 0x0, "Trying to parse a non-integer as an integer");
 
@@ -174,6 +239,9 @@ BigInt nibblesToInteger(Nibble[] nibbles, ref uint i, bool isExtra = false) {
     BigInt res = BigInt("0");
     if(nibbles[i] < BaseConstants.length) {
         res = BaseConstants[nibbles[i]];
+    }
+    else if(nibbles[i] == 0xA) {
+        assert(isExtra, "Cannot parse a list as an integer");
     }
     else if(nibbles[i] == 0xB) {
         assert(isExtra, "Cannot parse a real as an integer");
@@ -228,6 +296,8 @@ out(r; r.length >= 4, "Must return 0x0B and at least 1 nibble for each part")
 real nibblesToReal(Nibble[] nibbles, ref uint i) {
     import std.range : retro;
     
+    assert(nibbles[i] == 0x0 && nibbles[i + 1] == 0xB, "Trying to parse non-real as real");
+    // skip over the two nibbles in the indicator 0x0B
     i += 2;
     BigInt ip = nibblesToInteger(nibbles, i, true);
     BigInt fp = nibblesToInteger(nibbles, i, true);
