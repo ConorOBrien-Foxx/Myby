@@ -44,6 +44,7 @@ int main(string[] args) {
     string outfile;
     string fpath;
     string code;
+    bool temp;//todo:remove
     auto info = getoptSafeError(
         args,
         std.getopt.config.bundling,
@@ -58,6 +59,7 @@ int main(string[] args) {
         "execute|e", "Executes provided code", &code,
         "debug|d", "Prints debug information", &useDebug,
         "runDebug|r", "Runtime debug information", &useRuntimeDebug,
+        "z", "temp", &temp
     );
     
     void writelnResult(Atom a) {
@@ -136,6 +138,14 @@ int main(string[] args) {
         else {
             stdout.writeln(args);
         }
+    }
+    
+    if(temp) {
+        auto a = parseLiterateOld(code).byteNibbleFmt;
+        auto b = parseLiterate(code).byteNibbleFmt;
+        stderr.writeln("Original: ", a);
+        stderr.writeln("New:      ", b);
+        return a == b ? 0 : 1;
     }
     
     if(compile) {

@@ -9,7 +9,7 @@ import myby.condense;
 import myby.debugger;
 import myby.instructions;
 import myby.integer;
-import myby.literate : NiladParseState, UseFilterSeparators;
+import myby.literate : NiladParseState;
 import myby.nibble;
 import myby.speech;
 import myby.string;
@@ -97,7 +97,7 @@ Token[] tokenize(Nibble[] code) {
             i++;
         }
         
-        if(UseFilterSeparators && lastWasNilad && token.name == InsName.Filter) {
+        /*if(UseFilterSeparators && lastWasNilad && token.name == InsName.Filter) {
             Token* lastToken = &tokens[$ - 1];
             if(lastToken.name != InsName.ListLiteral) {
                 Token copy = *lastToken;
@@ -106,7 +106,8 @@ Token[] tokenize(Nibble[] code) {
             }
             // we do not push this token, since it is just a literal
         }
-        else if(lastWasNilad && token.isNilad) {
+        else*/
+        if(lastWasNilad && token.isNilad) {
             tokens[$ - 1].arr ~= token;
         }
         else {

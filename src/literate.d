@@ -13,8 +13,6 @@ import myby.integer;
 import myby.nibble;
 import myby.string;
 
-enum UseFilterSeparators = false;
-
 enum NiladParseState {
     None,
     LastWasNilad,
@@ -28,7 +26,336 @@ int toHexDigit(char c) {
     else assert(0, "cannot convert '" ~ c ~ "' to a hex digit");
 }
 
+enum LiterateType {
+    Unknown,
+    Comment,
+    Integer,
+    Real,
+    String,
+    KeyAccess,
+    Identifier,
+    Whitespace,
+    Alias,
+    AliasDefine,
+}
+struct LiterateToken {
+    LiterateType type;
+    union {
+        struct { BigInt head; BigInt tail; }
+        string str;
+        LiterateInfo info; 
+    }
+    
+    string toString() {
+        final switch(type) {
+            case LiterateType.Unknown:
+                return "LiterateToken(<Unknown>)";
+                
+            case LiterateType.Comment:
+                return "LiterateToken(Comment)";
+                
+            case LiterateType.Integer:
+                return "LiterateToken(Integer, "
+                     ~ to!string(head) ~ ")";
+                     
+            case LiterateType.Real:
+                return "LiterateToken(Integer, "
+                     ~ to!string(head) ~ ".rev"
+                     ~ to!string(tail) ~ ")";
+                     
+            case LiterateType.String:
+                return "LiterateToken(String, '"
+                     ~ to!string(str) ~ "')";
+                     
+            case LiterateType.KeyAccess:
+                return "LiterateToken(KeyAccess, $."
+                     ~ to!string(str) ~ ")";
+                     
+            case LiterateType.Identifier:
+                return "LiterateToken(Identifier, "
+                     ~ to!string(info.nibs) ~ " "
+                     ~ to!string(info.speech) ~ ")";
+                     
+            case LiterateType.Alias:
+                return "LiterateToken(Alias, "
+                     ~ to!string(str) ~ ")";
+                     
+            case LiterateType.AliasDefine:
+                return "LiterateToken(AliasDefine, "
+                     ~ to!string(str) ~ ":)";
+                
+            case LiterateType.Whitespace:
+                return "LiterateToken(Whitespace)";
+        }
+    }
+}
+
+enum IdentifierPostfixes = [ '.', ':' ];
+enum IdentifierPrefixes = [ '$' ];
+enum MaxAliasCount = 32;
+LiterateToken[] tokenizeLiterate(T)(T str) {
+    import std.algorithm.searching : canFind;
+    /* 1. definitions */
+    LiterateToken[] tokens;
+    string[] aliases;
+    
+    uint i = 0;
+    
+    bool hasIndex(uint ip) {
+        return ip < str.length;
+    }
+    
+    bool hasAhead(T)(T needle) {
+        static if(is(T == string)) {
+            if(needle.length == 0) {
+                return true;
+            }
+            return hasIndex(i + needle.length - 1)
+                && str[i..i+needle.length] == needle;
+        }
+        static if(is(T == char)) {
+            return hasIndex(i + 1)
+                && str[i + 1] == needle;
+        }
+    }
+    
+    bool hasAheadFn(alias fn)() {
+        return hasIndex(i + 1)
+            && fn(str[i + 1]);
+    }
+    
+    BigInt parseNumber(bool reverse=false) {
+        int sign = 1;
+        auto start = i;
+        if(str[start] == '_') {
+            sign = -1;
+            start++;
+            i++;
+        }
+        while(i < str.length && str[i].isDigit) {
+            i++;
+        }
+        string rep = str[start..i];
+        return sign * BigInt(reverse ? to!string(rep.retro) : rep);
+    }
+    
+    string readAlphabetic() {
+        string name;
+        while(i < str.length && 'a' <= str[i] && str[i] <= 'z') {
+            name ~= str[i++];
+        }
+        return name;
+    }
+    
+    /* 2. tokenization */
+    while(i < str.length) {
+        LiterateToken token;
+        if(hasAhead("NB.")) {
+            // Comment
+            while(i < str.length && str[i] != '\n') {
+                i++;
+            }
+            token.type = LiterateType.Comment;
+        }
+        else if(str[i].isDigit || str[i] == '_' && hasAheadFn!isDigit) {
+            // Integer or Real
+            token.head = parseNumber();
+            if(i < str.length && str[i] == '.') {
+                i++;
+                token.tail = parseNumber(true);
+                token.type = LiterateType.Real;
+            }
+            else {
+                token.type = LiterateType.Integer;
+            }
+        }
+        else if(str[i] == '\'') {
+            // String
+            string build = "";
+            i++;
+            while(i < str.length) {
+                // termination condition
+                if(str[i] == '\'') {
+                    // doubling up on '' is another way to escape a quote
+                    if(hasAhead('\'')) {
+                        build ~= str[++i];
+                    }
+                    else {
+                        break;
+                    }
+                }
+                else if(str[i] == '\\' && i + 1 < str.length) {
+                    switch(str[++i]) {
+                        case 'n':  build ~= '\n'; break;
+                        case 't':  build ~= '\t'; break;
+                        case '0':  build ~= '\0'; break;
+                        case '\'': build ~= '\''; break;
+                        case '\\': build ~= '\\'; break;
+                        case 'x':
+                            uint d1 = toHexDigit(str[++i]);
+                            uint d2 = toHexDigit(str[++i]);
+                            build ~= cast(char)(d1 * 16 + d2);
+                            break;
+                        default:
+                            assert(0, "Unknown escape: \\" ~ str[i]);
+                    }
+                }
+                else {
+                    build ~= str[i];
+                }
+                i++;
+            }
+            i++; // skip past last '
+            Debugger.print("String to convert: <", build, ">");
+            token.str = build;
+            token.type = LiterateType.String;
+        }
+        else if(hasAhead("$.")) {
+            // Access Key
+            i += 2;
+            token.str = readAlphabetic();
+            token.type = LiterateType.KeyAccess;
+        }
+        else {
+            char head = str[i];
+            string name = readAlphabetic();
+            if(name.length == 0) {
+                name ~= str[i];
+            }
+            else {
+                i--;
+            }
+            if(hasIndex(i + 1)) {
+                i++;
+                // dollar prefix joins to a single command
+                if(IdentifierPrefixes.canFind(head)) {
+                    name ~= str[i];
+                }
+                else if(IdentifierPostfixes.canFind(str[i])) {
+                    while(hasIndex(i) && IdentifierPostfixes.canFind(str[i])) {
+                        name ~= str[i++];
+                    }
+                    i--;
+                }
+                else {
+                    i--;
+                }
+            }
+            
+            auto r = name in InstructionMap;
+            if(r !is null) {
+                token.info = *r;
+                token.type = LiterateType.Identifier;
+            }
+            else if(aliases.canFind(name)) {
+                token.type = LiterateType.Alias;
+                token.str = name;
+            }
+            else if(head == ' ' || head == '\r') {
+                // ignore
+                token.type = LiterateType.Whitespace;
+            }
+            else if(name[$-1] == ':') {
+                // TODO: check for redefined alias
+                token.type = LiterateType.AliasDefine;
+                string finalName = name[0..$-1];
+                aliases ~= finalName;
+                token.str = finalName;
+            }
+            else {
+                assert(0, "Unhandled instruction: " ~ name);
+            }
+            i++;
+        }
+
+        assert(token.type != LiterateType.Unknown, "Malformed token");
+        if(token.type != LiterateType.Whitespace
+        && token.type != LiterateType.Comment) {
+            tokens ~= token;
+        }
+    }
+    
+    return tokens;
+}
+
 Nibble[] parseLiterate(T)(T str) {
+    import std.algorithm.mutation : strip, stripLeft, stripRight;
+    Nibble[] code;
+    Nibble[][string] aliases;
+    
+    Nibble[] aliasFor(uint index) {
+        // FEA0-FEBF
+        Nibble[] res = [0xF, 0xE, 0x0, 0x0];
+        res[2] = cast(Nibble)(0xA + index / 16);
+        res[3] = cast(Nibble)(index % 16);
+        assert(res[2] <= 0xB, "Out of room for aliases");
+        return res;
+    }
+    
+    import std.stdio;
+    Debugger.print("===== TOKENIZE DEBUG =====");
+    auto tokens = tokenizeLiterate(str)
+        // remove leading and trailing breaks
+        .strip!(a => a.type == LiterateType.Identifier && a.info.nibs == Info[InsName.Break].nibs)
+        // remove leading open parentheses
+        .stripLeft!(a => a.type == LiterateType.Identifier && a.info.nibs == Info[InsName.OpenParen].nibs)
+        // remove trailnig close parentheses
+        .stripRight!(a => a.type == LiterateType.Identifier && a.info.nibs == Info[InsName.CloseParen].nibs);
+        
+    foreach(i, tok; tokens) {
+        Debugger.print(i, ": ", tok);
+        final switch(tok.type) {
+            case LiterateType.Integer:
+                code ~= integerToNibbles(tok.head);
+                break;
+            
+            case LiterateType.Real:
+                code ~= realToNibbles(tok.head, tok.tail);
+                break;
+            
+            case LiterateType.String:
+                code ~= stringToNibbles(tok.str);
+                break;
+            
+            case LiterateType.KeyAccess:
+                code ~= Info[InsName.OpenParen].nibs;
+                code ~= stringToNibbles(tok.str);
+                code ~= Info[InsName.Bond].nibs;
+                code ~= Info[InsName.First].nibs;
+                code ~= Info[InsName.CloseParen].nibs;
+                break;
+                
+            case LiterateType.Identifier:
+                code ~= tok.info.nibs;
+                // TODO: assert two consecutive conjunctions do not exist
+                break;
+                
+            case LiterateType.Alias:
+                assert(tok.str in aliases, "Undefined alias: " ~ tok.str);
+                code ~= aliases[tok.str];
+                break;
+            
+            case LiterateType.AliasDefine:
+                uint index = aliases.length;
+                Nibble[] aliasCode = aliasFor(index);
+                aliases[tok.str] = aliasCode;
+                code ~= aliasCode;
+                break;
+            
+            case LiterateType.Unknown:
+            case LiterateType.Comment:
+            case LiterateType.Whitespace:
+                assert(0, "Unexpected token type passed through: " ~ tok.type.to!string);
+        }
+    }
+    Debugger.print("Nibbles: ", code.byteNibbleFmt);
+    Debugger.print("===== / TOKENIZE DEBUG =====");
+    return code;
+}
+
+// gonna keep this around for a bit, despite not being called
+// TODO: remove
+Nibble[] parseLiterateOld(T)(T str) {
     str = str.strip;
     Nibble[] code;
     Nibble[][string] aliases;
@@ -79,7 +406,7 @@ Nibble[] parseLiterate(T)(T str) {
             Debugger.print("---> Number");
             if(state == NiladParseState.LastWasNiladSeparator) {
                 code ~= 0x2;
-                assert(UseFilterSeparators, "Adjacent numbers forming a list is disabled.");
+                assert(0, "Adjacent numbers forming a list is disabled.");
             }
             BigInt parseNumber(bool reverse=false) {
                 int sign = 1;
@@ -116,7 +443,7 @@ Nibble[] parseLiterate(T)(T str) {
             // what else could two adjacent nilads indicate?
             if(state == NiladParseState.LastWasNiladSeparator) {
                 code ~= 0x2;
-                assert(UseFilterSeparators, "Adjacent numbers forming a list is disabled.");
+                assert(0, "Adjacent numbers forming a list is disabled.");
             }
             string build = "";
             i++;
