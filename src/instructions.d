@@ -423,8 +423,6 @@ Verb getVerb(InsName name) {
             .setDyad((l, r) => match!(
                 (a, b) => Atom(iota(a, b + 1).map!Atom.array),
                 (Atom[] a, Atom[] b) => Atom(arrayRange(a, b).map!Atom.array),
-                (a, Atom[] b) => Atom(duplicateEach(b, a)),
-                (Atom[] a, b) => Atom(duplicateEach(a, b)),
                 (string a, string b) => Atom(
                     arrayRange(a.atomOrds, b.atomOrds)
                     .map!atomUnords
@@ -464,6 +462,16 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             .setDyad((l, r) => match!(
+                // duplicate each
+                (Atom[] as, Atom[] bs) {
+                    Atom[] res;
+                    foreach(a, b; as.lockstep(bs)) {
+                        res ~= b.repeat(a.as!uint).array;
+                    }
+                    return Atom(res);
+                },
+                (a, Atom[] b) => Atom(duplicateEach(b, a)),
+                (Atom[] a, b) => Atom(duplicateEach(a, b)),
                 // Binomial
                 (a, b) => Atom(binomial(a, b)),
                 (_1, _2) => Nil.nilAtom,
