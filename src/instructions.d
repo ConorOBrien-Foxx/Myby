@@ -24,9 +24,9 @@ import myby.speech;
 
 enum InsName {
     Integer,                //0
+    ListLiteral,            //0A
     Real,                   //0B
     String,                 //1
-    ListLiteral,            //x2x
     Filter,                 //2
     Map,                    //3
     Add,                    //4

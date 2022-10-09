@@ -10,10 +10,10 @@ struct Token {
     SpeechPart speech;
     InsName name;
     union {
-        BigInt  big;
-        string  str;
-        real    dec;
-        Token[] arr;
+        BigInt   big;
+        string   str;
+        real     dec;
+        BigInt[] arr;
     };
     int index = -1;
     
@@ -38,7 +38,7 @@ struct Token {
                 addendum = str;
                 break;
             case InsName.ListLiteral:
-                addendum = arr.map!(a => a.toString()).join(", ");
+                addendum = arr.map!(to!string).join(", ");
                 break;
             case InsName.Real:
                 addendum = to!string(dec);

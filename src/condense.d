@@ -77,7 +77,8 @@ struct Condenser {
                     break;
                 
                 case InsName.ListLiteral:
-                    result = token.arr.map!(a => handleVerb(a, true)).array;
+                    result = token.arr.map!Atom.array;
+                    // result = token.arr.map!(a => handleVerb(a, true)).array;
                     break;
                 
                 default:

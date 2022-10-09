@@ -301,12 +301,27 @@ Nibble[] parseLiterate(T)(T str) {
         .stripLeft!(a => a.type == LiterateType.Identifier && a.info.nibs == Info[InsName.OpenParen].nibs)
         // remove trailnig close parentheses
         .stripRight!(a => a.type == LiterateType.Identifier && a.info.nibs == Info[InsName.CloseParen].nibs);
-        
-    foreach(i, tok; tokens) {
+    
+    uint i = 0;
+    while(i < tokens.length) {
+        auto tok = tokens[i];
         Debugger.print(i, ": ", tok);
         final switch(tok.type) {
             case LiterateType.Integer:
-                code ~= integerToNibbles(tok.head);
+                if(i + 1 < tokens.length && tokens[i + 1].type == LiterateType.Integer) {
+                    BigInt[] list = [];
+                    while(i < tokens.length && tokens[i].type == LiterateType.Integer) {
+                        list ~= tokens[i].head;
+                        i++;
+                    }
+                    i--;
+                    Debugger.print("List: ", list);
+                    Debugger.print("Code: ", numberListToNibbles(list));
+                    code ~= numberListToNibbles(list);
+                }
+                else {
+                    code ~= integerToNibbles(tok.head);
+                }
                 break;
             
             case LiterateType.Real:
@@ -347,6 +362,7 @@ Nibble[] parseLiterate(T)(T str) {
             case LiterateType.Whitespace:
                 assert(0, "Unexpected token type passed through: " ~ tok.type.to!string);
         }
+        i++;
     }
     Debugger.print("Nibbles: ", code.byteNibbleFmt);
     Debugger.print("===== / TOKENIZE DEBUG =====");

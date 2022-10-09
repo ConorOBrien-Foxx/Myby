@@ -30,12 +30,19 @@ Token[] tokenize(Nibble[] code) {
         Nibble nib = code[i];
         // reminder that nouns are just niladic verbs 
         if(nib == 0x0) {
-            // distinguish between doubles and ints
-            if(i + 1 < code.length && code[i + 1] == 0xB) {
+            // lists
+            if(i + 1 < code.length && code[i + 1] == 0xA) {
+                token.speech = SpeechPart.Verb;
+                token.name = InsName.ListLiteral;
+                token.arr = nibblesToNumberList(code, i);
+            }
+            // reals
+            else if(i + 1 < code.length && code[i + 1] == 0xB) {
                 token.speech = SpeechPart.Verb;
                 token.name = InsName.Real;
                 token.dec = nibblesToReal(code, i);
             }
+            // ints
             else {
                 token.speech = SpeechPart.Verb;
                 token.name = InsName.Integer;
@@ -106,14 +113,11 @@ Token[] tokenize(Nibble[] code) {
             }
             // we do not push this token, since it is just a literal
         }
-        else*/
-        if(lastWasNilad && token.isNilad) {
-            tokens[$ - 1].arr ~= token;
-        }
         else {
             lastWasNilad = token.isNilad;
-            tokens ~= token;
-        }
+        }*/
+        
+        tokens ~= token;
     }
     // list condensation step
     // Debugger.print(tokens);
@@ -359,11 +363,13 @@ class Interpreter {
                     break;
                 case SpeechPart.Adjective:
                     flushOpStack();
+                    /*
                     if(token.name == InsName.Filter && previousWasNilad) {
                         // the next verb is a FAKE verb, and should not affect
                         // the count of actual verbs
                         parenStackArity[$-1]--;
                     }
+                    */
                     stack ~= token;
                     break;
                 case SpeechPart.Conjunction:
