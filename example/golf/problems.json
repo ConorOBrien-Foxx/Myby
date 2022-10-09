@@ -94,11 +94,11 @@
         "id": 251594,
         "name": "find-the-nth-mersenne-prime",
         "tests": [
-            {"x":0, "result":3},
-            {"x":1, "result":7},
-            {"x":2, "result":31},
-            {"x":3, "result":127},
-            {"x":4, "result":8191}
+            {"x":1, "result":3},
+            {"x":2, "result":7},
+            {"x":3, "result":31},
+            {"x":4, "result":127},
+            {"x":5, "result":8191}
         ]
     },
     {

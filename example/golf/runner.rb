@@ -9,7 +9,7 @@ take = ARGV
 
 problems = JSON::parse File.read path
 problems.each.with_index { |problem, i|
-    next unless take.nil? || take.index(i.to_s)
+    next unless take.empty? || take.index(i.to_s)
     id = problem["id"]
     name = problem["name"]
     tests = problem["tests"]
