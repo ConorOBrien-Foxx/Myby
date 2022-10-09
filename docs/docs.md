@@ -566,7 +566,7 @@ NB.=> 0 0 0 0 0  0  0  0  0   0   0   0   0    0    1
 | Signature | Explanation |
 |----|----|
 | list → any; string → string | First element of |
-| number, list → any; number, string → string | `x`th element of `y`. (Implements modular indexing, i.e., wraps around. E.g., `_1{y` ⇔ `(#-1){y`.) |
+| number, list → any; number, string → string | `x`th element of `y`. (Implements modular indexing, i.e., wraps around. E.g., `_1{y` ⇔ `(+-1){y`.) |
 
 ### `}` - Last
 
