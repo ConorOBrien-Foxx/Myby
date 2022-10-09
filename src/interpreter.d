@@ -31,7 +31,8 @@ Token[] tokenize(Nibble[] code) {
         // reminder that nouns are just niladic verbs 
         if(nib == 0x0) {
             // lists
-            if(i + 1 < code.length && code[i + 1] == 0xA) {
+            if(i + 1 < code.length && code[i + 1] == 0xA
+            || i + 2 < code.length && code[i + 1] == 0xC && code[i + 2] >= 0xE) {
                 token.speech = SpeechPart.Verb;
                 token.name = InsName.ListLiteral;
                 token.arr = nibblesToNumberList(code, i);

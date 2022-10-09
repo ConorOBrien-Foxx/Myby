@@ -123,7 +123,7 @@ Nibble[] numberListToNibbles(T)(T[] ns) {
     }
     else {
         arr ~= [0xC, 0xF];
-        arr ~= integerToNibbles(ns.length);
+        arr ~= integerToNibbles(ns.length)[1..$];
         foreach(n; ns) {
             arr ~= integerToNibbles(n)[1..$];
         }
@@ -205,7 +205,8 @@ Nibble[] integerToNibbles(T)(T n) {
                 // TODO: figure out what this constant 0x119(281) is
                 // TODO: really actually do this, it depends on BaseConstants.length
                 // somehow. constant changed to 0x118(280).
-                targetIndex = n - 0x118;
+                // i guess i'll never do this. constant changed again to 0x115(277).
+                targetIndex = n - 0x115;
                 if(n > OneMillion) targetIndex--;
             }
             arr ~= 0xF;
@@ -247,8 +248,14 @@ BigInt nibblesToInteger(Nibble[] nibbles, ref uint i, bool isExtra = false) {
         assert(isExtra, "Cannot parse a real as an integer");
     }
     else if(nibbles[i] == 0xC) {
-        res = ExtraConstants[nibbles[++i]];
-        if(res == OneMillionPlaceholder) res = OneMillion;
+        auto next = nibbles[++i];
+        if(next < ExtraConstants.length) {
+            res = ExtraConstants[next];
+            if(res == OneMillionPlaceholder) res = OneMillion;
+        }
+        else if(next == 0xE || next == 0xF) {
+            assert(isExtra, "Cannot parse a list as an integer");
+        }
     }
     else if(nibbles[i] == 0xD) {
         int index = nibbles[++i] * 16 + nibbles[++i];
