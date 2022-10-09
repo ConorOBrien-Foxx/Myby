@@ -41,6 +41,7 @@ int main(string[] args) {
     bool jsonOutput;
     bool decompile;
     bool decompileAlign;
+    bool noCode;
     string outfile;
     string fpath;
     string code;
@@ -58,7 +59,8 @@ int main(string[] args) {
         "file|f", "Uses named file", &fpath,
         "execute|e", "Executes provided code", &code,
         "debug|d", "Prints debug information", &useDebug,
-        "runDebug|r", "Runtime debug information", &useRuntimeDebug,
+        "rundebug|r", "Runtime debug information", &useRuntimeDebug,
+        "nocode|x", "Prevents program execution", &noCode,
         "z", "temp", &temp
     );
     
@@ -189,6 +191,9 @@ int main(string[] args) {
             nibs = getNibbles(code);
         }
         writeln(toLiterateAligned(nibs));
+    }
+    
+    if(noCode) {
         return 0;
     }
     

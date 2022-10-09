@@ -197,6 +197,9 @@ string toLiterate(Nibble[] nibs, Token[] tokens) {
 
 alias LiterateBuilder = Tuple!(string[], "reps", string[], "joins");
 LiterateBuilder toLiterateBuilder(Nibble[] nibs, Token[] tokens) {
+    import std.algorithm.iteration : map;
+    import std.array : join;
+    
     string[] reps;
     string[] joins;
     reps.length = joins.length = tokens.length;
@@ -213,6 +216,11 @@ LiterateBuilder toLiterateBuilder(Nibble[] nibs, Token[] tokens) {
             switch(tok.name) {
                 case InsName.Integer:
                     reps[i] = tok.big.to!string;
+                    thisIsNumber = true;
+                    break;
+                
+                case InsName.ListLiteral:
+                    reps[i] = tok.arr.map!(to!string).join(" ");
                     thisIsNumber = true;
                     break;
                 
