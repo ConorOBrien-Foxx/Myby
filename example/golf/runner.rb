@@ -5,11 +5,12 @@ $MYBY = Gem.win_platform? ? '.\myby.exe' : './myby'
 base = File.dirname $0
 path = File.join base, "problems.json"
 
-take = ARGV
-
 problems = JSON::parse File.read path
+
+take = ARGV.map { |e| e.to_i % problems.size }
+
 problems.each.with_index { |problem, i|
-    next unless take.empty? || take.index(i.to_s)
+    next unless take.empty? || take.index(i)
     id = problem["id"]
     name = problem["name"]
     tests = problem["tests"]
@@ -31,6 +32,10 @@ problems.each.with_index { |problem, i|
         end
         # cmd = "#$MYBY -l #{codepath} #{args * " "}"
         cmd = [$MYBY, "-j", "-l", codepath, *args]
+        if list["f"]
+            cmd << "-f"
+            cmd << list["f"]
+        end
         stdout, stderr, status = Open3.capture3 *cmd
         stdout.chomp!
         failed = false

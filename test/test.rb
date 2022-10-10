@@ -48,6 +48,11 @@ tests = [
         output: "1.5\n",
         succeeds: true,
     },
+    *[*1..10, 20, 30, 50, 70, 1000, 1112, 2000, 3000, 4000, 900000, 1000000000].map { |n| {
+        input: "-l -e \"#{n}\"",
+        output: "#{n}\n",
+        succeeds: true,
+    } }
 ]
 
 def indent_all(str)
