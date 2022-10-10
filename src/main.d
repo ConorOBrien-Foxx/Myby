@@ -4,6 +4,7 @@ import std.algorithm.iteration : map;
 import std.array;
 import std.bigint;
 import std.getopt;
+import std.range : lockstep;
 import std.stdio;
 import std.sumtype;
 
@@ -45,6 +46,9 @@ int main(string[] args) {
     string outfile;
     string fpath;
     string code;
+    string fValue;
+    string gValue;
+    string hValue;
     bool temp;//todo:remove
     auto info = getoptSafeError(
         args,
@@ -56,11 +60,14 @@ int main(string[] args) {
         "alignuncompile|a", "Uncompile (decompile) and aligns compiled program", &decompileAlign,
         "outfile|o", "Outputs relevant data to specified file", &outfile,
         "literate|l", "Input source is a literate program", &literate,
-        "file|f", "Uses named file", &fpath,
+        "file|i", "Uses named file", &fpath,
         "execute|e", "Executes provided code", &code,
         "debug|d", "Prints debug information", &useDebug,
         "rundebug|r", "Runtime debug information", &useRuntimeDebug,
         "nocode|x", "Prevents program execution", &noCode,
+        "f", "Sets verb F:", &fValue,
+        "g", "Sets verb G:", &gValue,
+        "h", "Sets verb H:", &hValue,
         "z", "temp", &temp
     );
     
@@ -195,6 +202,18 @@ int main(string[] args) {
     
     if(noCode) {
         return 0;
+    }
+    
+    foreach(fv, fname; [fValue, gValue, hValue].lockstep([InsName.F, InsName.G, InsName.H])) {
+        if(fv) {
+            Interpreter fInt = new Interpreter(fv);
+            // ensure initialized
+            getVerb(fname);
+            // set definition
+            fInt.shunt;
+            Verb[] chains = fInt.condense;
+            verbs[fname] = chains[$ - 1];
+        }
     }
     
     Interpreter i;

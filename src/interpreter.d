@@ -309,6 +309,8 @@ Token[] autoCompleteParentheses(Token[] tokens) {
 class Interpreter {
     Nibble[] code;
     Token[] stack;
+    bool shunted;
+    
     this(Nibble[] c) {
         code = c;
     }
@@ -457,11 +459,14 @@ class Interpreter {
         flushOpStack();
         
         // writeln("Shunted : ", stack);
+        shunted = true;
     }
     
     Verb[] condense() {
         import std.range : split;
         import std.algorithm.iteration : each;
+        
+        assert(shunted, "Nothing to condense!");
         
         Debugger.print("Initial stack:");
         Debugger.print(stack);

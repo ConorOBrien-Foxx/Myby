@@ -113,6 +113,16 @@ enum InsName {
     InitialAlias,           //----
     DefinedAlias,           //FEA0-FEBF
     VerbDiagnostic,         //FEC0
+    F,                      //FED0
+    G,                      //FED1
+    H,                      //FED2
+    //FED3: maybe "n-th" verb
+    U,                      //FED4
+    V,                      //FED5
+    //FED6: maybe "n-th" adjective
+    C,                      //FED7
+    D,                      //FED8
+    //FED9: maybe "n-th" conjunction
     Break,                  //FF
     None,                   //----
 }
@@ -237,6 +247,15 @@ enum InsInfo[InsName] Info = [
     //FEA0-FEBF reserved for aliases
     //TODO: Conjunction/Adjective aliases?
     InsName.VerbDiagnostic:         InsInfo("?:",      0xFEC0,    SpeechPart.Adjective),
+    InsName.F:                      InsInfo("F:",      0xFED0,    SpeechPart.Verb),
+    InsName.G:                      InsInfo("G:",      0xFED1,    SpeechPart.Verb),
+    InsName.H:                      InsInfo("H:",      0xFED2,    SpeechPart.Verb),
+    //FED3: maybe "n-th" verb
+    InsName.U:                      InsInfo("U:",      0xFED4,    SpeechPart.Adjective),
+    InsName.V:                      InsInfo("V:",      0xFED5,    SpeechPart.Adjective),
+    //FED6: maybe "n-th" adjective
+    InsName.C:                      InsInfo("C:",      0xFED7,    SpeechPart.Conjunction),
+    InsName.D:                      InsInfo("D:",      0xFED8,    SpeechPart.Conjunction),
     InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
 ];
 
@@ -250,9 +269,8 @@ enum NameMap = Info.mapKeyValue!(NameInfo[int],
     (ref hash, k, v) => hash[v.code] = NameInfo(v.speech, k)
 );
 
+static Verb[InsName] verbs;
 Verb getVerb(InsName name) {
-    static Verb[InsName] verbs;
-    
     if(!verbs) {
         // TODO: this looks awful. clean it.
         // maybe: setMonad, setDyad?
@@ -914,6 +932,17 @@ Verb getVerb(InsName name) {
                 .setDyad((_1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
             )
+            .setMarkedArity(1);
+        
+        // f
+        verbs[InsName.F] = new Verb("F:")
+            .setMonad(_ => Nil.nilAtom)
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        // g
+        verbs[InsName.G] = new Verb("G:")
+            .setMonad(_ => Nil.nilAtom)
+            .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
         // Nilads
