@@ -416,6 +416,13 @@ Verb getVerb(InsName name) {
                     }
                     return Atom(res);
                 },
+                (string as, Atom[] bs) {
+                    string res;
+                    foreach(a, b; as.lockstep(bs)) {
+                        res ~= a.repeat(b.as!uint).joinToString;
+                    }
+                    return Atom(res);
+                },
                 /*
                 (Atom[] a, Atom[] b) => Atom(
                     zip(a, b)
@@ -502,6 +509,14 @@ Verb getVerb(InsName name) {
                 (a, b) => Atom(binomial(a, b)),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
+            .setInverse(new Verb("!!.")
+                .setMonad(a => a.match!(
+                    (Atom[] a) => Atom(a.map!(c => c.match!(c => atomFor(c[1]), _ => c)).array),
+                    _ => Nil.nilAtom,
+                ))
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+            )
             .setMarkedArity(2);
         
         verbs[InsName.First] = new Verb("{")
@@ -1148,10 +1163,25 @@ Adjective getAdjective(InsName name) {
                 .setChildren([v])
         );
         
-        // Generate
         adjectives[InsName.Generate] = new Adjective(
             (Verb v) => new Verb("G")
-                .setMonad((Verb v, a) => generate(v, a))
+                .setMonad((Verb v, a) => a.match!(
+                    // Sort By
+                    (Atom[] a) {
+                        // TODO: stable sort?
+                        Atom[] d = a.dup;
+                        if(v.markedArity == 2) {
+                            d.sort!((a, b) => v(a, b).truthiness);
+                        }
+                        else {
+                            // TODO: more efficient sort by algorithm
+                            d.sort!((a, b) => v(a) < v(b));
+                        }
+                        return Atom(d);
+                    },
+                    // Generate
+                    _ => generate(v, a)
+                ))
                 .setDyad((Verb v, a, n) => generate(v, a, n))
                 .setMarkedArity(1)
                 .setChildren([v])
