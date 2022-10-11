@@ -1168,14 +1168,14 @@ Adjective getAdjective(InsName name) {
                 .setMonad((Verb v, a) => a.match!(
                     // Sort By
                     (Atom[] a) {
-                        // TODO: stable sort?
+                        import std.algorithm.mutation : SwapStrategy;
                         Atom[] d = a.dup;
                         if(v.markedArity == 2) {
-                            d.sort!((a, b) => v(a, b).truthiness);
+                            d.sort!((a, b) => v(a, b).truthiness, SwapStrategy.stable);
                         }
                         else {
                             // TODO: more efficient sort by algorithm
-                            d.sort!((a, b) => v(a) < v(b));
+                            d.sort!((a, b) => v(a) < v(b), SwapStrategy.stable);
                         }
                         return Atom(d);
                     },
