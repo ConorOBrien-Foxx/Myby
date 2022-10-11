@@ -409,12 +409,20 @@ Verb getVerb(InsName name) {
                 (a, Atom[] b) => Atom(reshape(b, a)),
                 (string a, b) => Atom(reshape(a.atomChars, b).joinToString),
                 (a, string b) => Atom(reshape(b.atomChars, a).joinToString),
+                (Atom[] as, Atom[] bs) {
+                    Atom[] res;
+                    foreach(a, b; as.lockstep(bs)) {
+                        res ~= a.repeat(b.as!uint).array;
+                    }
+                    return Atom(res);
+                },
+                /*
                 (Atom[] a, Atom[] b) => Atom(
                     zip(a, b)
                         .filter!(t => t[1].truthiness)
                         .map!(t => t[0])
                         .array
-                ),
+                ),*/
                 (a, b) => Atom(reshape([atomFor(b)], a)),
                 (_1, _2) => Nil.nilAtom,
             )(a, b))
