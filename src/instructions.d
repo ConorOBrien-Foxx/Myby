@@ -1112,6 +1112,9 @@ Adjective getAdjective(InsName name) {
                         import std.math.rounding;
                         bool discrete = a < 0;
                         uint n = (discrete ? -a : a).to!uint;
+                        if(arr.length < n) {
+                            return Atom(cast(Atom[]) []);
+                        }
                         if(discrete) {
                             uint size = 
                                 ceil(1.0 * arr.length / n).to!uint;

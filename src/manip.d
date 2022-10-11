@@ -180,7 +180,7 @@ Verb foldFor(Verb v) {
         // find a way to eliminate it
         Debugger.print("Reducing: ", arr);
         
-        Atom id = v.getIdentity(arr.empty ? Nil.nilAtom : arr.front);
+        Atom id = v.getIdentity(arr);
         return id.isNil
             ? arr.reduce!v
             : reduce!v(id, arr);
@@ -190,8 +190,7 @@ Verb foldFor(Verb v) {
             (Atom[] arr) {
                 Debugger.print("Fold for  ", v);
                 Debugger.print("Identity: ", v.identity);
-                Debugger.print("Head id:  ",
-                    v.getIdentity(arr.empty ? Nil.nilAtom : arr[0]));
+                Debugger.print("Head id:  ", v.getIdentity(arr));
                 Debugger.print("Array:    ", arr);
                 return reduceHelper(v, arr);
             },

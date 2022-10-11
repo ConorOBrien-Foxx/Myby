@@ -730,6 +730,10 @@ class Verb {
         }
     }
     
+    Atom getIdentity(T)(T arr) {
+        return getIdentity(arr.empty ? Nil.nilAtom : arr.front);
+    }
+    
     Atom monadic(Atom a) {
         return executeMonadic(monad, a);
     }
