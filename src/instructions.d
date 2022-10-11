@@ -291,7 +291,11 @@ Verb getVerb(InsName name) {
                 .setDyad((a, b) => a - b)
                 .setMarkedArity(2) // TODO: check if this is a bad idea
             )
-            .setIdentity(Atom(BigInt(0)))
+            .setIdentity(a => a.match!(
+                (Atom[] _) => Atom(cast(Atom[]) []),
+                (string _) => Atom(""),
+                _ => Atom(BigInt(0))
+            ))
             .setMarkedArity(2);
         
         verbs[InsName.Subtract] = new Verb("-")

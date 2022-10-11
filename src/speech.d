@@ -513,8 +513,10 @@ class Verb {
     uint markedArity = 2;
     bool niladic = false;
     bool inferSelf = true;
+    bool hasIdentityFn = false;
     Atom rangeStart = BigInt(0);
     Atom identity;
+    VerbMonad identityFn;
     Verb[] children;
     //!!!! NOTE: ADD ANY PROPERTY ADDED TO .dup !!!!
     
@@ -533,8 +535,10 @@ class Verb {
         res.niladic = niladic;
         res.inferSelf = inferSelf;
         res.markedArity = markedArity;
+        res.hasIdentityFn = hasIdentityFn;
         res.rangeStart = rangeStart;
         res.identity = identity;
+        res.identityFn = identityFn;
         // TODO: this might need to be called recursively
         res.children = children.map!(a => a.dup).array;
         // res.setChains(info);
@@ -679,6 +683,12 @@ class Verb {
     }
     Verb setIdentity(Atom i) {
         identity = i;//todo: clone?
+        hasIdentityFn = false;
+        return this;
+    }
+    Verb setIdentity(VerbMonadSimple vms) {
+        identityFn = vms;
+        hasIdentityFn = true;
         return this;
     }
     Verb setRangeStart(T)(T rs) {
@@ -700,8 +710,8 @@ class Verb {
         // */
     }
     
-    Atom monadic(Atom a) {
-        return monad.match!(
+    Atom executeMonadic(VerbMonad m, Atom a) {
+        return m.match!(
             f => f(children, a),
             f => f(children[0], children[1], a),
             f => children.length && inferSelf
@@ -709,6 +719,19 @@ class Verb {
                 : f(this, a),
             f => f(a)
         );
+    }
+    
+    Atom getIdentity(Atom a) {
+        if(hasIdentityFn) {
+            return executeMonadic(identityFn, a);
+        }
+        else {
+            return identity;
+        }
+    }
+    
+    Atom monadic(Atom a) {
+        return executeMonadic(monad, a);
     }
     
     Atom dyadic(Atom a, Atom b) {

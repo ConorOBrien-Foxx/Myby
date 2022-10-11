@@ -179,15 +179,19 @@ Verb foldFor(Verb v) {
         // TODO: I don't like that this conditional is checked every time
         // find a way to eliminate it
         Debugger.print("Reducing: ", arr);
-        return v.identity.isNil || !arr.empty
+        
+        Atom id = v.getIdentity(arr.empty ? Nil.nilAtom : arr.front);
+        return id.isNil
             ? arr.reduce!v
-            : reduce!v(v.identity, arr);
+            : reduce!v(id, arr);
     }
     return new Verb("₂\\")
         .setMonad((Verb v, a) => a.match!(
             (Atom[] arr) {
                 Debugger.print("Fold for  ", v);
                 Debugger.print("Identity: ", v.identity);
+                Debugger.print("Head id:  ",
+                    v.getIdentity(arr.empty ? Nil.nilAtom : arr[0]));
                 Debugger.print("Array:    ", arr);
                 return reduceHelper(v, arr);
             },
