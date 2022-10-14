@@ -199,7 +199,7 @@ string toLiterate(Nibble[] nibs, Token[] tokens) {
 alias LiterateBuilder = Tuple!(string[], "reps", string[], "joins");
 LiterateBuilder toLiterateBuilder(Nibble[] nibs, Token[] tokens) {
     import std.algorithm.iteration : map;
-    import std.array : join;
+    import std.array : join, replace;
     
     string[] reps;
     string[] joins;
@@ -226,8 +226,11 @@ LiterateBuilder toLiterateBuilder(Nibble[] nibs, Token[] tokens) {
                     break;
                 
                 case InsName.String:
-                    // TODO: escape
-                    reps[i] = "'" ~ tok.str.to!string ~ "'";
+                    // TODO: escape more
+                    reps[i] = "'" ~ tok.str.to!string
+                        .replace("\n", "\\n")
+                        .replace("'", "''")
+                        ~ "'";
                     break;
                 
                 default:

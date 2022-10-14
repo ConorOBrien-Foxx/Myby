@@ -36,7 +36,7 @@ enum InsName {
     UniqPrimeFactorsCount, PreviousPrime, NextPrime, FirstNPrimes,
     PrimesBelow, PrimesBelowCount, Benil, Memoize, Keep, Loop, BLoop, While,
     Time, InitialAlias, DefinedAlias, VerbDiagnostic, F, G, H, U, V, C, D,
-    Break, Gerund,
+    Break, Gerund, LineFeed,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -62,6 +62,8 @@ struct InsInfo {
 enum InsInfo[InsName] Info = [
     // Integer: 0
     // String: 1
+    InsName.LineFeed:               InsInfo("lf",      0x12,      SpeechPart.Verb),
+    // Instructions: 2-F
     InsName.Filter:                 InsInfo("\\",      0x2,       SpeechPart.Adjective),
     InsName.Map:                    InsInfo("\"",      0x3,       SpeechPart.Adjective),
     InsName.Add:                    InsInfo("+",       0x4,       SpeechPart.Verb),
