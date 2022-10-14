@@ -66,12 +66,13 @@ Nibble[] toBase16(T)(T n) {
     return digits.reverse;
 }
 
+enum PadCharacter = 0xB;
 int[] nibbleToCharCodes(Nibble[] arr) {
     import std.range : chunks;
     int[] result = [];
     foreach(pair; arr.chunks(2)) {
         int sum = pair[0] * 16;
-        sum += pair.length == 1 ? 0xB : pair[1];
+        sum += pair.length == 1 ? PadCharacter : pair[1];
         result ~= sum;
     }
     return result;

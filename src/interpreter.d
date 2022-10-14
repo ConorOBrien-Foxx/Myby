@@ -2,7 +2,7 @@ module myby.interpreter;
 
 import std.bigint;
 import std.conv : to;
-import std.range : back, popBack, popBackN;
+import std.range : back, popBack, popBackN, split;
 import std.typecons;
 
 import myby.condense;
@@ -270,6 +270,23 @@ bool isMain(SpeechPart speech) {
 }
 
 Token[] autoCompleteParentheses(Token[] tokens) {
+    import std.algorithm.mutation : stripRight;
+    tokens = tokens.stripRight!(a => a.name == InsName.OpenParen);
+    import std.algorithm.iteration : filter;
+    Token[] res;
+    auto breaks = tokens.filter!(a => a.name == InsName.Break);
+    foreach(line; tokens.split!(a => a.name == InsName.Break)) {
+        res ~= autoCompleteParenthesesLine(line);
+        if(!breaks.empty) {
+            res ~= breaks.front;
+            breaks.popFront;
+        }
+    }
+    Debugger.print(res);
+    return res;
+}
+
+Token[] autoCompleteParenthesesLine(Token[] tokens) {
     int balance = 0;
     int openMatch = 0;
     foreach(token; tokens) {
@@ -319,6 +336,7 @@ class Interpreter {
         this(str.parseLiterate);
     }
     
+    // TODO: trim right padding ) and left padding (?
     void shunt() {
         Token[] opStack;
         uint[] parenStackArity = [0];
@@ -416,7 +434,7 @@ class Interpreter {
                             
                         case InsName.CloseParen:
                             // TODO: exploit behavior?
-                            assert(parenStackArity.length, "Close parenthesis without open parenthesis");
+                            // assert(parenStackArity.length, "Close parenthesis without open parenthesis");
                             uint count = parenStackArity.back;
                             parenStackArity.popBack;
                             flushOpStack();
@@ -426,7 +444,10 @@ class Interpreter {
                                 InsName.CloseParen,
                                 BigInt(count)
                             );
-                            parenStackArity[$-1]++;
+                            // no-op if nothing left
+                            if(parenStackArity.length > 0) {
+                                parenStackArity[$-1]++;
+                            }
                             break;
                             
                         case InsName.Break:
@@ -463,7 +484,6 @@ class Interpreter {
     }
     
     Verb[] condense() {
-        import std.range : split;
         import std.algorithm.iteration : each;
         
         assert(shunted, "Nothing to condense!");

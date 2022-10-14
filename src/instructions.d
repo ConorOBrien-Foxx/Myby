@@ -23,108 +23,20 @@ import myby.prime;
 import myby.speech;
 
 enum InsName {
-    Integer,                //0
-    ListLiteral,            //0A
-    Real,                   //0B
-    String,                 //1
-    Filter,                 //2
-    Map,                    //3
-    Add,                    //4
-    Subtract,               //5
-    Multiply,               //6
-    Divide,                 //7
-    Exponentiate,           //8
-    Identity,               //9
-    Bond,                   //A
-    OnPrefixes,             //AA
-    OnSuffixes,             //AC
-    SplitCompose,           //AD
-    OpenParen,              //B
-    ArityForce,             //BA
-    Vectorize,              //BC
-    Reflex,                 //BD
-    CloseParen,             //C
-    Compose,                //D
-    Under,                  //DA
-    Hook,                   //DC
-    MonadChain,             //DD
-    Range,                  //E
-    Modulus,                //F0
-    LastChain,              //F10
-    ThisChain,              //F11
-    NextChain,              //F12
-    NthChain,               //F13
-    Diagonal,               //F14
-    Oblique,                //F15
-    Ternary,                //F16
-    Minimum,                //F17
-    Maximum,                //F18
-    OnLeft,                 //F19
-    OnRight,                //F1A
-    Generate,               //F1B
-    Inverse,                //F1C
-    Power,                  //F1D
-    Print,                  //F1E
-    Scan,                   //F1F
-    Link,                   //F2
-    Binomial,               //F3
-    Equality,               //F4
-    LessThan,               //F5
-    GreaterThan,            //F6
-    MemberIn,               //F7
-    First,                  //F8
-    Last,                   //F9
-    LessEqual,              //FA
-    GreaterEqual,           //FB
-    Inequality,             //FC
-    Pair,                   //FD
-    Exit,                   //FE00
-    Put,                    //FE01
-    Putch,                  //FE02
-    Getch,                  //FE03
-    Empty,                  //FE40
-    Ascii,                  //FE41
-    Alpha,                  //FE42
-    ToJSON,                 //FE50
-    FromJSON,               //FE51
-    ReadFile,               //FE52
-    WriteFile,              //FE53
-    DigitRange,             //FE60
-    Place,                  //FE61
-    Hash,                   //FE62
-    NthPrime,               //FE70
-    IsPrime,                //FE71
-    PrimeFactors,           //FE72
-    PrimeFactorsCount,      //FE73
-    UniqPrimeFactors,       //FE74
-    UniqPrimeFactorsCount,  //FE75
-    PreviousPrime,          //FE76
-    NextPrime,              //FE77
-    FirstNPrimes,           //FE78
-    PrimesBelow,            //FE79
-    PrimesBelowCount,       //FE7A
-    Benil,                  //FE80
-    Memoize,                //FE81
-    Keep,                   //FE82
-    Loop,                   //FE83
-    BLoop,                  //FE84
-    While,                  //FE85
-    Time,                   //FE86
-    InitialAlias,           //----
-    DefinedAlias,           //FEA0-FEBF
-    VerbDiagnostic,         //FEC0
-    F,                      //FED0
-    G,                      //FED1
-    H,                      //FED2
-    //FED3: maybe "n-th" verb
-    U,                      //FED4
-    V,                      //FED5
-    //FED6: maybe "n-th" adjective
-    C,                      //FED7
-    D,                      //FED8
-    //FED9: maybe "n-th" conjunction
-    Break,                  //FF
-    None,                   //----
+    Integer, ListLiteral, Real, String, Filter, Map, Add, Subtract, Multiply,
+    Divide, Exponentiate, Identity, Bond, OnPrefixes, OnSuffixes,
+    SplitCompose, OpenParen, ArityForce, Vectorize, Reflex, CloseParen,
+    Compose, Under, Hook, MonadChain, Range, Modulus, LastChain, ThisChain,
+    Link, Diagonal, Oblique, Ternary, Minimum, Maximum, OnLeft, OnRight,
+    Generate, Inverse, Power, Print, Scan, Pad, Binomial, Equality, LessThan,
+    GreaterThan, MemberIn, First, Last, LessEqual, GreaterEqual, Inequality,
+    Pair, NextChain, NthChain, Exit, Put, Putch, Getch, Empty, Ascii, Alpha,
+    ToJSON, FromJSON, ReadFile, WriteFile, DigitRange, Place, Hash, NthPrime,
+    IsPrime, PrimeFactors, PrimeFactorsCount, UniqPrimeFactors,
+    UniqPrimeFactorsCount, PreviousPrime, NextPrime, FirstNPrimes,
+    PrimesBelow, PrimesBelowCount, Benil, Memoize, Keep, Loop, BLoop, While,
+    Time, InitialAlias, DefinedAlias, VerbDiagnostic, F, G, H, U, V, C, D,
+    Break, None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
 
@@ -185,8 +97,8 @@ enum InsInfo[InsName] Info = [
     InsName.Modulus:                InsInfo("%",       0xF0,      SpeechPart.Verb),
     InsName.LastChain:              InsInfo("$^",      0xF10,     SpeechPart.Verb),
     InsName.ThisChain:              InsInfo("$:",      0xF11,     SpeechPart.Verb),
-    InsName.NextChain:              InsInfo("$v",      0xF12,     SpeechPart.Verb),
-    InsName.NthChain:               InsInfo("$N",      0xF13,     SpeechPart.Adjective),
+    InsName.Link:                   InsInfo(";",       0xF12,     SpeechPart.Verb),
+    //F13
     InsName.Diagonal:               InsInfo("/:",      0xF14,     SpeechPart.Adjective),
     InsName.Oblique:                InsInfo("/.",      0xF15,     SpeechPart.Adjective),
     InsName.Ternary:                InsInfo("?",       0xF16,     SpeechPart.MultiConjunction),
@@ -199,7 +111,7 @@ enum InsInfo[InsName] Info = [
     InsName.Power:                  InsInfo("^:",      0xF1D,     SpeechPart.Conjunction),
     InsName.Print:                  InsInfo("echo",    0xF1E,     SpeechPart.Verb),
     InsName.Scan:                   InsInfo("\\..",    0xF1F,     SpeechPart.Conjunction),
-    InsName.Link:                   InsInfo(";",       0xF2,      SpeechPart.Verb),
+    InsName.Pad:                    InsInfo("P",       0xF2,      SpeechPart.Verb),
     InsName.Binomial:               InsInfo("!",       0xF3,      SpeechPart.Verb),
     InsName.Equality:               InsInfo("=",       0xF4,      SpeechPart.Verb),
     InsName.LessThan:               InsInfo("<",       0xF5,      SpeechPart.Verb),
@@ -211,20 +123,27 @@ enum InsInfo[InsName] Info = [
     InsName.GreaterEqual:           InsInfo(">:",      0xFB,      SpeechPart.Verb),
     InsName.Inequality:             InsInfo("~:",      0xFC,      SpeechPart.Verb),
     InsName.Pair:                   InsInfo(",",       0xFD,      SpeechPart.Verb),
+    ////FE0* - I/O////
     InsName.Exit:                   InsInfo("exit",    0xFE00,    SpeechPart.Verb),
     InsName.Put:                    InsInfo("put",     0xFE01,    SpeechPart.Verb),
     InsName.Putch:                  InsInfo("putch",   0xFE02,    SpeechPart.Verb),
     InsName.Getch:                  InsInfo("getch",   0xFE03,    SpeechPart.Verb),
+    InsName.ToJSON:                 InsInfo("json",    0xFE04,    SpeechPart.Verb),
+    InsName.FromJSON:               InsInfo("unjson",  0xFE05,    SpeechPart.Verb),
+    InsName.ReadFile:               InsInfo("read",    0xFE06,    SpeechPart.Verb),
+    InsName.WriteFile:              InsInfo("write",   0xFE07,    SpeechPart.Verb),
+    ////FE1* - reflection////
+    InsName.NextChain:              InsInfo("$v",      0xFE10,    SpeechPart.Verb),
+    InsName.NthChain:               InsInfo("$N",      0xFE11,    SpeechPart.Adjective),
+    ////FE4* - constants////
     InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
     InsName.Ascii:                  InsInfo("A",       0xFE41,    SpeechPart.Verb),
     InsName.Alpha:                  InsInfo("L",       0xFE42,    SpeechPart.Verb),
-    InsName.ToJSON:                 InsInfo("json",    0xFE50,    SpeechPart.Verb),
-    InsName.FromJSON:               InsInfo("unjson",  0xFE51,    SpeechPart.Verb),
-    InsName.ReadFile:               InsInfo("read",    0xFE52,    SpeechPart.Verb),
-    InsName.WriteFile:              InsInfo("write",   0xFE53,    SpeechPart.Verb),
+    ////FE6* - range////
     InsName.DigitRange:             InsInfo("R:",      0xFE60,    SpeechPart.Verb),
     InsName.Place:                  InsInfo("place",   0xFE61,    SpeechPart.Verb),
     InsName.Hash:                   InsInfo("hash",    0xFE62,    SpeechPart.Verb),
+    ////FE7* - primes
     InsName.NthPrime:               InsInfo("primn",   0xFE70,    SpeechPart.Verb),
     InsName.IsPrime:                InsInfo("primq",   0xFE71,    SpeechPart.Verb),
     InsName.PrimeFactors:           InsInfo("primf",   0xFE72,    SpeechPart.Verb),
@@ -236,6 +155,7 @@ enum InsInfo[InsName] Info = [
     InsName.FirstNPrimes:           InsInfo("prims",   0xFE78,    SpeechPart.Verb),
     InsName.PrimesBelow:            InsInfo("primb",   0xFE79,    SpeechPart.Verb),
     InsName.PrimesBelowCount:       InsInfo("primbo",  0xFE7A,    SpeechPart.Verb),
+    ////FE8* - advanced adj/conj////
     InsName.Benil:                  InsInfo("benil",   0xFE80,    SpeechPart.Adjective),
     InsName.Memoize:                InsInfo("M.",      0xFE81,    SpeechPart.Adjective),
     InsName.Keep:                   InsInfo("keep",    0xFE82,    SpeechPart.Adjective),
@@ -243,10 +163,11 @@ enum InsInfo[InsName] Info = [
     InsName.BLoop:                  InsInfo("bloop",   0xFE84,    SpeechPart.Conjunction),
     InsName.While:                  InsInfo("while",   0xFE85,    SpeechPart.Conjunction),
     InsName.Time:                   InsInfo("T.",      0xFE86,    SpeechPart.Adjective),
-    InsName.DefinedAlias:           InsInfo("(n/a)",   0xFEA0,    SpeechPart.Verb),
+    InsName.VerbDiagnostic:         InsInfo("?:",      0xFE87,    SpeechPart.Adjective),
     //FEA0-FEBF reserved for aliases
+    InsName.DefinedAlias:           InsInfo("(n/a)",   0xFEA0,    SpeechPart.Verb),
     //TODO: Conjunction/Adjective aliases?
-    InsName.VerbDiagnostic:         InsInfo("?:",      0xFEC0,    SpeechPart.Adjective),
+    ////FED* - high order I/O////
     InsName.F:                      InsInfo("F:",      0xFED0,    SpeechPart.Verb),
     InsName.G:                      InsInfo("G:",      0xFED1,    SpeechPart.Verb),
     InsName.H:                      InsInfo("H:",      0xFED2,    SpeechPart.Verb),
@@ -469,6 +390,24 @@ Verb getVerb(InsName name) {
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(1);
+            
+        verbs[InsName.Pad] = new Verb("P")
+            .setMonad(a => a.match!(
+                (Atom[] a) {
+                    uint longest = a.map!(e => e.match!(c => c.length, _ => 0u)).maxElement;
+                    return Atom(a.map!(
+                        row => verbs[InsName.Pad](row, longest)
+                    ).array);
+                },
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((a, b) => match!(
+                (a, Atom[] b) => Atom(padLeftInfer(b, atomFor(a))),
+                (Atom[] a, b) => Atom(padRightInfer(a, atomFor(b))),
+                (a, string b) => Atom(padLeftInfer(b.atomChars, atomFor(a)).joinToString),
+                (string a, b) => Atom(padRightInfer(a.atomChars, atomFor(b)).joinToString),
+                (_1, _2) => Nil.nilAtom
+            )(a, b));
         
         verbs[InsName.Link] = new Verb(";")
             // Wrap
@@ -614,6 +553,8 @@ Verb getVerb(InsName name) {
             // Single Join
             .setMonad(a => a.match!(
                 (Atom[] a) => Atom(a.joinToString),
+                // Ords
+                (string s) => Atom(s.map!(e => Atom(BigInt(cast(long) e))).array),
                 _ => Nil.nilAtom,
             ))
             // Greater than
@@ -1108,35 +1049,16 @@ Adjective getAdjective(InsName name) {
                 ))
                 .setDyad((Verb v, a, b) => match!(
                     // slices
-                    (BigInt a, Atom[] arr) {
-                        import std.math.rounding;
-                        bool discrete = a < 0;
-                        uint n = (discrete ? -a : a).to!uint;
-                        if(arr.length < n) {
-                            return Atom(cast(Atom[]) []);
-                        }
-                        if(discrete) {
-                            uint size = 
-                                ceil(1.0 * arr.length / n).to!uint;
-                            return Atom(
-                                iota(size)
-                                    .map!(i => i * n)
-                                    .map!(i => arr[i..min($, i + n)])
-                                    .map!Atom
-                                    .map!v
-                                    .array
-                            );
-                        }
-                        else {
-                            return Atom(
-                                iota(arr.length + 1 - n)
-                                    .map!(i => arr[i..i + n])
-                                    .map!Atom
-                                    .map!v
-                                    .array
-                            );
-                        }
-                    },
+                    (BigInt a, Atom[] arr) => Atom(slicesOf(v, a, arr)),
+                    (BigInt a, string s) => Atom(
+                        slicesOf(v, a, s.atomChars)
+                            .map!(slice => slice.match!(
+                                a => a.joinToString,
+                                x => to!string(x),
+                            ))
+                            .map!Atom
+                            .array
+                        ),
                     (_1, _2) => Nil.nilAtom,
                 )(a, b))
                 .setMarkedArity(1)
@@ -1663,7 +1585,8 @@ MultiConjunction getMultiConjunction(InsName name) {
                 return new Verb("H")
                     .setMonad((Verb[] verbs, a) => verbs[0](a, verbs[1](a)))
                     .setDyad((Verb[] verbs, x, y) =>
-                        verbs[0](x, verbs[1].markedArity == 1 ? verbs[1](y) : verbs[1](x, y))
+                        verbs[0](x, verbs[1](y))
+                        // verbs[0](x, verbs[1].markedArity == 1 ? verbs[1](y) : verbs[1](x, y))
                     )
                     .setMarkedArity(2)
                     .setChildren(verbs);

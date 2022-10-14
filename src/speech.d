@@ -371,8 +371,6 @@ struct Atom {
             // index of 
             (Atom[] a, b) => Atom(BigInt(a.countUntil(atomFor(b)))),
             (string a, string b) => Atom(BigInt(a.countUntil(b))),
-            // left pad
-            (a, Atom[] b) => Atom(padLeftInfer(b, atomFor(a))),
             (_1, _2) => Nil.nilAtom,
         )(this, rhs);
     }

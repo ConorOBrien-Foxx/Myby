@@ -518,6 +518,15 @@ Atom[] padLeftInfer(Atom[] arr, Atom by) {
     return arr;
 }
 
+Atom[] padRightInfer(Atom[] arr, Atom by) {
+    Atom padWith = blankFor(atomFor(arr));
+    uint max = by.as!uint;
+    while(arr.length < max) {
+        arr ~= padWith;
+    }
+    return arr;
+}
+
 Atom[] multisetDifference(Atom[] as, Atom[] bs) {
     import std.bitmanip;
     BitArray amask, bmask;
@@ -568,4 +577,30 @@ Atom generate(Verb v, Atom x, Atom n) {
         }
     }
     return args[0];
+}
+
+Atom[] slicesOf(N)(Verb v, N a, Atom[] arr) {
+    import std.math.rounding;
+    bool discrete = a < 0;
+    uint n = (discrete ? -a : a).to!uint;
+    if(arr.length < n) {
+        return [];
+    }
+    if(discrete) {
+        uint size = 
+            ceil(1.0 * arr.length / n).to!uint;
+        return iota(size)
+            .map!(i => i * n)
+            .map!(i => arr[i..min($, i + n)])
+            .map!Atom
+            .map!v
+            .array;
+    }
+    else {
+        return iota(arr.length + 1 - n)
+            .map!(i => arr[i..i + n])
+            .map!Atom
+            .map!v
+            .array;
+    }
 }
