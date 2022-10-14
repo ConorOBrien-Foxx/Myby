@@ -885,8 +885,12 @@ class Verb {
             nextChildren ~= g;
         }
         return new Verb(":")
-            .setMonad(_ => Nil.nilAtom)
-            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMonad((Verb[] verbs, a) =>
+                Atom(verbs.map!(v => v(a)).array)
+            )
+            .setDyad((Verb[] verbs, x, y) =>
+                Atom(verbs.map!(v => v(x, y)).array)
+            )
             .setMarkedArity(2)
             .setChildren(nextChildren)
             .setRangeStart(nextChildren[0].rangeStart)
