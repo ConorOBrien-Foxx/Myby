@@ -181,9 +181,23 @@ Verb foldFor(Verb v) {
         Debugger.print("Reducing: ", arr);
         
         Atom id = v.getIdentity(arr);
-        return id.isNil
-            ? arr.reduce!v
-            : reduce!v(id, arr);
+        if(v.isGerund) {
+            Debugger.print("Gerund detected");
+            auto en = arr.enumerate();
+            alias IndexValue = typeof(en.front);
+            return id.isNil
+                ? en.reduce!((p, c) =>
+                    IndexValue(p.index, v.gerund(c.index, p.value, c.value))
+                ).value
+                : reduce!((p, c) =>
+                    v.gerund(c.index ? c.index - 1 : c.index, p, c.value)
+                )(id, en);
+        }
+        else {
+            return id.isNil
+                ? arr.reduce!v
+                : reduce!v(id, arr);
+        }
     }
     return new Verb("₂\\")
         .setMonad((Verb v, a) => a.match!(
@@ -218,27 +232,6 @@ Verb foldFor(Verb v) {
         )(a, b))
         .setMarkedArity(1)
         .setChildren([v]);
-}
-
-Verb powerFor(Verb f, Verb g) {
-    return new Verb("^:")
-        .setMonad((f, g, a) {
-            Atom times = g(a);
-            return times.match!(
-                (Infinity i) => assert(0, "TODO: Fixpoint"),
-                (n) {
-                    assert(n >= 0, "TODO: Negative (inverse) repetition");
-                    for(typeof(n) i = 0; i < n; i++) {
-                        a = f(a);
-                    }
-                    return a;
-                },
-                _ => Nil.nilAtom,
-            );
-        })
-        .setDyad((f, g, _1, _2) => Nil.nilAtom)
-        .setMarkedArity(1)
-        .setChildren([f, g]);
 }
 
 Atom[] nub(Atom[] a) {
@@ -603,4 +596,12 @@ Atom[] slicesOf(N)(Verb v, N a, Atom[] arr) {
             .map!v
             .array;
     }
+}
+
+Atom[] mapVerb(Verb v, Atom[] arr) {
+    return v.isGerund
+        ? arr.enumerate()
+            .map!(t => v.gerund(t.index, t.value))
+            .array
+        : arr.map!v.array;
 }

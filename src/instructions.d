@@ -36,7 +36,8 @@ enum InsName {
     UniqPrimeFactorsCount, PreviousPrime, NextPrime, FirstNPrimes,
     PrimesBelow, PrimesBelowCount, Benil, Memoize, Keep, Loop, BLoop, While,
     Time, InitialAlias, DefinedAlias, VerbDiagnostic, F, G, H, U, V, C, D,
-    Break, None,
+    Break, Gerund,
+    None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
 
@@ -74,13 +75,14 @@ enum InsInfo[InsName] Info = [
     InsName.OnPrefixes:             InsInfo("\\.",     0xAA,      SpeechPart.Adjective),
     // AC: `&)` has no meanings
     InsName.OnSuffixes:             InsInfo("\\:",     0xAC,      SpeechPart.Adjective),
-    // AD: `&D` has no meaning
+    // AD: `&@` has no meaning
     InsName.SplitCompose:           InsInfo("O",       0xAD,      SpeechPart.MultiConjunction),
     // Unassigned (maybe): ADAD/ACAC/etc
     InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
     // Unassigned *AND* Unimplemented: B2 `(\` and B3 `("`
+    InsName.Gerund:                 InsInfo("`",       0xB2,      SpeechPart.Conjunction),
     // BA: `(` followed by A... (A `&` AA `\.` AC `\: AD `O`) has no meaning
-    InsName.ArityForce:             InsInfo("`",       0xBA,      SpeechPart.Adjective),
+    InsName.ArityForce:             InsInfo("`:",      0xBA,      SpeechPart.Adjective),
     // BC: `()` has no meaning
     InsName.Vectorize:              InsInfo("V",       0xBC,      SpeechPart.Adjective),
     // BD: `(` followed by D... (D `@` DA `&.` DD `@.`) has no meaning
@@ -960,17 +962,8 @@ Adjective getAdjective(InsName name) {
             (Verb v) => new Verb("\"")
                 // map
                 .setMonad((Verb v, a) => a.match!(
-                    (Atom[] arr) => Atom(arr.map!v.array),
-                    (string str) => Atom(
-                        str.map!(to!string)
-                           .map!Atom
-                           .map!v
-                           // .map!(a => a.match!(
-                               // (Atom[] a) => a.joinToString,
-                               // _ => a.as!string,
-                           // ))
-                           .joinToString
-                    ),
+                    (Atom[] arr) => Atom(mapVerb(v, arr)),
+                    (string str) => Atom(mapVerb(v, str.atomChars).joinToString),
                     _ => Nil.nilAtom,
                 ))
                 // zip
@@ -1008,7 +1001,7 @@ Adjective getAdjective(InsName name) {
         // ArityForce
         adjectives[InsName.ArityForce] = new Adjective(
             // TODO: copy better, e.g. inverse
-            (Verb v) => new Verb("`")
+            (Verb v) => new Verb("`:")
                 .setMonad((Verb v, a) => v(a))
                 .setDyad((Verb v, a, b) => v(a, b))
                 .setMarkedArity(v.markedArity == 2 ? 1 : 2)
@@ -1465,27 +1458,11 @@ Conjunction getConjunction(InsName name) {
         );
         
         conjunctions[InsName.Compose] = new Conjunction(
-            (Verb f, Verb g) => new Verb("@")
-                .setMonad((f, g, a) => f(g(a)))
-                .setDyad((f, g, a, b) => f(g(a, b)))
-                .setMarkedArity(g.markedArity)
-                .setNiladic(f.niladic || g.niladic)
-                .setInverse(new Verb("!.")
-                    // (f@g)!. <=> g!.@(f!.)
-                    .setMonad((f, g, a) {
-                        auto gInv = g.invert();
-                        auto fInv = f.invert();
-                        return gInv(fInv(a));
-                    })
-                    .setDyad((f, g, _1, _2) => Nil.nilAtom)
-                    .setMarkedArity(g.markedArity)
-                    .setChildren([f, g])
-                )
-                .setChildren([f, g])
+            (Verb f, Verb g) => Verb.compose(f, g)
         );
         
         conjunctions[InsName.Power] = new Conjunction(
-            (Verb f, Verb g) => powerFor(f, g),
+            (Verb f, Verb g) => Verb.power(f, g),
         );
         
         conjunctions[InsName.Under] = new Conjunction(
@@ -1547,6 +1524,10 @@ Conjunction getConjunction(InsName name) {
                 .setDyad((_1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
                 .setChildren([f, g])
+        );
+        
+        conjunctions[InsName.Gerund] = new Conjunction(
+            (Verb f, Verb g) => Verb.gerund(f, g)
         );
     }
     

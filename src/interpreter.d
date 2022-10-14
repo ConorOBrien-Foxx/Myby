@@ -16,7 +16,7 @@ import myby.string;
 import myby.token;
 
 enum ConjunctionNibbles = [0xA, 0xD];
-enum TwoNibbleOverrides = [0xAC, 0xDC, 0xBA, 0xBC, 0xBD];
+enum TwoNibbleOverrides = [0xAC, 0xDC, 0xBA, 0xBC, 0xBD, 0xB2];
 Token[] tokenize(Nibble[] code) {
     import std.algorithm.searching : canFind;
     Debugger.print("Tokenizing:");

@@ -512,6 +512,7 @@ class Verb {
     bool niladic = false;
     bool inferSelf = true;
     bool hasIdentityFn = false;
+    bool isGerund = false;
     Atom rangeStart = BigInt(0);
     Atom identity;
     VerbMonad identityFn;
@@ -534,6 +535,7 @@ class Verb {
         res.inferSelf = inferSelf;
         res.markedArity = markedArity;
         res.hasIdentityFn = hasIdentityFn;
+        res.isGerund = isGerund;
         res.rangeStart = rangeStart;
         res.identity = identity;
         res.identityFn = identityFn;
@@ -595,6 +597,11 @@ class Verb {
     
     string head() {
         return display;
+    }
+    
+    Verb setGerund(bool g) {
+        isGerund = g;
+        return this;
     }
     
     // Note: Below cannot be setMonad(T)(T m)
@@ -720,7 +727,10 @@ class Verb {
     }
     
     Atom getIdentity(Atom a) {
-        if(hasIdentityFn) {
+        if(isGerund) {
+            return children[0].getIdentity(a);
+        }
+        else if(hasIdentityFn) {
             return executeMonadic(identityFn, a);
         }
         else {
@@ -800,6 +810,11 @@ class Verb {
         return evaluate(args);
     }
     
+    Atom gerund(T...)(uint index, T arguments) {
+        index %= children.length;
+        return children[index](arguments);
+    }
+    
     override string toString() {
         if(niladic) {
             return "VerbNilad(" ~ display ~ ")";
@@ -853,6 +868,78 @@ class Verb {
             un.setInverse(un);
         }
         return un;
+    }
+    
+    static Verb gerund(Verb f, Verb g) {
+        Verb[] nextChildren;
+        if(f.isGerund) {
+            nextChildren ~= f.children;
+        }
+        else {
+            nextChildren ~= f;
+        }
+        if(g.isGerund) {
+            nextChildren ~= g.children;
+        }
+        else {
+            nextChildren ~= g;
+        }
+        return new Verb(":")
+            .setMonad(_ => Nil.nilAtom)
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(2)
+            .setChildren(nextChildren)
+            .setRangeStart(nextChildren[0].rangeStart)
+            .setGerund(true);
+    }
+    
+    static Verb compose(Verb f, Verb g) {
+        if(f.isGerund) {
+            return f.dup
+                .setChildren(f.children.map!(child => Verb.compose(child, g)).array);
+        }
+        else if(g.isGerund) {
+            return g.dup
+                .setChildren(g.children.map!(child => Verb.compose(f, child)).array);
+        }
+        return new Verb("@")
+            .setMonad((f, g, a) => f(g(a)))
+            .setDyad((f, g, a, b) => f(g(a, b)))
+            .setMarkedArity(g.markedArity)
+            .setNiladic(f.niladic || g.niladic)
+            .setInverse(new Verb("!.")
+                // (f@g)!. <=> g!.@(f!.)
+                .setMonad((f, g, a) {
+                    auto gInv = g.invert();
+                    auto fInv = f.invert();
+                    return gInv(fInv(a));
+                })
+                .setDyad((f, g, _1, _2) => Nil.nilAtom)
+                .setMarkedArity(g.markedArity)
+                .setChildren([f, g])
+            )
+            .setChildren([f, g]);
+    }
+    
+    static Verb power(Verb f, Verb g) {
+        return new Verb("^:")
+            .setMonad((f, g, a) {
+                Atom times = g(a);
+                return times.match!(
+                    (Infinity i) => assert(0, "TODO: Fixpoint"),
+                    (n) {
+                        assert(n >= 0, "TODO: Negative (inverse) repetition");
+                        for(typeof(n) i = 0; i < n; i++) {
+                            a = f(a);
+                        }
+                        return a;
+                    },
+                    _ => Nil.nilAtom,
+                );
+            })
+            .setDyad((f, g, _1, _2) => Nil.nilAtom)
+            .setMarkedArity(1)
+            .setChildren([f, g]);
     }
 }
 
