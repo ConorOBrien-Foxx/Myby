@@ -263,9 +263,9 @@
         "id": 252442,
         "name": "repeat-values-in-array",
         "tests": [
-            {"x":[1,2,3], "y":[1,2,3], "result":[1,2,2,3,3,3]},
-            {"x":[5,1,1,0], "y":[6,0,0,6], "result":[6,6,6,6,6,0,0]},
-            {"x":[0,0], "y":[100,100], "result":[]}
+            {"y":[1,2,3], "x":[1,2,3], "result":[1,2,2,3,3,3]},
+            {"y":[5,1,1,0], "x":[6,0,0,6], "result":[6,6,6,6,6,0,0]},
+            {"y":[0,0], "x":[100,100], "result":[]}
         ]
     },
     {
@@ -319,6 +319,73 @@
                 "f":"# < 0",
                 "result":[]
             }
+        ]
+    },
+    {
+        "id": 241267,
+        "name": "remove-odd-indices-and-double-the-even-indices",
+        "tests": [
+            {"x":"abcdef", "result":"bbddff"},
+            {"x":"umbrella", "result":"mmrrllaa"},
+            {"x":"looooooooong text", "result":"ooooooooooggttxx"},
+            {"x":"abc", "result":"bb"},
+            {"x":"xkcd", "result":"kkdd"},
+            {"x":"Hello, World!", "result":"eell,,WWrrdd"},
+            {"x":"D", "result":""},
+            {"x":"KK", "result":"KK"},
+            {"x":"Hi", "result":"ii"},
+            {"x":"odd_length!", "result":"dd__eegghh"},
+            {"x":"", "result":""}
+        ]
+    },
+    {
+        "id": 64315,
+        "name": "separate-a-list-into-even-indexed-and-odd-indexed-parts",
+        "tests": [
+            {"x":[0, 1, 2, 3, 4], "result":[0, 2, 4, 1, 3]},
+            {
+                "x":[110, 22, 3330, 4444, 55555, 6],
+                "result":[110, 3330, 55555, 22, 4444, 6]
+            }
+        ],
+        "note": "Alternative 7b: ({ % 2)G&.!"
+    },
+    {
+        "id": 146402,
+        "name": "count-the-changes-in-an-array",
+        "tests": [
+            {"x":[],"result":0},
+            {"x":[0],"result":0},
+            {"x":[0,1],"result":1},
+            {"x":[0,0],"result":0},
+            {"x":[1,2,3,17],"result":3},
+            {"x":[1,1,1,2,2,3],"result":2},
+            {"x":[-3,3,3,-3,0],"result":3}
+        ]
+    },
+    {
+        "id": 55051,
+        "name": "twisting-words",
+        "tests": [
+            {
+                "x":"Programming Puzzles & Code Golf",
+                "y":4,
+                "result":"Prog\nmmar\ning \nzzuP\nles \noC &\nde G\n flo"
+            },
+            {
+                "x":"Hello, World!",
+                "y":5,
+                "result":"Hello\nroW ,\nld!  "
+            }
+        ]
+    },
+    {
+        "id": 63772,
+        "name": "determine-the-color-of-a-chess-square",
+        "tests": [
+            {"x":"b1","result":"light"},
+            {"x":"g6","result":"light"},
+            {"x":"d4","result":"dark"}
         ]
     }
 ]

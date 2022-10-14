@@ -7,12 +7,14 @@ path = File.join base, "problems.json"
 
 problems = JSON::parse File.read path
 
-take = ARGV.map { |e| e.to_i % problems.size }
+take = ARGV.map { |e|
+    /^-?\d+$/ === e ? e.to_i % problems.size : e
+}
 
 problems.each.with_index { |problem, i|
-    next unless take.empty? || take.index(i)
-    id = problem["id"]
     name = problem["name"]
+    next unless take.empty? || take.index(i) || take.index(name)
+    id = problem["id"]
     tests = problem["tests"]
     puts "== PROBLEM #{i}: #{name} (##{id}) =="
     success = 0
