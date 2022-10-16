@@ -931,6 +931,31 @@ Verb getVerb(InsName name) {
             )
             .setMarkedArity(1);
         
+        verbs[InsName.ReadFile] = new Verb("read")
+            .setMonad(a => a.match!(
+                (string s) {
+                    import std.file : read;
+                    return Atom(cast(string)(read(s)));
+                },
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.WriteFile] = new Verb("write")
+            .setMonad(a => Nil.nilAtom)
+            .setDyad((content, name) => match!(
+                (c, string n) {
+                    import std.file : write;
+                    string ts = atomFor(c).atomToString;
+                    write(n, ts);
+                    // return Atom(ts);
+                    return Atom(n);
+                },
+                (_1, _2) => Nil.nilAtom,
+            )(name, content))
+            .setMarkedArity(1);
+        
         // f
         verbs[InsName.F] = new Verb("F:")
             .setMonad(_ => Nil.nilAtom)
@@ -938,6 +963,11 @@ Verb getVerb(InsName name) {
             .setMarkedArity(1);
         // g
         verbs[InsName.G] = new Verb("G:")
+            .setMonad(_ => Nil.nilAtom)
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        // h
+        verbs[InsName.H] = new Verb("H:")
             .setMonad(_ => Nil.nilAtom)
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
