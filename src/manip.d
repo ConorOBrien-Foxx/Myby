@@ -605,3 +605,17 @@ Atom[] mapVerb(Verb v, Atom[] arr) {
             .array
         : arr.map!v.array;
 }
+
+bool[] nubSieve(T)(T arr) {
+    bool[] res;
+    bool[typeof(arr.front)] unseen;
+    foreach(e; arr) {
+        if(e in unseen) {
+            res ~= false;
+        }
+        else {
+            res ~= unseen[e] = true;
+        }
+    }
+    return res;
+}

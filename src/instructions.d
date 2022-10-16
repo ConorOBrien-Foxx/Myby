@@ -36,7 +36,7 @@ enum InsName {
     UniqPrimeFactorsCount, PreviousPrime, NextPrime, FirstNPrimes,
     PrimesBelow, PrimesBelowCount, Benil, Memoize, Keep, Loop, BLoop, While,
     Time, InitialAlias, DefinedAlias, VerbDiagnostic, F, G, H, U, V, C, D,
-    Break, Gerund, LineFeed,
+    Break, Gerund, LineFeed, PrimeTotient,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -159,6 +159,7 @@ enum InsInfo[InsName] Info = [
     InsName.FirstNPrimes:           InsInfo("prims",   0xFE78,    SpeechPart.Verb),
     InsName.PrimesBelow:            InsInfo("primb",   0xFE79,    SpeechPart.Verb),
     InsName.PrimesBelowCount:       InsInfo("primbo",  0xFE7A,    SpeechPart.Verb),
+    InsName.PrimeTotient:           InsInfo("primt",   0xFE7B,    SpeechPart.Verb),
     ////FE8* - advanced adj/conj////
     InsName.Benil:                  InsInfo("benil",   0xFE80,    SpeechPart.Adjective),
     InsName.Memoize:                InsInfo("M.",      0xFE81,    SpeechPart.Adjective),
@@ -314,7 +315,7 @@ Verb getVerb(InsName name) {
         verbs[InsName.Modulus] = new Verb("%")
             .setMonad((Atom a) => a.match!(
                 // Sort
-                (Atom[] a) => Atom(a.sort.array),
+                (Atom[] a) => Atom(a.dup.sort.array),
                 // Ord
                 (string s) => Atom(BigInt(cast(long) s[0])),
                 // Chr
@@ -424,6 +425,8 @@ Verb getVerb(InsName name) {
             .setMonad(a => a.match!(
                 // Evaluate
                 (string s) => Interpreter.evaluate(s),
+                // Nub Sieve
+                (Atom[] a) => Atom(nubSieve(a.map!"a.value").map!Atom.array),
                 _ => Nil.nilAtom,
             ))
             // Pair
@@ -630,6 +633,7 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.MemberIn] = new Verb("e.")
             .setMonad(a => a.match!(
+                // All same
                 (Atom[] a) => Atom(a.nub.length <= 1),
                 _ => Nil.nilAtom,
             ))
@@ -732,6 +736,12 @@ Verb getVerb(InsName name) {
                 (BigInt a) => Atom(primeFactors(a).map!Atom.array),
                 _ => Nil.nilAtom,
             ))
+            // Inverse: Product
+            .setInverse(new Verb("primf!.")
+                .setMonad(a => foldFor(verbs[InsName.Multiply])(a))
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+            )
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
@@ -803,6 +813,21 @@ Verb getVerb(InsName name) {
             // Next Prime After
             .setMonad(a => a.match!(
                 (BigInt a) => Atom(nextPrime(a)),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.PrimeTotient] = new Verb("primt")
+            // Prime Totient
+            .setMonad(a => a.match!(
+                (BigInt a) {
+                    auto f = primeFactors(a);
+                    return Atom(zip(f, nubSieve(f))
+                        .map!"a[0] - (a[1] ? 1 : 0)"
+                        .productOver
+                    );
+                },
                 _ => Nil.nilAtom,
             ))
             .setDyad((_1, _2) => Nil.nilAtom)
@@ -976,9 +1001,9 @@ Adjective getAdjective(InsName name) {
                     ),
                     // TODO: maybe don't call Atom every iteration?
                     (Atom[] a, b) => Atom(a.map!(t => v(t, Atom(b))).array),
-                    (string a, b) => Atom(a.map!(t => v(t.to!string, Atom(b))).joinToString),
+                    // (string a, b) => Atom(a.map!(t => v(t.to!string, Atom(b))).joinToString),
                     (a, Atom[] b) => Atom(b.map!(t => v(Atom(a), t)).array),
-                    (a, string b) => Atom(b.map!(t => v(Atom(a), t.to!string)).joinToString),
+                    // (a, string b) => Atom(b.map!(t => v(Atom(a), t.to!string)).joinToString),
                     (_1, _2) => Nil.nilAtom,
                 )(a, b))
                 .setInverseMutual(new Verb("\"!.")
