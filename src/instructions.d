@@ -36,7 +36,9 @@ enum InsName {
     UniqPrimeFactorsCount, PreviousPrime, NextPrime, FirstNPrimes,
     PrimesBelow, PrimesBelowCount, Benil, Memoize, Keep, Loop, BLoop, While,
     Time, InitialAlias, DefinedAlias, VerbDiagnostic, F, G, H, U, V, C, D,
-    Break, Gerund, LineFeed, PrimeTotient,
+    Break, Gerund, LineFeed, PrimeTotient, IsAlpha, IsNumeric, IsAlphaNumeric,
+    IsUppercase, IsLowercase, IsBlank, KeepAlpha, KeepNumeric,
+    KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -139,6 +141,19 @@ enum InsInfo[InsName] Info = [
     ////FE1* - reflection////
     InsName.NextChain:              InsInfo("$v",      0xFE10,    SpeechPart.Verb),
     InsName.NthChain:               InsInfo("$N",      0xFE11,    SpeechPart.Adjective),
+    ////FE3* - class tests////
+    InsName.IsAlpha:                InsInfo("alq",     0xFE30,    SpeechPart.Verb),
+    InsName.IsNumeric:              InsInfo("numq",    0xFE31,    SpeechPart.Verb),
+    InsName.IsAlphaNumeric:         InsInfo("alnumq",  0xFE32,    SpeechPart.Verb),
+    InsName.IsUppercase:            InsInfo("upq",     0xFE33,    SpeechPart.Verb),
+    InsName.IsLowercase:            InsInfo("downq",   0xFE34,    SpeechPart.Verb),
+    InsName.IsBlank:                InsInfo("blankq",  0xFE35,    SpeechPart.Verb),
+    InsName.KeepAlpha:              InsInfo("alk",     0xFE38,    SpeechPart.Verb),
+    InsName.KeepNumeric:            InsInfo("numk",    0xFE39,    SpeechPart.Verb),
+    InsName.KeepAlphaNumeric:       InsInfo("alnumk",  0xFE3A,    SpeechPart.Verb),
+    InsName.KeepUppercase:          InsInfo("upk",     0xFE3B,    SpeechPart.Verb),
+    InsName.KeepLowercase:          InsInfo("downk",   0xFE3C,    SpeechPart.Verb),
+    InsName.KeepBlank:              InsInfo("blankk",  0xFE3D,    SpeechPart.Verb),
     ////FE4* - constants////
     InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
     InsName.Ascii:                  InsInfo("A",       0xFE41,    SpeechPart.Verb),
@@ -954,6 +969,103 @@ Verb getVerb(InsName name) {
                 },
                 (_1, _2) => Nil.nilAtom,
             )(name, content))
+            .setMarkedArity(1);
+        
+        import std.ascii;
+        verbs[InsName.IsAlpha] = new Verb("alq")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.all!isAlpha),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.IsNumeric] = new Verb("numq")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.all!isDigit),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.IsAlphaNumeric] = new Verb("alnumq")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.all!isAlphaNum),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.IsUppercase] = new Verb("upq")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.all!isUpper),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.IsLowercase] = new Verb("downq")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.all!isLower),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.IsBlank] = new Verb("blankq")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.all!isWhite),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.KeepAlpha] = new Verb("alk")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.filter!isAlpha.to!string),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.KeepNumeric] = new Verb("numk")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.filter!isDigit.to!string),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.KeepAlphaNumeric] = new Verb("alnumk")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.filter!isAlphaNum.to!string),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.KeepUppercase] = new Verb("upk")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.filter!isUpper.to!string),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.KeepLowercase] = new Verb("downk")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.filter!isLower.to!string),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.KeepLowercase] = new Verb("blankk")
+            .setMonad(a => a.match!(
+                (string s) => Atom(s.filter!isWhite.to!string),
+                _ => Nil.nilAtom
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
         // f
