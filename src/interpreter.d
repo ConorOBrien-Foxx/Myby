@@ -16,7 +16,11 @@ import myby.string;
 import myby.token;
 
 enum ConjunctionNibbles = [0xA, 0xD];
-enum TwoNibbleOverrides = [0xAC, 0xDC, 0xBA, 0xBC, 0xBD, 0xB2];
+enum TwoNibbleOverrides = [
+    0xAC,
+    0xBA, 0xBC, 0xBD, 0xB2, 0xB3,
+    0xDC,
+];
 Token[] tokenize(Nibble[] code) {
     import std.algorithm.searching : canFind;
     Debugger.print("Tokenizing:");
@@ -241,7 +245,7 @@ LiterateBuilder toLiterateBuilder(Nibble[] nibs, Token[] tokens) {
         if(tok.name == InsName.Break
         || tok.speech == SpeechPart.Conjunction) {
             joins[i] = "";
-            if(i > 0) {
+            if(i > 0 && reps[i][0] != '.' && reps[i][0] != ':') {
                 joins[i - 1] = "";
             }
         }

@@ -37,7 +37,7 @@ enum InsName {
     PrimesBelow, PrimesBelowCount, Benil, Memoize, Keep, Loop, BLoop, While,
     Time, InitialAlias, DefinedAlias, VerbDiagnostic, F, G, H, U, V, C, D,
     Break, Gerund, LineFeed, PrimeTotient, IsAlpha, IsNumeric, IsAlphaNumeric,
-    IsUppercase, IsLowercase, IsBlank, KeepAlpha, KeepNumeric,
+    IsUppercase, IsLowercase, IsBlank, KeepAlpha, KeepNumeric, DotProduct,
     KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank,
     None,
 }
@@ -61,6 +61,13 @@ struct InsInfo {
 }
 
 // Unassigned *AND* Unimplemented: Initial ) at start of program.
+// Note on "no meaning": This arises due to the fact that conjunctions
+// and adjectives can only appear in specific places; therefore such
+// extensions must continue to be adjectives/conjunctions, else they
+// create ambiguity. e.g., if AA was a noun K, then the sequence (K)
+// would be parsed as BAAC <=> (BA)(AC) <=> `:\: which is wrong.
+// However, if AA was an adjective K, then the sequence (K) would never
+// appear in code for the same reason (& never appears in code.
 enum InsInfo[InsName] Info = [
     // Integer: 0
     // String: 1
@@ -77,19 +84,21 @@ enum InsInfo[InsName] Info = [
     InsName.Bond:                   InsInfo("&",       0xA,       SpeechPart.Conjunction),
     // AA: `&&` has no meaning
     InsName.OnPrefixes:             InsInfo("\\.",     0xAA,      SpeechPart.Adjective),
-    // AC: `&)` has no meanings
+    // AC: `&)` has no meaning
     InsName.OnSuffixes:             InsInfo("\\:",     0xAC,      SpeechPart.Adjective),
     // AD: `&@` has no meaning
     InsName.SplitCompose:           InsInfo("O",       0xAD,      SpeechPart.MultiConjunction),
     // Unassigned (maybe): ADAD/ACAC/etc
     InsName.OpenParen:              InsInfo("(",       0xB,       SpeechPart.Syntax),
-    // Unassigned *AND* Unimplemented: B2 `(\` and B3 `("`
+    // B2: `(\` has no meaning
     InsName.Gerund:                 InsInfo("`",       0xB2,      SpeechPart.Conjunction),
-    // BA: `(` followed by A... (A `&` AA `\.` AC `\: AD `O`) has no meaning
+    // B3: `("` has no meaning
+    InsName.DotProduct:             InsInfo(".",       0xB3,      SpeechPart.Conjunction),
+    // BA: `(` followed by A... (A `&` AA `\.` AC `\:` AD `O`) has no meaning
     InsName.ArityForce:             InsInfo("`:",      0xBA,      SpeechPart.Adjective),
     // BC: `()` has no meaning
     InsName.Vectorize:              InsInfo("V",       0xBC,      SpeechPart.Adjective),
-    // BD: `(` followed by D... (D `@` DA `&.` DD `@.`) has no meaning
+    // BD: `(` followed by D... (D `@` DA `&.` DC `H` DD `@.`) has no meaning
     InsName.Reflex:                 InsInfo("~",       0xBD,      SpeechPart.Adjective),
     InsName.CloseParen:             InsInfo(")",       0xC,       SpeechPart.Syntax),
     InsName.Compose:                InsInfo("@",       0xD,       SpeechPart.Conjunction),
@@ -1697,6 +1706,14 @@ Conjunction getConjunction(InsName name) {
         
         conjunctions[InsName.Gerund] = new Conjunction(
             (Verb f, Verb g) => Verb.gerund(f, g)
+        );
+        
+        conjunctions[InsName.DotProduct] = new Conjunction(
+            (Verb f, Verb g) => new Verb(".")
+                .setMonad(a => Nil.nilAtom)
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+                .setChildren([f, g])
         );
     }
     

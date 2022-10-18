@@ -216,8 +216,14 @@ LiterateToken[] tokenizeLiterate(T)(T str) {
             token.str = readAlphabetic();
             token.type = LiterateType.KeyAccess;
         }
+        else if(str[i] == ' ' || str[i] == '\r') {
+            // ignore
+            i++;
+            token.type = LiterateType.Whitespace;
+        }
         else {
             char head = str[i];
+            
             string name = readAlphabetic();
             if(name.length == 0) {
                 name ~= str[i];
@@ -242,6 +248,7 @@ LiterateToken[] tokenizeLiterate(T)(T str) {
                 }
             }
             
+            Debugger.print("Prospective instruction: ", name);
             auto r = name in InstructionMap;
             if(r !is null) {
                 token.info = *r;
@@ -250,10 +257,6 @@ LiterateToken[] tokenizeLiterate(T)(T str) {
             else if(aliases.canFind(name)) {
                 token.type = LiterateType.Alias;
                 token.str = name;
-            }
-            else if(head == ' ' || head == '\r') {
-                // ignore
-                token.type = LiterateType.Whitespace;
             }
             else if(name[$-1] == ':') {
                 // TODO: check for redefined alias

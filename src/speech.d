@@ -578,14 +578,18 @@ class Verb {
         return treeToBoxedString(this);
     }
     
+    string postDisplay() {
+        return display[0] == ':' || display[0] == '.' ? ' ' ~ display : display;
+    }
+    
     string inlineDisplay() {
         switch(children.length) {
             case 0:
                 return display;
             case 1:
-                return children[0].inlineDisplay ~ display;
+                return children[0].inlineDisplay ~ postDisplay;
             case 2:
-                return children[0].inlineDisplay ~ display ~ children[1].inlineDisplay;
+                return children[0].inlineDisplay ~ postDisplay ~ children[1].inlineDisplay;
             default:
                 return children.map!(a => a.inlineDisplay).join(" ") ~ display;
         }
