@@ -38,7 +38,8 @@ enum InsName {
     Time, InitialAlias, DefinedAlias, VerbDiagnostic, F, G, H, U, V, C, D,
     Break, Gerund, LineFeed, PrimeTotient, IsAlpha, IsNumeric, IsAlphaNumeric,
     IsUppercase, IsLowercase, IsBlank, KeepAlpha, KeepNumeric, DotProduct,
-    KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank,
+    KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank, Palindromize,
+    Inside,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -150,6 +151,9 @@ enum InsInfo[InsName] Info = [
     ////FE1* - reflection////
     InsName.NextChain:              InsInfo("$v",      0xFE10,    SpeechPart.Verb),
     InsName.NthChain:               InsInfo("$N",      0xFE11,    SpeechPart.Adjective),
+    ////FE2* - string////
+    InsName.Palindromize:           InsInfo("enpal",   0xFE20,    SpeechPart.Verb),
+    InsName.Inside:                 InsInfo("inner",   0xFE21,    SpeechPart.Verb),
     ////FE3* - class tests////
     InsName.IsAlpha:                InsInfo("alq",     0xFE30,    SpeechPart.Verb),
     InsName.IsNumeric:              InsInfo("numq",    0xFE31,    SpeechPart.Verb),
@@ -590,6 +594,15 @@ Verb getVerb(InsName name) {
             ))
             // Greater than
             .setDyad((a, b) => Atom(a > b))
+            .setInverse(new Verb(">!.")
+                .setMonad(a => a.match!(
+                    (Atom[] o) => Atom(o.map!(a => a.as!dchar).to!string),
+                    (n) => Atom((cast(dchar) n).to!string),
+                    _ => Nil.nilAtom
+                ))
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+            )
             .setMarkedArity(2);
         
         verbs[InsName.LessEqual] = new Verb("<:")
@@ -1077,6 +1090,22 @@ Verb getVerb(InsName name) {
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
+        verbs[InsName.Palindromize] = new Verb("enpal")
+            .setMonad(a => a.match!(
+                (s) => Atom(s ~ s.retro.array[1..$].to!(typeof(s))),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.Inside] = new Verb("inner")
+            .setMonad(a => a.match!(
+                (s) => Atom(s.length <= 1 ? s[0..0] : s[1..$-1]),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
         // f
         verbs[InsName.F] = new Verb("F:")
             .setMonad(_ => Nil.nilAtom)
@@ -1358,6 +1387,15 @@ Adjective getAdjective(InsName name) {
             (Verb v) => new Verb("V")
                 .setMonad((Verb v, a) => vectorAt(v, a))
                 .setDyad((Verb v, a, b) => vectorAt(v, a, b))
+                .setInverseMutual(new Verb("V!.")
+                    .setMonadSelf((Verb v, a) => v.inverse.monad.match!(
+                        t => t(v.f.invert(), a),
+                        _ => assert(0, "Improperly initialized `V` Verb")
+                    ))
+                    .setDyad((_1, _2) => Nil.nilAtom)
+                    .setMarkedArity(1)
+                    .setChildren([v])
+                )
                 .setMarkedArity(v.markedArity)
                 .setChildren([v])
         );

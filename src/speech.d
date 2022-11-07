@@ -271,7 +271,7 @@ struct Atom {
         return value.match!(
             (a) => Atom(a + cast(typeof(a))1),
             // behead
-            (a) => Atom(a[1..$]),
+            (a) => Atom(a.length == 0 ? a : a[1..$]),
             _ => Nil.nilAtom,
         );
     }
@@ -280,7 +280,7 @@ struct Atom {
         return value.match!(
             (a) => Atom(a - cast(typeof(a))1),
             // betail
-            (a) => Atom(a[0..$-1]),
+            (a) => Atom(a.length == 0 ? a : a[0..$-1]),
             _ => Nil.nilAtom,
         );
     }

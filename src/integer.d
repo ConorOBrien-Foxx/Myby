@@ -54,7 +54,7 @@ enum OneMillionPlaceholder = -3; // limits inferred cache size
 enum OneMillion = 1000000;
 enum ExtraConstants = [
     6, 1000, 16, 32, 64,
-    128, 256, 512, 1024,
+    128, 256, 97, 1024,
     100, 255,
     OneMillionPlaceholder, -2, -1
 ];
