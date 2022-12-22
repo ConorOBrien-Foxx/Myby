@@ -27,3 +27,5 @@ __dummy.html
 *.ilk
 *.pdb
 test.myby
+test.d
+test.exe

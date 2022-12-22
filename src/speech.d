@@ -211,6 +211,16 @@ struct Atom {
         );
     }
     
+    bool isFiniteNumeric() {
+        return value.match!(
+            (bool _) => true,
+            (real _) => true,
+            (BigInt _) => true,
+            (Infinity _) => false,
+            _ => false,
+        );
+    }
+    
     real as(Type : real)() {
         return value.match!(
             (a) => cast(real) a,
@@ -285,14 +295,14 @@ struct Atom {
         );
     }
     
-    alias IntegralTypes = AliasSeq!(real, BigInt, bool);
+    alias FiniteIntegralTypes = AliasSeq!(real, BigInt, bool);
     
     enum mathOps = ["+", "-", "/", "*", "%", "^^"];
     Atom opBinary(string op)(Atom rhs)
     if(mathOps.canFind(op)) {
         if(isNumeric && rhs.isNumeric) {
             // real casts all args to real
-            static foreach(Type; IntegralTypes) {
+            static foreach(Type; FiniteIntegralTypes) {
                 if(isType!Type || rhs.isType!Type
                 || op == "/" && is(Type == real) && this % rhs != Atom(0)) {
                     Type a = this.as!Type;
@@ -402,9 +412,9 @@ struct Atom {
         int relComp(S, T)(S a, T b) {
             return a < b ? -1 : a > b ? 1 : 0;
         }
-        static foreach(Type; IntegralTypes) {
-            if(isType!Type && other.isNumeric
-            || other.isType!Type && isNumeric) {
+        static foreach(Type; FiniteIntegralTypes) {
+            if(isType!Type && other.isFiniteNumeric
+            || other.isType!Type && isFiniteNumeric) {
                 Type a = this.as!Type;
                 Type b = other.as!Type;
                 return relComp(a, b);

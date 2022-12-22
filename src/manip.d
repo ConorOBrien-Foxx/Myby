@@ -367,12 +367,36 @@ Atom fromBase(B)(Atom[] n, B base) {
     // TODO: better approach to indexing an array nicely?
     foreach(i, e; zip(n.length.iota, n.retro)) {
         e.match!(
-            (BigInt e) => sum += base^^i * e,
-            (bool b) => sum += b ? base^^i : 0,
+            (BigInt e) { sum += base^^i * e; },
+            (bool b) { if(b) sum += base^^i; },
             _ => assert(0, "Invalid base digit: " ~ e.atomToString)
         );
     }
     return Atom(sum);
+}
+
+
+string INSENSITIVE_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
+string SENSITIVE_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+Atom stringFromBase(B)(string n, B base) {
+    import std.string : toLower;
+    
+    string alphabet = SENSITIVE_ALPHABET;
+    if(base <= INSENSITIVE_ALPHABET.length) {
+        alphabet = INSENSITIVE_ALPHABET;
+        n = n.toLower;
+    }
+    
+    Atom[] result = n.map!((c) {
+        auto index = alphabet.countUntil(c);
+
+        assert(0 <= index && index < base,
+            "Invalid base " ~ base.to!string ~ " digit: " ~ c.to!string);
+
+        return Atom(BigInt(index));
+    }).array;
+    
+    return fromBase(result, base);
 }
 
 auto baseRange(S, T)(S n, T base) {

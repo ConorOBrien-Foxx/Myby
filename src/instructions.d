@@ -536,6 +536,9 @@ Verb getVerb(InsName name) {
                 (Atom[] a, Atom[] b) => Atom(multisetDifference(a, b)),
                 // Base conversion
                 (a, b) => Atom(a.toBase(b).map!Atom.array),
+                // Unmarked Case: Anti-Base conversion
+                (Atom[] a, b) => Atom(fromBase(a, b)),
+                (string a, b) => Atom(stringFromBase(a, b)),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setInverse(new Verb("}!.")

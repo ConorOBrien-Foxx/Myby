@@ -387,5 +387,110 @@
             {"x":"g6","result":"light"},
             {"x":"d4","result":"dark"}
         ]
+    },
+    {
+        "id": 108675,
+        "name": "is-this-word-lexically-ordered",
+        "tests": [
+            {"x":"ABCDEF", "result":true},
+            {"x":"ZYX", "result":true},
+            {"x":"no", "result":true},
+            {"x":"tree", "result":true},
+            {"x":"q", "result":true},
+            {"x":"ABCDC", "result":false},
+            {"x":"yes", "result":false},
+            {"x":"deed", "result":false}
+        ],
+        "note": "Alternative 6b: (# e. #`-@%) /"
+    },
+    {
+        "id": 137632,
+        "name": "triangle-a-number",
+        "tests": [
+            {"x":[0], "result":0},
+            {"x":[1], "result":1},
+            {"x":[1, 2], "result":4},
+            {"x":[1, 2, 3], "result":10},
+            {"x":[9, 9, 9], "result":54},
+            {"x":[1, 0, 0, 0, 0, 0], "result":6},
+            {"x":[6, 5, 4, 3, 2, 1], "result":91}
+        ]
+    },
+    {
+        "id": 203893,
+        "name": "bl-lu-ur-rr-ry-yv-vi-is-si-io-on-blur-the-text",
+        "tests": [
+            {"x":"Ab","result":"Ab"},
+            {"x":"Abc","result":"Ab bc"},
+            {"x":"Abcd","result":"Ab bc cd"},
+            {"x":"E?h?","result":"Eh"},
+            {"x":"Blurry vision","result":"Bl lu ur rr ry yv vi is si io on"},
+            {"x":"We're #1!","result":"We er re e1"},
+            {"x":"I'm an example!","result":"Im ma an ne ex xa am mp pl le"},
+            {"x":"This is _not_ legible","result":"Th hi is si is sn no ot tl le eg gi ib bl le"},
+            {"x":"(a*b*c)+5^-x","result":"ab bc c5 5x"},
+            {"x":"??a_%,1!=z#@","result":"a1 1z"}
+        ]
+    },
+    {
+        "id": 165793,
+        "name": "new-password-idea-word-walker",
+        "tests": [
+            {"x":"Once Upon A Time","result":"OpAe"},
+            {"x":"There was a man","result":"Taaa"},
+            {"x":"Who made a task","result":"Waak"},
+            {"x":"That was neat!","result":"Taa"},
+            {"x":"This is a long string to display how the generator is supposed to work","result":"Tsagnoyotoipto"}
+        ],
+        "note": "Alternative 12.5b: > {\\\" ! +-@>:@<:H\" /&' ' @."
+    },
+    {
+        "id": 60610,
+        "name": "non-unique-duplicate-elements",
+        "tests": [
+            {"x":[],"result":[]},
+            {"x":[-1,0,1],"result":[]},
+            {"x":[1,1],"result":[1]},
+            {"x":[3,0,0,1,1,0,5,3],"result":[3,0,1]},
+            {"x":[-34,0,1,-34,4,8,4],"result":[-34,4]}
+        ],
+        "note": "Alternative 7b: /#(+\\>1)\"@="
+    },
+    {
+        "id": 253568,
+        "name": "alphabet-checksum",
+        "tests": [
+            {"x":"helloworld", "result":"k"},
+            {"x":"abcdef", "result":"p"},
+            {"x":"codegolf", "result":"h"},
+            {"x":"stackexchange", "result":"e"},
+            {"x":"aaaaa", "result":"a"}
+        ]
+    },
+    {
+        "id": 255850,
+        "name": "8086-segment-address",
+        "tests": [
+            {"x":"0000:0000", "result":0},
+            {"x":"1111:1111", "result":74273},
+            {"x":"FFFF:0000", "result":1048560},
+            {"x":"FFFF:0010", "result":1048576}
+        ]
+    },
+    {
+        "id": 254224,
+        "name": "maximum-average-ord",
+        "tests": [
+            {"x":["hello","world","bye"], "result":110.4}
+        ],
+        "todo": [
+            "https://codegolf.stackexchange.com/questions/252491/generate-parity-bits",
+            "https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator",
+            "https://codegolf.stackexchange.com/questions/250213/generate-an-arbitrary-half-of-a-string",
+            "https://codegolf.stackexchange.com/questions/89494/list-of-possible-birth-years-of-living-humans",
+            "https://codegolf.stackexchange.com/questions/253309/triangular-polkadot-numbers",
+            "https://codegolf.stackexchange.com/questions/168427/count-consecutive-characters"
+        ]
     }
+    
 ]

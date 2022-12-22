@@ -1,0 +1,6 @@
+NB. reciprocal definition
+# * (1&-" 1&/" / @.)&.primf
+NB. product (factors - nub-sieve(factors)) <=> totient
+-" , H&.primf
+NB. builtin
+primt
