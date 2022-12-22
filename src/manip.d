@@ -361,9 +361,26 @@ S[] toBase(S, T)(S a, T b) {
     return res;
 }
 
-Atom fromBase(B)(Atom[] n, B base) {
+Atom fromBase(B)(Atom a, B base) {
+    return a.match!(
+        (Atom[] a) => Atom(arrayFromBase(a, base)),
+        (string a) => Atom(stringFromBase(a, base)),
+        _ => Nil.nilAtom,
+    );
+}
+
+Atom arrayFromBase(B)(Atom[] n, B base) {
     // TODO: floating point??
     BigInt sum;
+    if(n.empty) return Atom(sum);
+    bool isArrayArray = n[0].match!(
+        (Atom[] _) => true,
+        (string _) => true,
+        _ => false
+    );
+    if(isArrayArray) {
+        return Atom(n.map!(a => fromBase(a, base)).array);
+    }
     // TODO: better approach to indexing an array nicely?
     foreach(i, e; zip(n.length.iota, n.retro)) {
         e.match!(
@@ -418,7 +435,7 @@ Atom stringFromBase(B)(string n, B base) {
         return Atom(BigInt(index));
     }).array;
     
-    return fromBase(result, base);
+    return arrayFromBase(result, base);
 }
 
 auto baseRange(S, T)(S n, T base) {

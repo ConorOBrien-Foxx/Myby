@@ -436,7 +436,8 @@ struct Atom {
                 }
                 catch(AssertError) {
                     // if no comparison features succeed, they cannot be equal
-                    assert(0, "Cannot compare " ~ readableTypeName(a, b));
+                    return false;
+                    // assert(0, "Cannot compare equality of " ~ readableTypeName(a, b));
                 }
             },
         )(value, other.value);

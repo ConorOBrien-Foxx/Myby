@@ -13,7 +13,7 @@ take = ARGV.map { |e|
 
 problems.each.with_index { |problem, i|
     name = problem["name"]
-    next unless take.empty? || take.index(i) || take.index(name)
+    next unless take.empty? || take.index(i) || take.any? { |t| name.index t }
     float_precision = problem["float_precision"]
     id = problem["id"]
     tests = problem["tests"]

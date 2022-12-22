@@ -39,7 +39,7 @@ enum InsName {
     Break, Gerund, LineFeed, PrimeTotient, IsAlpha, IsNumeric, IsAlphaNumeric,
     IsUppercase, IsLowercase, IsBlank, KeepAlpha, KeepNumeric, DotProduct,
     KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank, Palindromize,
-    Inside, ChunkBy, Left, Right,
+    Inside, ChunkBy, Left, Right, FromBase, ToBase, LeftMap,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -73,6 +73,9 @@ enum InsInfo[InsName] Info = [
     // Integer: 0
     // String: 1
     InsName.LineFeed:               InsInfo("lf",      0x12,      SpeechPart.Verb),
+    InsName.LeftMap:                InsInfo("\":" ,    0x19,      SpeechPart.Adjective),
+    InsName.FromBase:               InsInfo("#." ,     0x1A,      SpeechPart.Verb),
+    InsName.ToBase:                 InsInfo("#:",      0x1B,      SpeechPart.Verb),
     InsName.Left:                   InsInfo("[" ,      0x1C,      SpeechPart.Verb),
     InsName.Right:                  InsInfo("]",       0x1D,      SpeechPart.Verb),
     // Instructions: 2-F
@@ -470,6 +473,47 @@ Verb getVerb(InsName name) {
             .setDyad((a, b) => a.linkWith(b))
             .setMarkedArity(2);
         
+        verbs[InsName.FromBase] = new Verb("#.")
+            // From binary
+            .setMonad(a => fromBase(a, 2))
+            // From base
+            .setDyad((a, b) => a.match!(
+                (BigInt a) => fromBase(b, a),
+                _ => assert(0, "Invalid base: " ~ a.atomToString),
+            ))
+            .setInverseMutual(new Verb("#.!.")
+                .setMonad(a => verbs[InsName.ToBase](a))
+                .setDyad((a, b) => verbs[InsName.ToBase](a, b))
+                .setMarkedArity(1)
+            )
+            .setMarkedArity(1);
+        
+        verbs[InsName.ToBase] = new Verb("#:")
+            // To binary
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(a.toBase(2).map!Atom.array),
+                (Atom[] a) {
+                    Atom[] list = a.map!(n => verbs[InsName.ToBase](n)).array;
+                    uint longest = list.map!(e => e.match!(c => c.length, _ => 0u)).maxElement;
+                    return Atom(list.map!(
+                        row => verbs[InsName.Pad](longest, row)
+                    ).array);
+                },
+                _ => Nil.nilAtom,
+            ))
+            // To base
+            .setDyad((a, b) => match!(
+                (BigInt a, BigInt b) => Atom(b.toBase(a).map!Atom.array),
+                (_1, _2) => Nil.nilAtom,
+            )(a, b))
+            .setInverseMutual(new Verb("#:!.")
+                .setMonad(a => verbs[InsName.FromBase](a))
+                .setDyad((a, b) => verbs[InsName.FromBase](a, b))
+                .setMarkedArity(1)
+            )
+            .setMarkedArity(1);
+        // TODO: inverse
+        
         verbs[InsName.Pair] = new Verb(",")
             .setMonad(a => a.match!(
                 // Evaluate
@@ -549,8 +593,6 @@ Verb getVerb(InsName name) {
         verbs[InsName.Last] = new Verb("}")
             // Last element
             .setMonad(a => a.match!(
-                // To binary
-                (BigInt a) => Atom(a.toBase(2).map!Atom.array),
                 a => verbs[InsName.First](
                     Atom(BigInt(-1)),
                     atomFor(a)
@@ -559,25 +601,8 @@ Verb getVerb(InsName name) {
             .setDyad((l, r) => match!(
                 // multiset subtraction
                 (Atom[] a, Atom[] b) => Atom(multisetDifference(a, b)),
-                // Base conversion
-                (a, b) => Atom(a.toBase(b).map!Atom.array),
-                // Unmarked Case: Anti-Base conversion
-                (Atom[] a, b) => Atom(fromBase(a, b)),
-                (string a, b) => Atom(stringFromBase(a, b)),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
-            .setInverse(new Verb("}!.")
-                // From binary
-                .setMonad(a => a.match!(
-                    (Atom[] a) => fromBase(a, 2),
-                    _ => Nil.nilAtom,
-                ))
-                .setDyad((a, b) => match!(
-                    (Atom[] a, b) => fromBase(a, b),
-                    (_1, _2) => Nil.nilAtom,
-                )(a, b))
-                .setMarkedArity(1)
-            )
             .setMarkedArity(1);
         
         verbs[InsName.Equality] = new Verb("=")
@@ -1209,10 +1234,9 @@ Adjective getAdjective(InsName name) {
                     (string a, string b) => Atom(
                         zip(a, b).map!(t => v(t[0].to!string, t[1].to!string)).joinToString
                     ),
-                    // TODO: maybe don't call Atom every iteration?
-                    (Atom[] a, b) => Atom(a.map!(t => v(t, Atom(b))).array),
+                    (Atom[] a, _) => Atom(a.map!(t => v(t, b)).array),
                     // (string a, b) => Atom(a.map!(t => v(t.to!string, Atom(b))).joinToString),
-                    (a, Atom[] b) => Atom(b.map!(t => v(Atom(a), t)).array),
+                    (_, Atom[] b) => Atom(b.map!(t => v(a, t)).array),
                     // (a, string b) => Atom(b.map!(t => v(Atom(a), t.to!string)).joinToString),
                     (_1, _2) => Nil.nilAtom,
                 )(a, b))
@@ -1231,6 +1255,25 @@ Adjective getAdjective(InsName name) {
                     .setMarkedArity(1)
                     .setChildren([v])
                 )
+                .setMarkedArity(v.markedArity)
+                .setChildren([v])
+        );
+        
+        adjectives[InsName.LeftMap] = new Adjective(
+            (Verb v) => new Verb("\"")
+                // map
+                .setMonad((Verb v, a) => a.match!(
+                    (Atom[] arr) => Atom(mapVerb(v, arr)),
+                    (string str) => Atom(mapVerb(v, str.atomChars).joinToString),
+                    _ => Nil.nilAtom,
+                ))
+                // zip
+                .setDyad((Verb v, a, b) => match!(
+                    (Atom[] a, _) => Atom(a.map!(t => v(t, b)).array),
+                    (_, Atom[] b) => Atom(b.map!(t => v(a, t)).array),
+                    (_1, _2) => Nil.nilAtom,
+                )(a, b))
+                // TODO: inverse
                 .setMarkedArity(v.markedArity)
                 .setChildren([v])
         );

@@ -20,10 +20,10 @@ import myby.nibble;
  * If z=1, then we have a string literal. We have a few options,
  * depending on the value of xxx.
  *  | xxx | Corresponding behavior |
- *  | 0 | Read bytes until matching 00 byte
- *  | 1 | Read bytes until matching FF byte
- *  | 2 | Read bytes until matching F0 byte
- *  | 3 | Read bytes until matching 0F byte
+ *  | 0 | Read bytes until matching FF byte
+ *  | 1 | Overridden: ":
+ *  | 2 | Overridden: #.
+ *  | 3 | Overridden: #:
  *  | 4 | Overridden: [
  *  | 5 | Overridden: ]
  *  | 6 | Read bytes until the first bit of a byte is 1 (including ngraphs)
@@ -46,7 +46,8 @@ void appendNibble(ref Nibble[] result, char ch) {
     result ~= ch % 16;
 }
 
-enum char[] ValidTerminators = [ 0x00, 0xFF, 0xF0, 0x0F ];
+// enum char[] ValidTerminators = [ 0x00, 0xFF, 0xF0, 0x0F ];
+enum char[] ValidTerminators = [ 0x00 ];
 Nibble[] stringToNibblesNaive(string str) {
     import std.algorithm.searching : countUntil;
     import std.stdio;
