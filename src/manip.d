@@ -8,6 +8,7 @@ import std.array;
 import std.bigint;
 import std.conv : to, ConvOverflowException;
 import std.datetime;
+import std.functional : binaryFun;
 import std.range;
 import std.sumtype;
 import std.traits;
@@ -681,4 +682,16 @@ bool[] nubSieve(T)(T arr) {
         }
     }
     return res;
+}
+
+auto grade(alias Compare="a < b", T)(T[] arr) {
+    alias fn = binaryFun!Compare;
+    auto inds = arr.length.iota.array;
+    inds.sort!((i, j) => fn(arr[i], arr[j]));
+    return inds;
+}
+
+alias gradeUp = grade;
+auto gradeDown(T)(T arr) {
+    return arr.grade!"a > b";
 }

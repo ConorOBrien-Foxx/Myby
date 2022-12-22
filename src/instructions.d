@@ -408,17 +408,25 @@ Verb getVerb(InsName name) {
             )
             .setMarkedArity(1);
         
-        // Left
         verbs[InsName.Left] = new Verb("[")
-            // TODO: we can use monads for something different, since we have #
-            .setMonad(a => a)
+            // Grade Up / argsort
+            .setMonad(a => a.match!(
+                (Atom[] a) => Atom(a.gradeUp.map!BigInt.map!Atom.array),
+                (string a) => Atom(a.atomChars.gradeUp.map!BigInt.map!Atom.array),
+                _ => Nil.nilAtom,
+            ))
+            // Left
             .setDyad((a, b) => a)
             .setMarkedArity(2);
         
-        // Right
         verbs[InsName.Right] = new Verb("]")
-            // TODO: we can use monads for something different, since we have #
-            .setMonad(a => a)
+            // Grade Down
+            .setMonad(a => a.match!(
+                (Atom[] a) => Atom(a.gradeDown.map!BigInt.map!Atom.array),
+                (string a) => Atom(a.atomChars.gradeDown.map!BigInt.map!Atom.array),
+                _ => Nil.nilAtom,
+            ))
+            // Right
             .setDyad((a, b) => b)
             .setMarkedArity(2);
         
@@ -1291,7 +1299,7 @@ Adjective getAdjective(InsName name) {
         
         // OnLeft
         adjectives[InsName.OnLeft] = new Adjective(
-            (Verb v) => new Verb("[")
+            (Verb v) => new Verb("[.")
                 .setMonad((Verb v, a) => v(a))
                 .setDyad((Verb v, a, b) => v(a))
                 .setMarkedArity(2)
@@ -1300,7 +1308,7 @@ Adjective getAdjective(InsName name) {
         
         // OnRight
         adjectives[InsName.OnRight] = new Adjective(
-            (Verb v) => new Verb("]")
+            (Verb v) => new Verb("].")
                 .setMonad((Verb v, a) => v(a))
                 .setDyad((Verb v, a, b) => v(b))
                 .setMarkedArity(2)
@@ -1311,7 +1319,7 @@ Adjective getAdjective(InsName name) {
         adjectives[InsName.OnPrefixes] = new Adjective(
             (Verb v) => new Verb("\\.")
                 .setMonad((Verb v, a) => a.match!(
-                    (Atom[] a) => Atom(
+                    a => Atom(
                         iota(a.length)
                             .map!(i => a[0..i + 1])
                             .map!Atom
