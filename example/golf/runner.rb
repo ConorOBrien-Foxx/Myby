@@ -14,6 +14,7 @@ take = ARGV.map { |e|
 problems.each.with_index { |problem, i|
     name = problem["name"]
     next unless take.empty? || take.index(i) || take.index(name)
+    float_precision = problem["float_precision"]
     id = problem["id"]
     tests = problem["tests"]
     puts "== PROBLEM #{i}: #{name} (##{id}) =="
@@ -52,7 +53,16 @@ problems.each.with_index { |problem, i|
             STDERR.puts stderr
             failed = true
         end
-        if result != "null" && stdout != result
+        mismatch = stdout != result
+        if mismatch && !float_precision.nil?
+            stdout = stdout.to_f.round float_precision
+            result = result.to_f.round float_precision
+            mismatch = stdout != result
+            stdout = "≈#{stdout}"
+            result = "≈#{result}"
+        end
+        
+        if result != "null" && mismatch
             STDERR.puts "Failed due to result mismatch:"
             STDERR.puts "Expected:"
             STDERR.puts result
@@ -61,9 +71,9 @@ problems.each.with_index { |problem, i|
             failed = true
         end
         if failed
-            cmd.each.with_index(1) { |c, i|
-                puts "Arg #{i}: #{c}"
-            }
+            # cmd.each.with_index(1) { |c, i|
+                # puts "Arg #{i}: #{c}"
+            # }
             STDERR.puts cmd.inspect
             STDERR.puts stderr.gsub(/^/m, " " * 4).lines[0..5]
         else

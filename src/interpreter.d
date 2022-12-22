@@ -20,6 +20,7 @@ enum TwoNibbleOverrides = [
     0xAC,
     0xBA, 0xBC, 0xBD, 0xB2, 0xB3,
     0xDC,
+    0x1C, 0x1D
 ];
 Token[] tokenize(Nibble[] code) {
     import std.algorithm.searching : canFind;
@@ -32,8 +33,9 @@ Token[] tokenize(Nibble[] code) {
         Token token;
         token.index = i;
         Nibble nib = code[i];
-        // reminder that nouns are just niladic verbs 
-        if(nib == 0x0) {
+        bool isOverridden = i + 1 < code.length && TwoNibbleOverrides.canFind(nib * 16 + code[i + 1]);
+        // reminder that nouns are just niladic verbs
+        if(!isOverridden && nib == 0x0) {
             // lists
             if(i + 1 < code.length && code[i + 1] == 0xA
             || i + 2 < code.length && code[i + 1] == 0xC && code[i + 2] >= 0xE) {
@@ -54,7 +56,7 @@ Token[] tokenize(Nibble[] code) {
                 token.big = nibblesToInteger(code, i);
             }
         }
-        else if(nib == 0x1) {
+        else if(!isOverridden && nib == 0x1) {
             token.speech = SpeechPart.Verb;
             token.name = InsName.String;
             token.str = nibblesToString(code, i);
@@ -68,7 +70,7 @@ Token[] tokenize(Nibble[] code) {
                 name += nib;
             }
             // extended characters
-            if(i + 1 < code.length && TwoNibbleOverrides.canFind(name * 16 + code[i + 1])) {
+            if(isOverridden) {
                 appendNibble;
             }
             else if(nib == 0xF) {

@@ -1,4 +1,11 @@
 require 'pathname'
+
+if ARGV.size < 2
+    STDERR.puts "Error: Expected 2 arguments, got #{ARGV.size}"
+    STDERR.puts "Usage: know.rb src_path pattern"
+    exit 1
+end
+
 src = File.join Pathname.new(ARGV[0]).cleanpath, "*.myby"
 files = Dir[src.gsub("\\", "/")]
 pat = Regexp.new ARGV[1]

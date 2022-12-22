@@ -24,8 +24,8 @@ import myby.nibble;
  *  | 1 | Read bytes until matching FF byte
  *  | 2 | Read bytes until matching F0 byte
  *  | 3 | Read bytes until matching 0F byte
- *  | 4 |
- *  | 5 |
+ *  | 4 | Overridden: [
+ *  | 5 | Overridden: ]
  *  | 6 | Read bytes until the first bit of a byte is 1 (including ngraphs)
  *  | 7 | Read bytes until the first bit of a byte is 1
  */
@@ -229,7 +229,7 @@ string nibblesToString(Nibble[] nibbles, ref uint i) {
         i += 2;
     }
     else if(half <= 5) {
-        assert(0, "Unassigned string behavior: half = 4,5");
+        assert(0, "Overridden bytes (not in string)");
     }
     else if(half <= 7) {
         bool usesNGraphs = half == 6;

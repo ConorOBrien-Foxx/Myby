@@ -39,7 +39,7 @@ enum InsName {
     Break, Gerund, LineFeed, PrimeTotient, IsAlpha, IsNumeric, IsAlphaNumeric,
     IsUppercase, IsLowercase, IsBlank, KeepAlpha, KeepNumeric, DotProduct,
     KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank, Palindromize,
-    Inside, ChunkBy,
+    Inside, ChunkBy, Left, Right,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -73,6 +73,8 @@ enum InsInfo[InsName] Info = [
     // Integer: 0
     // String: 1
     InsName.LineFeed:               InsInfo("lf",      0x12,      SpeechPart.Verb),
+    InsName.Left:                   InsInfo("[" ,      0x1C,      SpeechPart.Verb),
+    InsName.Right:                  InsInfo("]",       0x1D,      SpeechPart.Verb),
     // Instructions: 2-F
     InsName.Filter:                 InsInfo("\\",      0x2,       SpeechPart.Adjective),
     InsName.Map:                    InsInfo("\"",      0x3,       SpeechPart.Adjective),
@@ -103,6 +105,9 @@ enum InsInfo[InsName] Info = [
     InsName.Reflex:                 InsInfo("~",       0xBD,      SpeechPart.Adjective),
     InsName.CloseParen:             InsInfo(")",       0xC,       SpeechPart.Syntax),
     InsName.Compose:                InsInfo("@",       0xD,       SpeechPart.Conjunction),
+    // psuedo command sequence - sugar for `@[` and `@]` respectively
+    InsName.OnLeft:                 InsInfo("[.",      0xD1C,     SpeechPart.Adjective),
+    InsName.OnRight:                InsInfo("].",      0xD1D,     SpeechPart.Adjective),
     // DA: `@&` has no meaning
     InsName.Under:                  InsInfo("&.",      0xDA,      SpeechPart.Conjunction),
     // DC: `@)` has no meaning
@@ -120,8 +125,8 @@ enum InsInfo[InsName] Info = [
     InsName.Ternary:                InsInfo("?",       0xF16,     SpeechPart.MultiConjunction),
     InsName.Minimum:                InsInfo("<.",      0xF17,     SpeechPart.Verb),
     InsName.Maximum:                InsInfo(">.",      0xF18,     SpeechPart.Verb),
-    InsName.OnLeft:                 InsInfo("[",       0xF19,     SpeechPart.Adjective),
-    InsName.OnRight:                InsInfo("]",       0xF1A,     SpeechPart.Adjective),
+    //F19
+    //F1A
     InsName.Generate:               InsInfo("G",       0xF1B,     SpeechPart.Adjective),
     InsName.Inverse:                InsInfo("!.",      0xF1C,     SpeechPart.Adjective),
     InsName.Power:                  InsInfo("^:",      0xF1D,     SpeechPart.Conjunction),
@@ -400,6 +405,20 @@ Verb getVerb(InsName name) {
             )
             .setMarkedArity(1);
         
+        // Left
+        verbs[InsName.Left] = new Verb("[")
+            // TODO: we can use monads for something different, since we have #
+            .setMonad(a => a)
+            .setDyad((a, b) => a)
+            .setMarkedArity(2);
+        
+        // Right
+        verbs[InsName.Right] = new Verb("]")
+            // TODO: we can use monads for something different, since we have #
+            .setMonad(a => a)
+            .setDyad((a, b) => b)
+            .setMarkedArity(2);
+        
         // Range (indices)
         verbs[InsName.Range] = new Verb("R")
             .setMonad(a => a.match!(
@@ -530,6 +549,7 @@ Verb getVerb(InsName name) {
         verbs[InsName.Last] = new Verb("}")
             // Last element
             .setMonad(a => a.match!(
+                // To binary
                 (BigInt a) => Atom(a.toBase(2).map!Atom.array),
                 a => verbs[InsName.First](
                     Atom(BigInt(-1)),
@@ -547,6 +567,7 @@ Verb getVerb(InsName name) {
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setInverse(new Verb("}!.")
+                // From binary
                 .setMonad(a => a.match!(
                     (Atom[] a) => fromBase(a, 2),
                     _ => Nil.nilAtom,

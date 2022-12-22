@@ -18,7 +18,7 @@ jumpx # cell ?
 NB. ,
 # place 'tape' #;;O $.tape place $.tp ; 256 %~ 0 >. getch
 NB. .
-# #[ putch@cell
+# [ putch@cell
 NB. debug, ?
 echo
 NB. pick out the correct chain (+6 bc initial defs)
