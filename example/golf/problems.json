@@ -478,6 +478,27 @@
         ]
     },
     {
+        "id": 111707,
+        "name": "simple-csv-dsv-importer",
+        "tests": [
+            {
+                "x":["here is,some,sample","data,delimited,by commas"],
+                "y":",",
+                "result":[["here is","some","sample"],["data","delimited","by commas"]]
+            },
+            {
+                "x":["hello;\"","\";world","\";\""],
+                "y":";",
+                "result":[["hello","\""],["\"","world"],["\"","\""]]
+            },
+            {
+                "x":["to be or not","that is the question"],
+                "y":" ",
+                "result":[["to","be","or","not"],["that","is","the","question"]]
+            }
+        ]
+    },
+    {
         "id": 254224,
         "name": "maximum-average-ord",
         "tests": [

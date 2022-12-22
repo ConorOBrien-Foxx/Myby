@@ -25,7 +25,8 @@ problems.each.with_index { |problem, i|
         args = [ list["x"] ] rescue []
         args << list["y"] unless list["y"].nil?
         args.map! { |arg|
-            "unjson'#{arg.to_json.gsub("'", "''")}'"
+            escaped = arg.to_json.gsub(/\\|'/, '\0\0')
+            "unjson'#{escaped}'"
         }
         result = list["result"].to_json
         codepath = File.join base, "#{name}.myby"
@@ -60,6 +61,9 @@ problems.each.with_index { |problem, i|
             failed = true
         end
         if failed
+            cmd.each.with_index(1) { |c, i|
+                puts "Arg #{i}: #{c}"
+            }
             STDERR.puts cmd.inspect
             STDERR.puts stderr.gsub(/^/m, " " * 4).lines[0..5]
         else
