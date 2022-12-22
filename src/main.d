@@ -1,23 +1,26 @@
 module myby.main;
 
 import std.algorithm.iteration : map;
+import std.algorithm.searching : canFind;
 import std.array;
 import std.bigint;
+import std.file : read, FileException, write, exists, getcwd;
 import std.getopt;
+import std.path : buildPath, dirName;
+import std.process : spawnProcess, wait;
 import std.range : lockstep;
 import std.stdio;
 import std.sumtype;
 
-// TODO: remove superfluous headers
+import core.exception : AssertError;
+
 import myby.debugger;
 import myby.instructions;
-import myby.integer;
 import myby.interpreter;
 import myby.json : atomToJson;
 import myby.literate;
 import myby.nibble;
 import myby.speech;
-import myby.string;
 
 auto getoptSafeError(T...)(ref string[] args, T opts) {
     try {
@@ -30,25 +33,37 @@ auto getoptSafeError(T...)(ref string[] args, T opts) {
     }
 }
 
+string[] ScriptAliases = [
+    "know",
+    "runner",
+    "distr"
+];
 int main(string[] args) {
-    import std.file : read, FileException, write, exists;
-    import core.exception : AssertError;
+    // script aliases - do before processing args
+    if(args.length >= 2 && ScriptAliases.canFind(args[1])) {
+        auto scriptSource = buildPath(
+            getcwd(),
+            args[0].dirName,
+            "example",
+            "golf",
+            args[1] ~ ".rb"
+        );
+        auto pid = spawnProcess(["ruby", scriptSource] ~ args[2..$]);
+        return wait(pid);
+    }
     
     bool compile;
     bool literate;
-    bool useDebug;
-    bool useRuntimeDebug;
+    bool useDebug, useRuntimeDebug;
     bool dispTree;
     bool jsonOutput;
-    bool decompile;
-    bool decompileAlign;
+    bool decompile, decompileAlign;
     bool noCode;
+    bool scriptKnow, scriptRunner, scriptDistribution;
     string outfile;
     string fpath;
     string code;
-    string fValue;
-    string gValue;
-    string hValue;
+    string fValue, gValue, hValue;
     bool temp;//todo:remove
     auto info = getoptSafeError(
         args,
@@ -68,7 +83,12 @@ int main(string[] args) {
         "f", "Sets verb F:", &fValue,
         "g", "Sets verb G:", &gValue,
         "h", "Sets verb H:", &hValue,
-        "z", "temp", &temp
+        // quick aliases for other commands
+        "K", "know.rb", &scriptKnow,
+        "R", "runner.rb", &scriptRunner,
+        "D", "distr.rb", &scriptDistribution,
+        //todo:remove
+        "z", "temp", &temp,
     );
     
     void writelnResult(Atom a) {

@@ -2,6 +2,13 @@ require 'open3'
 $MYBY = Gem.win_platform? ? '.\myby.exe' : './myby'
 
 require 'pathname'
+
+if ARGV.size < 1
+    STDERR.puts "Error: Expected 1 argument, got 0"
+    STDERR.puts "Usage: distr.rb source_path"
+    exit 1
+end
+
 src = File.join Pathname.new(ARGV[0]).cleanpath, "*.myby"
 files = Dir[src.gsub("\\", "/")]
 
