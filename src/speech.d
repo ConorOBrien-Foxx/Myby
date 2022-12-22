@@ -898,7 +898,7 @@ class Verb {
         else {
             nextChildren ~= g;
         }
-        return new Verb(":")
+        return new Verb("`")
             .setMonad((Verb[] verbs, a) =>
                 Atom(verbs.map!(v => v(a)).array)
             )

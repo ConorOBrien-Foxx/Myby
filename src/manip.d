@@ -375,6 +375,28 @@ Atom fromBase(B)(Atom[] n, B base) {
     return Atom(sum);
 }
 
+Atom[][] chunkVerb(Verb v, Atom[] list) {
+    if(v.markedArity == 1) {
+        return list.chunkBy!((a, b) => v(a) == v(b))
+            .map!array
+            // .map!Atom
+            .array;
+    }
+    else {
+        return list.splitWhen!((a, b) => !v(a, b).truthiness)
+            .map!array
+            // .map!Atom
+            .array;
+    }
+}
+
+Atom chunkVerb(Verb v, Atom a) {
+    return a.match!(
+        (Atom[] list) => Atom(chunkVerb(v, list).map!Atom.array),
+        (string str) => Atom(chunkVerb(v, str.atomChars).map!joinToString.map!Atom.array),
+        _ => Nil.nilAtom,
+    );
+}
 
 string INSENSITIVE_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
 string SENSITIVE_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

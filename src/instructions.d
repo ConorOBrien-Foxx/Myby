@@ -114,7 +114,6 @@ enum InsInfo[InsName] Info = [
     InsName.LastChain:              InsInfo("$^",      0xF10,     SpeechPart.Verb),
     InsName.ThisChain:              InsInfo("$:",      0xF11,     SpeechPart.Verb),
     InsName.ChunkBy:                InsInfo("C",       0xF12,     SpeechPart.Adjective),
-    //F12
     //F13
     InsName.Diagonal:               InsInfo("/:",      0xF14,     SpeechPart.Adjective),
     InsName.Oblique:                InsInfo("/.",      0xF15,     SpeechPart.Adjective),
@@ -510,6 +509,9 @@ Verb getVerb(InsName name) {
                 try {
                     return match!(
                         // TODO: index by real?
+                        (bool b, Atom[] a) => !b || a.length <= 1
+                            ? a[0]
+                            : a[1],
                         (BigInt b, Atom[] a) => a.length
                             ? a[moldIndex(b, a.length)]
                             : Nil.nilAtom,
@@ -682,6 +684,7 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((a, b) => match!(
                 (a, Atom[] b) => Atom(b.canFind(atomFor(a))),
+                (a, string b) => Atom(b.canFind(a)),
                 (_1, _2) => Nil.nilAtom,
             )(a, b))
             .setMarkedArity(2);
@@ -1616,28 +1619,7 @@ Adjective getAdjective(InsName name) {
         
         adjectives[InsName.ChunkBy] = new Adjective(
             (Verb v) => new Verb("C")
-                .setMonad((Verb v, a) {
-                    Atom[] list = a.match!(
-                        (Atom[] a) => a,
-                        _ => assert(0, "Cannot chunk a non-list")
-                    );
-                    if(v.markedArity == 1) {
-                        return Atom(
-                            list.chunkBy!((a, b) => v(a) == v(b))
-                                .map!array
-                                .map!Atom
-                                .array
-                        );
-                    }
-                    else {
-                        return Atom(
-                            list.splitWhen!((a, b) => !v(a, b).truthiness)
-                                .map!array
-                                .map!Atom
-                                .array
-                        );
-                    }
-                })
+                .setMonad((Verb v, a) => chunkVerb(v, a))
                 .setDyad((_1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
                 .setChildren([v])
