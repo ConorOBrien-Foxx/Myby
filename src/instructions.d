@@ -39,7 +39,7 @@ enum InsName {
     Break, Gerund, LineFeed, PrimeTotient, IsAlpha, IsNumeric, IsAlphaNumeric,
     IsUppercase, IsLowercase, IsBlank, KeepAlpha, KeepNumeric, DotProduct,
     KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank, Palindromize,
-    Inside,
+    Inside, ChunkBy,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -113,7 +113,8 @@ enum InsInfo[InsName] Info = [
     InsName.Modulus:                InsInfo("%",       0xF0,      SpeechPart.Verb),
     InsName.LastChain:              InsInfo("$^",      0xF10,     SpeechPart.Verb),
     InsName.ThisChain:              InsInfo("$:",      0xF11,     SpeechPart.Verb),
-    InsName.Link:                   InsInfo(";",       0xF12,     SpeechPart.Verb),
+    InsName.ChunkBy:                InsInfo("C",       0xF12,     SpeechPart.Adjective),
+    //F12
     //F13
     InsName.Diagonal:               InsInfo("/:",      0xF14,     SpeechPart.Adjective),
     InsName.Oblique:                InsInfo("/.",      0xF15,     SpeechPart.Adjective),
@@ -197,6 +198,8 @@ enum InsInfo[InsName] Info = [
     InsName.While:                  InsInfo("while",   0xFE85,    SpeechPart.Conjunction),
     InsName.Time:                   InsInfo("T.",      0xFE86,    SpeechPart.Adjective),
     InsName.VerbDiagnostic:         InsInfo("?:",      0xFE87,    SpeechPart.Adjective),
+    ////FE9* - list manipulation////
+    InsName.Link:                   InsInfo(";",       0xFE90,    SpeechPart.Verb),
     //FEA0-FEBF reserved for aliases
     InsName.DefinedAlias:           InsInfo("(n/a)",   0xFEA0,    SpeechPart.Verb),
     //TODO: Conjunction/Adjective aliases?
@@ -1603,9 +1606,37 @@ Adjective getAdjective(InsName name) {
             (Verb v) => new Verb("loop")
                 .setMonad((Verb v, a) {
                     while((a = v(a)).truthiness) {
-                        
                     }
                     return a;
+                })
+                .setDyad((_1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+                .setChildren([v])
+        );
+        
+        adjectives[InsName.ChunkBy] = new Adjective(
+            (Verb v) => new Verb("C")
+                .setMonad((Verb v, a) {
+                    Atom[] list = a.match!(
+                        (Atom[] a) => a,
+                        _ => assert(0, "Cannot chunk a non-list")
+                    );
+                    if(v.markedArity == 1) {
+                        return Atom(
+                            list.chunkBy!((a, b) => v(a) == v(b))
+                                .map!array
+                                .map!Atom
+                                .array
+                        );
+                    }
+                    else {
+                        return Atom(
+                            list.splitWhen!((a, b) => !v(a, b).truthiness)
+                                .map!array
+                                .map!Atom
+                                .array
+                        );
+                    }
                 })
                 .setDyad((_1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
