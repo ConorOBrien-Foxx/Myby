@@ -1024,6 +1024,13 @@ Atom atomFor(T)(T a) {
     }
 }
 
+bool isString(Atom a) {
+    return a.match!(
+        (string x) => true,
+        _ => false
+    );
+}
+
 bool isArray(Atom a) {
     return a.match!(
         (Atom[] x) => true,

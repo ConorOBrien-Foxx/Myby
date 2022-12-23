@@ -588,6 +588,18 @@ Verb getVerb(InsName name) {
                             : Nil.nilAtom,
                         (BigInt b, string a) =>
                             Atom(to!string(a[moldIndex(b, a.length)])),
+                        (Atom[] b, string a) {
+                            Atom[] result = b.map!(e => verbs[InsName.First](e, a)).array;
+                            if(b.any!isArray) {
+                                return Atom(result);
+                            }
+                            else {
+                                // only coalesce to string if we were at the lowest level
+                                return Atom(result.joinToString);
+                            }
+                        },
+                        (Atom[] b, a) =>
+                            Atom(b.map!(e => verbs[InsName.First](e, a)).array),
                         (b, AVHash h) => Atom(h[_AtomValue(b)]),
                         (_1, _2) => Nil.nilAtom,
                     )(l, r);
