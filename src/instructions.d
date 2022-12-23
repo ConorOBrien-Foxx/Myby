@@ -9,6 +9,7 @@ import std.algorithm.sorting;
 import std.bigint;
 import std.conv : to;
 import std.datetime;
+import std.datetime.systime;
 import std.range;
 import std.sumtype;
 import std.typecons;
@@ -39,7 +40,8 @@ enum InsName {
     Break, Gerund, LineFeed, PrimeTotient, IsAlpha, IsNumeric, IsAlphaNumeric,
     IsUppercase, IsLowercase, IsBlank, KeepAlpha, KeepNumeric, DotProduct,
     KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank, Palindromize,
-    Inside, ChunkBy, Left, Right, FromBase, ToBase, LeftMap,
+    Inside, ChunkBy, Left, Right, FromBase, ToBase, LeftMap, SysTime, Year,
+    Month, Day, Hour, Minute, Second,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -179,6 +181,14 @@ enum InsInfo[InsName] Info = [
     InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
     InsName.Ascii:                  InsInfo("A",       0xFE41,    SpeechPart.Verb),
     InsName.Alpha:                  InsInfo("L",       0xFE42,    SpeechPart.Verb),
+    ////FE5* - time////
+    InsName.SysTime:                InsInfo("time",    0xFE50,    SpeechPart.Verb),
+    InsName.Year:                   InsInfo("yr"  ,    0xFE51,    SpeechPart.Verb),
+    InsName.Month:                  InsInfo("mo",      0xFE52,    SpeechPart.Verb),
+    InsName.Day:                    InsInfo("dy",      0xFE53,    SpeechPart.Verb),
+    InsName.Hour:                   InsInfo("hr",      0xFE54,    SpeechPart.Verb),
+    InsName.Minute:                 InsInfo("mn",      0xFE55,    SpeechPart.Verb),
+    InsName.Second:                 InsInfo("sc",      0xFE56,    SpeechPart.Verb),
     ////FE6* - range////
     InsName.DigitRange:             InsInfo("R:",      0xFE60,    SpeechPart.Verb),
     InsName.Place:                  InsInfo("place",   0xFE61,    SpeechPart.Verb),
@@ -207,9 +217,11 @@ enum InsInfo[InsName] Info = [
     InsName.VerbDiagnostic:         InsInfo("?:",      0xFE87,    SpeechPart.Adjective),
     ////FE9* - list manipulation////
     InsName.Link:                   InsInfo(";",       0xFE90,    SpeechPart.Verb),
-    //FEA0-FEBF reserved for aliases
-    InsName.DefinedAlias:           InsInfo("(n/a)",   0xFEA0,    SpeechPart.Verb),
+    ////FEA* - reserved for aliases////
+    ////FEB* - reserved for aliases////
     //TODO: Conjunction/Adjective aliases?
+    InsName.DefinedAlias:           InsInfo("(n/a)",   0xFEA0,    SpeechPart.Verb),
+    ////FEC* - unassigned////
     ////FED* - high order I/O////
     InsName.F:                      InsInfo("F:",      0xFED0,    SpeechPart.Verb),
     InsName.G:                      InsInfo("G:",      0xFED1,    SpeechPart.Verb),
@@ -220,6 +232,8 @@ enum InsInfo[InsName] Info = [
     //FED6: maybe "n-th" adjective
     InsName.C:                      InsInfo("C:",      0xFED7,    SpeechPart.Conjunction),
     InsName.D:                      InsInfo("D:",      0xFED8,    SpeechPart.Conjunction),
+    ////FEE* - unassigned////
+    ////FEF* - miscellaneous////
     InsName.Break:                  InsInfo("\n",      0xFF,      SpeechPart.Syntax),
 ];
 
@@ -1157,7 +1171,7 @@ Verb getVerb(InsName name) {
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
         
-        verbs[InsName.KeepLowercase] = new Verb("blankk")
+        verbs[InsName.KeepBlank] = new Verb("blankk")
             .setMonad(a => a.match!(
                 (string s) => Atom(s.filter!isWhite.to!string),
                 _ => Nil.nilAtom
@@ -1177,6 +1191,70 @@ Verb getVerb(InsName name) {
             .setMonad(a => a.match!(
                 (s) => Atom(s.length <= 1 ? s[0..0] : s[1..$-1]),
                 _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        // time
+        verbs[InsName.SysTime] = new Verb("time")
+            .setMonad((a) {
+                SysTime today = Clock.currTime();
+                AVHash data;
+                data[_AtomValue("yr")] = BigInt(today.year);
+                data[_AtomValue("mo")] = BigInt(today.month);
+                data[_AtomValue("dy")] = BigInt(today.day);
+                data[_AtomValue("hr")] = BigInt(today.hour);
+                data[_AtomValue("mn")] = BigInt(today.minute);
+                data[_AtomValue("sc")] = BigInt(today.second);
+                return Atom(data);
+            })
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.Year] = new Verb("yr")
+            .setMonad(a => a.match!(
+                (AVHash data) => Atom(data[_AtomValue("yr")]),
+                _ => Atom(BigInt(Clock.currTime().year))
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.Month] = new Verb("mo")
+            .setMonad(a => a.match!(
+                (AVHash data) => Atom(data[_AtomValue("mo")]),
+                _ => Atom(BigInt(Clock.currTime().month))
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.Day] = new Verb("dy")
+            .setMonad(a => a.match!(
+                (AVHash data) => Atom(data[_AtomValue("dy")]),
+                _ => Atom(BigInt(Clock.currTime().day))
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.Hour] = new Verb("hr")
+            .setMonad(a => a.match!(
+                (AVHash data) => Atom(data[_AtomValue("hr")]),
+                _ => Atom(BigInt(Clock.currTime().hour))
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.Minute] = new Verb("mn")
+            .setMonad(a => a.match!(
+                (AVHash data) => Atom(data[_AtomValue("mn")]),
+                _ => Atom(BigInt(Clock.currTime().minute))
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.Second] = new Verb("sc")
+            .setMonad(a => a.match!(
+                (AVHash data) => Atom(data[_AtomValue("sc")]),
+                _ => Atom(BigInt(Clock.currTime().second))
             ))
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
