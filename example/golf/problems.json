@@ -560,5 +560,41 @@
             {"x":[2454267026,2863311530,3681400539], "result":3817748707},
             {"x":[2341103945,2969112506,1849078949,1430639189], "result":3}
         ]
+    },
+    {
+        "id": 255650,
+        "name": "sum-every-second-digit-in-a-number",
+        "tests": [
+            {"x":10, "result":0},
+            {"x":101011, "result":1},
+            {"x":548915381, "result":26},
+            {"x":999999, "result":27},
+            {"x":2147483647, "result":29},
+            {"x":999999999, "result":36}
+        ],
+        "alternatives": [
+            {"bytes":7.5, "code":"+\\@}@^ 10&#: / 2"},
+            {"bytes":8.5, "code":"} +\"\\ P @. 10&#: / 2"},
+            {"bytes":8.5, "code":"} ( +\"\\@P 10&#: / 2 )"},
+            {"bytes":9,   "code":"( +\\ ] *\" + # 0 1 ) 10&#:"},
+            {"bytes":9.5, "code":"} ( +\"\\ (10 #: 10&*) / 2"}
+        ]
+    },
+    {
+        "id": 250213,
+        "name": "generate-an-arbitrary-half-of-a-string",
+        "tests": [
+            {"x": "aaaabbbb", "result": ["aabb"]},
+            {"x": "abab", "result": ["ab", "ba"]},
+            {"x": "aabbaa", "result": ["aab", "aba", "baa"]},
+            {"x": "aabbaaaa", "result": ["aaba", "abaa", "baaa"]},
+            {"x": "baccba", "result": ["acb", "bac", "bca", "cba"]},
+            {"x": "aabbcc", "result": ["abc"]},
+            {"x": "abcabc", "result": ["abc", "acb", "bac", "bca", "cab"]}
+        ],
+        "option": true,
+        "alternatives": [
+            {"bytes":11.5, "code":"# # +\\\"@(# =V #\\.)@/ %\" 2"}
+        ]
     }
 ]

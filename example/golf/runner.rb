@@ -13,7 +13,7 @@ take = ARGV.map { |e|
 
 problems.each.with_index { |problem, i|
     name = problem["name"]
-    next unless take.empty? || take.index(i) || take.any? { |t| name.index t }
+    next unless take.empty? || take.index(i) || take.any? { |t| String === t && name.index(t) }
     float_precision = problem["float_precision"]
     id = problem["id"]
     tests = problem["tests"]
@@ -53,7 +53,13 @@ problems.each.with_index { |problem, i|
             STDERR.puts stderr
             failed = true
         end
-        mismatch = stdout != result
+        mismatch = if problem["option"]
+            # TODO: this compares by strings, rather than
+            # by interpreted JSON values. fix that
+            result.index(stdout).nil?
+        else
+            stdout != result
+        end
         if mismatch && !float_precision.nil?
             stdout = stdout.to_f.round float_precision
             result = result.to_f.round float_precision
