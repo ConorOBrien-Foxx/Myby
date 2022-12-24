@@ -41,7 +41,7 @@ enum InsName {
     IsUppercase, IsLowercase, IsBlank, KeepAlpha, KeepNumeric, DotProduct,
     KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank, Palindromize,
     Inside, ChunkBy, Left, Right, FromBase, ToBase, LeftMap, SysTime, Year,
-    Month, Day, Hour, Minute, Second,
+    Month, Day, Hour, Minute, Second, Vowels, Consonants,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -181,6 +181,8 @@ enum InsInfo[InsName] Info = [
     InsName.Empty:                  InsInfo("E",       0xFE40,    SpeechPart.Verb),
     InsName.Ascii:                  InsInfo("A",       0xFE41,    SpeechPart.Verb),
     InsName.Alpha:                  InsInfo("L",       0xFE42,    SpeechPart.Verb),
+    InsName.Vowels:                 InsInfo("vow",     0xFE43,    SpeechPart.Verb),
+    InsName.Consonants:             InsInfo("con",     0xFE44,    SpeechPart.Verb),
     ////FE5* - time////
     InsName.SysTime:                InsInfo("time",    0xFE50,    SpeechPart.Verb),
     InsName.Year:                   InsInfo("yr"  ,    0xFE51,    SpeechPart.Verb),
@@ -427,7 +429,8 @@ Verb getVerb(InsName name) {
             .setMonad(a => a.match!(
                 (Atom[] a) => Atom(a.gradeUp.map!BigInt.map!Atom.array),
                 (string a) => Atom(a.atomChars.gradeUp.map!BigInt.map!Atom.array),
-                _ => Nil.nilAtom,
+                // wrap non-list
+                _ => Atom([ a ]),
             ))
             // Left
             .setDyad((a, b) => a)
@@ -438,7 +441,8 @@ Verb getVerb(InsName name) {
             .setMonad(a => a.match!(
                 (Atom[] a) => Atom(a.gradeDown.map!BigInt.map!Atom.array),
                 (string a) => Atom(a.atomChars.gradeDown.map!BigInt.map!Atom.array),
-                _ => Nil.nilAtom,
+                // pair non-list
+                _ => Atom([a, a]),
             ))
             // Right
             .setDyad((a, b) => b)
@@ -586,9 +590,12 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.First] = new Verb("{")
             // First element
-            .setMonad(a =>
-                verbs[InsName.First](atomFor(BigInt(0)), a)
-            )
+            .setMonad(a => a.match!(
+                (Atom[] _) => verbs[InsName.First](Atom(BigInt(0)), a),
+                (string _) => verbs[InsName.First](Atom(BigInt(0)), a),
+                // idempotent for non-array/strings
+                _ => a,
+            ))
             // Index
             .setDyad((l, r) {
                 try {
@@ -627,10 +634,10 @@ Verb getVerb(InsName name) {
         verbs[InsName.Last] = new Verb("}")
             // Last element
             .setMonad(a => a.match!(
-                a => verbs[InsName.First](
-                    Atom(BigInt(-1)),
-                    atomFor(a)
-                ),
+                (Atom[] _) => verbs[InsName.First](Atom(BigInt(-1)), a),
+                (string _) => verbs[InsName.First](Atom(BigInt(-1)), a),
+                // idempotent for non-array/strings
+                _ => a,
             ))
             .setDyad((l, r) => match!(
                 // multiset subtraction
@@ -1286,6 +1293,12 @@ Verb getVerb(InsName name) {
         
         verbs[InsName.Alpha] = Verb.nilad(Atom("abcdefghijklmnopqrstuvwxyz"));
         verbs[InsName.Alpha].display = "L";
+        
+        verbs[InsName.Vowels] = Verb.nilad(Atom("aeiou"));
+        verbs[InsName.Vowels].display = "vow";
+        
+        verbs[InsName.Consonants] = Verb.nilad(Atom("bcdfghjklmnpqrstvwxyz"));
+        verbs[InsName.Consonants].display = "con";
         
         verbs[InsName.Getch] = new Verb("getch")
             .setMonad(_ => atomGetch())

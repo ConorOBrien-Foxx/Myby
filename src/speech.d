@@ -966,7 +966,21 @@ class Verb {
                     _ => Nil.nilAtom,
                 );
             })
-            .setDyad((f, g, _1, _2) => Nil.nilAtom)
+            .setDyad((f, g, a, b) {
+                // TODO: gerund cases for g
+                Atom times = g(b);
+                return times.match!(
+                    (Infinity i) => assert(0, "TODO: Fixpoint"),
+                    (n) {
+                        assert(n >= 0, "TODO: Negative (inverse) repetition");
+                        for(typeof(n) i = 0; i < n; i++) {
+                            a = f(a);
+                        }
+                        return a;
+                    },
+                    _ => Nil.nilAtom,
+                );
+            })
             .setMarkedArity(1)
             .setChildren([f, g]);
     }
