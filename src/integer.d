@@ -29,7 +29,7 @@ import myby.nibble;
  *    | c4 | 64
  *    | c5 | 128
  *    | c6 | 256
- *    | c7 | 512
+ *    | c7 | 15
  *    | c8 | 1024
  *    | c9 | 100
  *    | ca | 255
@@ -38,8 +38,8 @@ import myby.nibble;
  *    | cd | -1
  *    | ce | A triple of numbers
  *    | cfq* | A series of q numbers in a row
- *    | dww | A number encoded using the next two nibbles
- *    |     | (The first 256 integers not otherwise encoded above)
+ *    | dww  | A number encoded using the next two nibbles
+ *    |      | (The first 256 integers not otherwise encoded above)
  *    | eqw* | A negative number encoding the next q nibbles
  *    | fqw* | A positive number encoding the next q nibbles (otherwise not encoded above)
  */
@@ -54,7 +54,7 @@ enum OneMillionPlaceholder = -3; // limits inferred cache size
 enum OneMillion = 1000000;
 enum ExtraConstants = [
     6, 1000, 16, 32, 64,
-    128, 256, 97, 1024,
+    128, 256, 15, 1024,
     100, 255,
     OneMillionPlaceholder, -2, -1
 ];

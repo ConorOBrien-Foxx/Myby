@@ -10,6 +10,7 @@ import std.bigint;
 import std.conv : to;
 import std.datetime;
 import std.datetime.systime;
+import std.random;
 import std.range;
 import std.sumtype;
 import std.typecons;
@@ -41,7 +42,7 @@ enum InsName {
     IsUppercase, IsLowercase, IsBlank, KeepAlpha, KeepNumeric, DotProduct,
     KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank, Palindromize,
     Inside, ChunkBy, Left, Right, FromBase, ToBase, LeftMap, SysTime, Year,
-    Month, Day, Hour, Minute, Second, Vowels, Consonants,
+    Month, Day, Hour, Minute, Second, Vowels, Consonants, Random,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -75,6 +76,7 @@ enum InsInfo[InsName] Info = [
     // Integer: 0
     // String: 1
     InsName.LineFeed:               InsInfo("lf",      0x12,      SpeechPart.Verb),
+    InsName.Random:                 InsInfo("?.",      0x18,      SpeechPart.Verb),
     InsName.LeftMap:                InsInfo("\":" ,    0x19,      SpeechPart.Adjective),
     InsName.FromBase:               InsInfo("#." ,     0x1A,      SpeechPart.Verb),
     InsName.ToBase:                 InsInfo("#:",      0x1B,      SpeechPart.Verb),
@@ -498,6 +500,18 @@ Verb getVerb(InsName name) {
             // Link
             .setDyad((a, b) => a.linkWith(b))
             .setMarkedArity(2);
+        
+        verbs[InsName.Random] = new Verb("?.")
+            .setMonad(a => a.match!(
+                // sample
+                (Atom[] list) => list.choice(),
+                (string s) => Atom(s.atomChars.choice()),
+                // uniform random [0,n) - bigints not natively supported here
+                (BigInt n) => Atom(uniform(0, n.to!ulong)),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
         
         verbs[InsName.FromBase] = new Verb("#.")
             // From binary

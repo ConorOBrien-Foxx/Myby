@@ -11,6 +11,7 @@ take = ARGV.map { |e|
     /^-?\d+$/ === e ? e.to_i % problems.size : e
 }
 
+total_score = 0
 problems.each.with_index { |problem, i|
     name = problem["name"]
     next unless take.empty? || take.index(i) || take.any? { |t| String === t && name.index(t) }
@@ -86,5 +87,7 @@ problems.each.with_index { |problem, i|
             success += 1
         end
     }
+    total_score += score.to_i
     puts "#{success} / #{total} passed"
 }
+puts "Total score: #{total_score}b"
