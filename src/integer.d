@@ -15,10 +15,10 @@ import myby.nibble;
  *    | 3 | 3
  *    | 4 | 4
  *    | 5 | 5
- *    | 6 | 7
- *    | 7 | 8
- *    | 8 | 9
- *    | 9 | 10
+ *    | 6 | 8
+ *    | 7 | 9
+ *    | 8 | 10
+ *    | 9 | Overridden: ?.
  *    | a | A pair of numbers
  *    | b | A real number encoded using the next two integers
  *    | cw | A special constant encoded using the next nibble
@@ -45,9 +45,8 @@ import myby.nibble;
  */
 
 enum BaseConstants = [
-    0, 1, 2, 3,
-    4, 5, 7, 8,
-    9, 10
+    0, 1, 2, 3, 4,
+    5, 8, 9, 10
 ];
 
 enum OneMillionPlaceholder = -3; // limits inferred cache size

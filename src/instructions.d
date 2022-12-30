@@ -74,9 +74,9 @@ struct InsInfo {
 // appear in code for the same reason (& never appears in code.
 enum InsInfo[InsName] Info = [
     // Integer: 0
+    InsName.Random:                 InsInfo("?.",      0x09,      SpeechPart.Verb),
     // String: 1
     InsName.LineFeed:               InsInfo("lf",      0x12,      SpeechPart.Verb),
-    InsName.Random:                 InsInfo("?.",      0x18,      SpeechPart.Verb),
     InsName.LeftMap:                InsInfo("\":" ,    0x19,      SpeechPart.Adjective),
     InsName.FromBase:               InsInfo("#." ,     0x1A,      SpeechPart.Verb),
     InsName.ToBase:                 InsInfo("#:",      0x1B,      SpeechPart.Verb),
@@ -1383,7 +1383,7 @@ Adjective getAdjective(InsName name) {
         );
         
         adjectives[InsName.LeftMap] = new Adjective(
-            (Verb v) => new Verb("\"")
+            (Verb v) => new Verb("\":")
                 // map
                 .setMonad((Verb v, a) => a.match!(
                     (Atom[] arr) => Atom(mapVerb(v, arr)),
