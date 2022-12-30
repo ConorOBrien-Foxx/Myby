@@ -628,6 +628,28 @@ T[] multisetDifference(T)(T[] as, T[] bs) {
     return res;
 }
 
+// TODO: optimize
+bool isSubsetOrEqual(T)(T[] as, T[] bs) {
+    foreach(a; as) {
+        if(!bs.canFind(a)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isStrictSubset(T)(T[] as, T[] bs) {
+    return as.length != bs.length && !as.equal(bs) && as.isSubsetOrEqual(bs);
+}
+
+bool isSupersetOrEqual(T)(T[] as, T[] bs) {
+    return isSubsetOrEqual(bs, as);
+}
+
+bool isStrictSuperset(T)(T[] as, T[] bs) {
+    return isStrictSubset(bs, as);
+}
+
 Atom generate(Verb v, Atom a) {
     if(v.markedArity <= 1) {
         return generate(v, Nil.nilAtom, a);

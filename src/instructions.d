@@ -43,6 +43,7 @@ enum InsName {
     KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank, Palindromize,
     Inside, ChunkBy, Left, Right, FromBase, ToBase, LeftMap, SysTime, Year,
     Month, Day, Hour, Minute, Second, Vowels, Consonants, Random,
+    Subset, Subseteq, Superset, Superseteq,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -197,6 +198,10 @@ enum InsInfo[InsName] Info = [
     InsName.DigitRange:             InsInfo("R:",      0xFE60,    SpeechPart.Verb),
     InsName.Place:                  InsInfo("place",   0xFE61,    SpeechPart.Verb),
     InsName.Hash:                   InsInfo("hash",    0xFE62,    SpeechPart.Verb),
+    InsName.Subset:                 InsInfo("(.",      0xFE63,    SpeechPart.Verb),
+    InsName.Subseteq:               InsInfo("(..",     0xFE64,    SpeechPart.Verb),
+    InsName.Superset:               InsInfo(").",      0xFE65,    SpeechPart.Verb),
+    InsName.Superseteq:             InsInfo(")..",     0xFE66,    SpeechPart.Verb),
     ////FE7* - primes
     InsName.NthPrime:               InsInfo("primn",   0xFE70,    SpeechPart.Verb),
     InsName.IsPrime:                InsInfo("primq",   0xFE71,    SpeechPart.Verb),
@@ -1070,6 +1075,38 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
+        
+        verbs[InsName.Subset] = new Verb("(.")
+            .setMonad(_ => Nil.nilAtom)
+            .setDyad((a, b) => match!(
+                (a, b) => Atom(isStrictSubset(a, b)),
+                (_1, _2) => Nil.nilAtom
+            )(a, b))
+            .setMarkedArity(2);
+        
+        verbs[InsName.Subseteq] = new Verb("(..")
+            .setMonad(_ => Nil.nilAtom)
+            .setDyad((a, b) => match!(
+                (a, b) => Atom(isSubsetOrEqual(a, b)),
+                (_1, _2) => Nil.nilAtom
+            )(a, b))
+            .setMarkedArity(2);
+        
+        verbs[InsName.Superset] = new Verb(").")
+            .setMonad(_ => Nil.nilAtom)
+            .setDyad((a, b) => match!(
+                (a, b) => Atom(isStrictSuperset(a, b)),
+                (_1, _2) => Nil.nilAtom
+            )(a, b))
+            .setMarkedArity(2);
+        
+        verbs[InsName.Superseteq] = new Verb(")..")
+            .setMonad(_ => Nil.nilAtom)
+            .setDyad((a, b) => match!(
+                (a, b) => Atom(isSupersetOrEqual(a, b)),
+                (_1, _2) => Nil.nilAtom
+            )(a, b))
+            .setMarkedArity(2);
         
         verbs[InsName.FromJSON] = new Verb("unjson")
             .setMonad(a => a.match!(

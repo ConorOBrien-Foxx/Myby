@@ -90,11 +90,15 @@ struct LiterateToken {
     }
 }
 
+bool isAliasAlphabetic(T)(T c) {
+    return 'a' <= c && c <= 'z';
+}
+
 enum IdentifierPostfixes = [ '.', ':' ];
 enum IdentifierPrefixes = [ '$' ];
 enum MaxAliasCount = 32;
 LiterateToken[] tokenizeLiterate(T)(T str) {
-    import std.algorithm.searching : canFind;
+    import std.algorithm.searching : canFind, all;
     /* 1. definitions */
     LiterateToken[] tokens;
     string[] aliases;
@@ -141,7 +145,7 @@ LiterateToken[] tokenizeLiterate(T)(T str) {
     
     string readAlphabetic() {
         string name;
-        while(i < str.length && 'a' <= str[i] && str[i] <= 'z') {
+        while(i < str.length && str[i].isAliasAlphabetic) {
             name ~= str[i++];
         }
         return name;
@@ -258,7 +262,7 @@ LiterateToken[] tokenizeLiterate(T)(T str) {
                 token.type = LiterateType.Alias;
                 token.str = name;
             }
-            else if(name[$-1] == ':') {
+            else if(name[$-1] == ':' && name[0..$-1].all!isAliasAlphabetic) {
                 // TODO: check for redefined alias
                 token.type = LiterateType.AliasDefine;
                 string finalName = name[0..$-1];
