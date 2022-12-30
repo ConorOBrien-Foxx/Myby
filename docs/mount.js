@@ -47,24 +47,28 @@ hljs.registerLanguage("myby", (h) => {
                 className: "number",
                 variants: [
                     { begin: `[01]+b` },
-                    { begin: `[0-9]+(\\.[0-9]+)?(e[+-]?[0-9]+)?` },
+                    { begin: `_?[0-9]+(\\.[0-9]+)?(e[+-]?[0-9]+)?` },
                 ],
                 relevance: 0,
             },
             // Adjective
+            // grep -E SpeechPart.Adjective src\instructions.d | ruby -e "puts STDIN.read.lines.map{|line|line.scan(/InsInfo.(.)(.+)\1/)[0]}.map{eval _1+_2+_1}.sort.sort_by.with_index{[-_1.size,_2]}.map{Regexp.escape(_1).gsub(?/,'\\\0')} * ?|"
             {
                 className: "literal",
                 variants: [
                     { begin: /^\s*[a-z]+:/ },
-                    { begin: /[!TM]\.|[\\][:.]|\\\.\.|\$N|[?\\G"\[\]]/ },
+                    // { begin: /[!TM]\.|[\\][:.]|\\\.\.|\$N|[?\\G"\[\]]/ },
+                    { begin: /benil|keep|loop|!\.|":|\$N|\0\.|\0:|\?:|M\.|T\.|U:|V:|\[\.|\\\.|\\:|\]\.|`:|"|C|G|V|\\|~/ },
                 ],
                 relevance: 0,
             },
             // Conjunction
+            // grep -E SpeechPart.(Multi)?Conjunction src\instructions.d | ruby -e "puts STDIN.read.lines.map{|line|line.scan(/InsInfo.(.)(.+)\1/)[0]}.map{eval _1+_2+_1}.sort.sort_by.with_index{[-_1.size,_2]}.map{Regexp.escape(_1).gsub(?/,'\\\0')} * ?|"
             {
                 className: "title",
                 variants: [
-                    { begin: /while|b?loop|benil|[&@\\]\.|[&@O~]|^:/ },
+                    // { begin: /while|b?loop|benil|[&@\\]\.|[&@O~]|^:/ },
+                    { begin: /bloop|while|\\\.\.|&\.|@\.|C:|D:|\^:|&|\.|\?|@|H|O|`/ },
                 ],
                 relevance: 0,
             },

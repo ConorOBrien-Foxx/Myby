@@ -123,31 +123,82 @@ NB.=> 6 12 18 24 30 36
             NB. <'s marked arity is 2, so " deduces zip
 ```
 
-### `[` - On Left
+### `":` - Left Map
 
 | Statistic | Value |
 |----|----|
 | Speech Part | Adjective |
-| Hex Representation | `F19` |
-| Nibble Cost | 3 |
-| Symbolic Usage | `u[` |
+| Hex Representation | `19` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `u":` |
 
 | Signature | Explanation |
 |----|----|
-| verb(1) → verb(2) | Left application. (With arguments `x` and `y`, computes `u@x`.) |
+| verb(1) → (verb(1) : list → list) | Map over. (Applies `u` to each element of the list.) |
+| verb(2) → (verb(2) : list, any → list) | Left map over. (For each element `xi` of `x`, computes `xi u y`.) |
+| verb(2) → (verb(2) : not list, list → list) | Right map over. (For each element `yi` of `y`, computes `x u yi`.) |
 
-### `]` - On Right
+#### Examples
+
+```myby
+1 2 3 4 ;": 5 6 7 8
+NB.=> 1 5 6 7 8
+NB.=> 2 5 6 7 8
+NB.=> 3 5 6 7 8
+NB.=> 4 5 6 7 8
+1 2 3 4 (# ; '│'&; O)": 5 6 7 8
+NB.=> 1 │ 5 6 7 8
+NB.=> 2 │ 5 6 7 8
+NB.=> 3 │ 5 6 7 8
+NB.=> 4 │ 5 6 7 8
+NB. compare to regular zip:
+1 2 3 4 (# ; '│'&; O)"  5 6 7 8
+NB.=> 1 │ 5
+NB.=> 2 │ 6
+NB.=> 3 │ 7
+NB.=> 4 │ 8
+NB. emulate right map (u~":~):
+1 2 3 4 (# + '│'&; O)~":~ 5 6 7 8
+NB.=> 1 2 3 4 │ 5
+NB.=> 1 2 3 4 │ 6
+NB.=> 1 2 3 4 │ 7
+NB.=> 1 2 3 4 │ 8
+```
+
+### `V` - Vectorize
 
 | Statistic | Value |
 |----|----|
 | Speech Part | Adjective |
-| Hex Representation | `F1A` |
-| Nibble Cost | 3 |
-| Symbolic Usage | `u]` |
+| Hex Representation | `BC` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `uV` |
 
 | Signature | Explanation |
 |----|----|
-| verb(1) → verb(2) | Left application. (With arguments `x` and `y`, computes `u@y`.) |
+| verb(N) → (verb(N)/1 : any → any) | Vectorize. (Applies `u` to every non-list element contained within `a`, or to `a` if it is a non-array.) |
+| verb(N) → (verb(N)/2 : any, any → any) | Dual vectorize. (Applies `xi u yi` to matching non-list elements contained within `x` and `y`, or `xi u y` or `x u yi` as appropriate.) |
+
+#### Examples
+
+```myby
+1 2 3 4 + 5 6 7 8
+NB.=> [1, 2, 3, 4, 5, 6, 7, 8]
+1 2 3 4 +V 5 6 7 8
+NB.=> [6, 8, 10, 12]
+(1 2  3 4  5 6 / 2) (,&(echo [ echo@'-----') ] +V) (9 3  2 _2  4 9 / 2)
+NB.=> 1 2
+NB.=> 3 4
+NB.=> 5 6
+NB.=> -----
+NB.=> 9  3
+NB.=> 2 _2
+NB.=> 4  9
+NB.=> -----
+NB.=> 10  5
+NB.=>  5  2
+NB.=>  9 15
+```
 
 ### `\.` - On Prefixes
 
@@ -175,6 +226,115 @@ NB.=> 6 12 18 24 30 36
 | Signature | Explanation |
 |----|----|
 | verb(1) → (verb(1) : list → list) | Apply to suffixes. (For each non-empty suffix list `h` of `a`, from largest to smallest, compute `u@h`.) |
+
+#### Examples
+
+```myby
+nextprime: (> * primq[.) G
+```
+
+### `~` - Reflex
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `FD` |
+| Nibble Cost | 2 |
+| Symbolic Usage | `u~` |
+
+| Signature | Explanation |
+|----|----|
+| verb → verb(2)/1 | Reflex. (Computes `a u a`.) |
+| verb → verb(2) | Commute. (Computes `y u x`.) |
+
+#### Examples
+
+```myby
++\~ ^@4         NB.<=> (^@4) +\ (^@4)
+NB.=> 2 3 4 5
+NB.=> 3 4 5 6
+NB.=> 4 5 6 7
+NB.=> 5 6 7 8
+```
+
+### `` `: `` - Arity Force
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `BA` |
+| Nibble Cost | 2 |
+| Symbolic Usage | ``u`:`` |
+
+| Signature | Explanation |
+|----|----|
+| verb(N) → verb(3-N) | Invert marked arity. (If `u` has marked arity `N`, then returns a verb that is identical to `u`, but with marked arity `3-N`; that is, dyadic if marked monadic, and monadic if marked dyadic.) |
+
+```myby
++" @ ('hello my world' / ' ')
+NB.=> [5, 2, 5]
+NB. ma(+) = 2, so ma(+") = 2, and hence (+" ...) would treated as +"&(...)
++`:" 'hello my world' / ' '
+NB.=> [5, 2, 5]
+NB. ma(+`:) = 1, so ma(+`:") = 1, thus (+" ...) is treated as +"@(...)
+```
+
+### `C` - Chunk By
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `D1C` (same as `@[`) |
+| Nibble Cost | 3 |
+| Symbolic Usage | `u[.` |
+
+| Signature | Explanation |
+|----|----|
+| verb(1) → (verb(1) : list → list(list)) | Chunk by. (Applies `u` to consecutive members of `a`, and groups its elements together in sublists by belonging to the same class as evaluated by `u@xi`. That is, every sublist in the result is uniform under `u`.) |
+
+#### Examples
+
+```myby
+NB. chunk by even-ness
+%&2C  4 7 6 8 1 3 9 5 2 8 6 3
+NB.=> 4
+NB.=> 7
+NB.=> 6 8
+NB.=> 1 3 9 5
+NB.=> 2 8 6
+NB.=> 3
+NB. Or:
+NB.=> [[4],[7],[6,8],[1,3,9,5],[2,8,6],[3]]
+NB. chunk by equality
+#C 'hello!'
+NB.=> ['h', 'e', 'll', 'o', '!']
+```
+
+### `[.` - On Left
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `D1C` (same as `@[`) |
+| Nibble Cost | 3 |
+| Symbolic Usage | `u[.` |
+
+| Signature | Explanation |
+|----|----|
+| verb(1) → verb(2) | Left application. (With arguments `x` and `y`, computes `u@x`.) |
+
+### `].` - On Right
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Adjective |
+| Hex Representation | `D1D` (same as `@]`) |
+| Nibble Cost | 3 |
+| Symbolic Usage | `u].` |
+
+| Signature | Explanation |
+|----|----|
+| verb(1) → verb(2) | Left application. (With arguments `x` and `y`, computes `u@y`.) |
 
 ### `!.` - Inverse
 
@@ -206,49 +366,6 @@ NB.=> 6 12 18 24 30 36
 |----|----|
 | verb(2) → verb(1) | Generate integer matching. (Given an integer `a`, starting with an integer `i=0`, increment `i` until `i u a` is false.) |
 | verb(2) → verb(1)/2 | Generate integer matching. (Same as above, but starting with `i=y`.) |
-
-#### Examples
-
-```myby
-nextprime: (> * primq[) G
-```
-
-### `~` - Reflex
-
-| Statistic | Value |
-|----|----|
-| Speech Part | Adjective |
-| Hex Representation | `FD` |
-| Nibble Cost | 2 |
-| Symbolic Usage | `u~` |
-
-| Signature | Explanation |
-|----|----|
-| verb → verb(2)/1 | Reflex. (Computes `a u a`.) |
-| verb → verb(2) | Commute. (Computes `y u x`.) |
-
-#### Examples
-
-```myby
-+\~ ^@4         NB.<=> (^@4) +\ (^@4)
-NB.=> 2 3 4 5
-NB.=> 3 4 5 6
-NB.=> 4 5 6 7
-NB.=> 5 6 7 8
-```
-
-### `` ` `` - Arity Force
-
-| Statistic | Value |
-|----|----|
-| Speech Part | Adjective |
-| Hex Representation | `BA` |
-| Nibble Cost | 2 |
-| Symbolic Usage | ``u` `` |
-
-| Signature | Explanation |
-|----|----|
-| verb(N) → verb(3-N) | Invert marked arity. (If `u` has marked arity `N`, then returns a verb that is identical to `u`, but with marked arity `3-N`; that is, dyadic if marked monadic, and monadic if marked dyadic.) |
 
 ### `benil` - Nil replacement
 
