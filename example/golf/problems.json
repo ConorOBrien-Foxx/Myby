@@ -640,5 +640,17 @@
             {"bytes": 10,   "code": "> ?.\" @. R { con`vow"},
             {"bytes": 12.5, "code": "> ?.\" @. #&1 0 { vow,con"}
         ]
+    },
+    {
+        "id": 198717,
+        "name": "repeat-every-other-character-in-string-starting-with-second-character",
+        "tests": [
+            {"x":"abcde", "result":"abbcdde"},
+            {"x":"za", "result":"zaa"},
+            {"x":"f", "result":"f"}
+        ],
+        "alternatives": [
+            {"bytes": 5.5,  "code": "} 2 % 3 ! #"}
+        ]
     }
 ]

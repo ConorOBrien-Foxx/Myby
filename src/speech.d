@@ -392,15 +392,8 @@ struct Atom {
             (Atom[] a, Atom[] b) => Atom(a.filter!(e => b.canFind(e)).array),
             (Atom[] a, b) => Atom(a.filter!(e => e == atomFor(b)).array),
             // Every n-th item; uninterleave
-            (a, Atom[] b) {
-                uint stride = a.to!uint;
-                Atom[][] result;
-                result.length = stride;
-                foreach(i, e; b) {
-                    result[i % stride] ~= e;
-                }
-                return Atom(result.map!Atom.array);
-            },
+            (a, Atom[] b) => Atom(uninterleave(b, a).map!Atom.array),
+            (a, string b) => Atom(uninterleave(b.atomChars, a).map!joinToString.map!Atom.array),
             (_1, _2) => Nil.nilAtom,
         )(this, rhs);
     }

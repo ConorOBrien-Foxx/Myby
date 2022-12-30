@@ -579,15 +579,13 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((l, r) => match!(
                 // duplicate each
-                (Atom[] as, Atom[] bs) {
-                    Atom[] res;
-                    foreach(a, b; as.lockstep(bs)) {
-                        res ~= b.repeat(a.as!uint).array;
-                    }
-                    return Atom(res);
-                },
+                (Atom[] as, Atom[] bs) => Atom(duplicateEachArray(bs, as)),
+                (Atom[] as, string b) => Atom(duplicateEachArray(b.atomChars, as).joinToString),
+                (string a, Atom[] bs) => Atom(duplicateEachArray(a.atomChars, bs).joinToString),
                 (a, Atom[] b) => Atom(duplicateEach(b, a)),
                 (Atom[] a, b) => Atom(duplicateEach(a, b)),
+                (a, string b) => Atom(duplicateEach(b.atomChars, a).joinToString),
+                (string a, b) => Atom(duplicateEach(a.atomChars, b).joinToString),
                 // Binomial
                 (a, b) => Atom(binomial(a, b)),
                 (_1, _2) => Nil.nilAtom,

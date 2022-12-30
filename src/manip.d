@@ -531,6 +531,24 @@ Atom[][] matrixFor(Atom a) {
     );
 }
 
+Atom[][] uninterleave(T)(Atom[] a, T s) {
+    uint stride = s.to!uint;
+    Atom[][] result;
+    result.length = stride;
+    foreach(i, e; a) {
+        result[i % stride] ~= e;
+    }
+    return result;
+}
+
+Atom[] duplicateEachArray(Atom[] arr, Atom[] by) {
+    Atom[] res;
+    foreach(a, b; arr.lockstep(by)) {
+        res ~= a.repeat(b.as!uint).array;
+    }
+    return res;
+}
+
 Atom[] duplicateEach(T)(Atom[] arr, T by) {
     Atom[] res;
     foreach(el; arr) {
