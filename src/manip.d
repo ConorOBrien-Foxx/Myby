@@ -630,6 +630,7 @@ T[] multisetDifference(T)(T[] as, T[] bs) {
 
 // TODO: optimize
 bool isSubsetOrEqual(T)(T[] as, T[] bs) {
+    if(as.length > bs.length) return false;
     foreach(a; as) {
         if(!bs.canFind(a)) {
             return false;
@@ -639,7 +640,7 @@ bool isSubsetOrEqual(T)(T[] as, T[] bs) {
 }
 
 bool isStrictSubset(T)(T[] as, T[] bs) {
-    return as.length != bs.length && !as.equal(bs) && as.isSubsetOrEqual(bs);
+    return as.length < bs.length && !as.equal(bs) && as.isSubsetOrEqual(bs);
 }
 
 bool isSupersetOrEqual(T)(T[] as, T[] bs) {
