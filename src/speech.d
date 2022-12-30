@@ -1058,14 +1058,14 @@ string arrayToString(Atom[] x, bool forceLinear=false) {
     }
     
     // else, handle 2D arrays
-    string[][] prepad;
+    dstring[][] prepad;
     uint[] columnWidths;
     foreach(row; x) {
         bool success = row.tryMatch!((Atom[] row) {
-            string[] prepadRow;
+            dstring[] prepadRow;
             foreach(i, atom; row) {
                 // TODO: reject 2D array with multiline repr
-                string repr = atomToString(atom);
+                dstring repr = atomToString(atom).to!dstring;
                 if(repr.canFind('\n')) {
                     return false;
                 }
@@ -1086,10 +1086,10 @@ string arrayToString(Atom[] x, bool forceLinear=false) {
     }
     foreach(row; prepad) {
         foreach(i, ref cell; row) {
-            cell = to!string(cell.padLeft(' ', columnWidths[i]));
+            cell = to!dstring(cell.padLeft(' ', columnWidths[i]));
         }
     }
-    return prepad.map!(a => a.join(" ")).join("\n");
+    return prepad.map!(a => a.join(" ")).join("\n").to!string;
 }
 
 string hashToString(AVHash x) {
