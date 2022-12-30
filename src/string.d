@@ -198,24 +198,29 @@ enum NGraphLookup = [
 ];
 
 string nibblesToString(Nibble[] nibbles, ref uint i) {
+    import std.algorithm.iteration : map;
+    import std.conv : to;
+    import std.array : array;
+    
     assert(nibbles[i] == 0x1, "Trying to parse a non-integer as an integer");
     i++;
-    string result = "";
+    int[] result;
     
     // if z == 0
     uint half = nibbles[i] % 8;
     uint z = nibbles[i] >> 3;
-    import std.stdio;
     
     if(z == 0) {
         if(half == 7) {
             result ~= nibbles[++i] * 16 + nibbles[++i];
         }
         else {
-            result ~= StringConstants[half];
+            foreach(byt; StringConstants[half]) {
+                result ~= byt;
+            }
         }
     }
-    // if z == 1 and xxx <= 3
+    // if z == 1 and xxx indexes a valid terminator
     else if(half < ValidTerminators.length) {
         auto term = ValidTerminators[half];
         auto t1 = term / 16;
@@ -225,10 +230,10 @@ string nibblesToString(Nibble[] nibbles, ref uint i) {
             if(nibbles[i] == t1 && nibbles[i + 1] == t2) {
                 break;
             }
-            result ~= nibbles[i] * 16 + nibbles[i+1];
+            result ~= nibbles[i] * 16 + nibbles[i + 1];
             i += 2;
         }
-        i += 2;
+        i++;
     }
     else if(half <= 5) {
         assert(0, "Overridden bytes (not in string)");
@@ -247,7 +252,9 @@ string nibblesToString(Nibble[] nibbles, ref uint i) {
                 result ~= c + 32;
             }
             else {
-                result ~= NGraphLookup[c];
+                foreach(byt; NGraphLookup[c]) {
+                    result ~= byt;
+                }
             }
             if(d1 >> 3 == 1) {
                 break;
@@ -260,7 +267,7 @@ string nibblesToString(Nibble[] nibbles, ref uint i) {
     
     i++;
     
-    return result;
+    return cast(string) result.map!(to!char).array;
 }
 
 Nibble[] stringToNibblesNGraphCompress(string str) {
@@ -340,6 +347,8 @@ Nibble[] stringToNibbles(string str) {
             }
         }
     }
+    
+    assert(result.length > 0, "Cannot encode given string: " ~ str);
     
     return result;
 }

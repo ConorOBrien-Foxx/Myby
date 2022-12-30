@@ -30,6 +30,7 @@ Token[] tokenize(Nibble[] code) {
     Token[] tokens;
     bool lastWasNilad = false;
     while(i < code.length) {
+        Debugger.print("i = ", i);
         Token token;
         token.index = i;
         Nibble nib = code[i];
@@ -110,19 +111,6 @@ Token[] tokenize(Nibble[] code) {
             token.speech = tup.speech;
             i++;
         }
-        
-        /*if(UseFilterSeparators && lastWasNilad && token.name == InsName.Filter) {
-            Token* lastToken = &tokens[$ - 1];
-            if(lastToken.name != InsName.ListLiteral) {
-                Token copy = *lastToken;
-                lastToken.arr = [copy];
-                lastToken.name = InsName.ListLiteral;
-            }
-            // we do not push this token, since it is just a literal
-        }
-        else {
-            lastWasNilad = token.isNilad;
-        }*/
         
         tokens ~= token;
     }
