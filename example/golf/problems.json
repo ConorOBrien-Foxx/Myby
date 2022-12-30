@@ -652,5 +652,36 @@
         "alternatives": [
             {"bytes": 5.5,  "code": "} 2 % 3 ! #"}
         ]
+    },
+    {
+        "id": 256166,
+        "name": "is-it-true-ask-pip",
+        "tests": [
+            {"x":"", "result":false},
+            {"x":"0", "result":false},
+            {"x":"000", "result":false},
+            {"x":".0", "result":false},
+            {"x":".00", "result":false},
+            {"x":"0.", "result":false},
+            {"x":"00.", "result":false},
+            {"x":"0.00", "result":false},
+            {"x":"0000000000000.00000000000000", "result":false},
+            {"x":"a", "result":true},
+            {"x":"0001", "result":true},
+            {"x":"0x00", "result":true},
+            {"x":" 0", "result":true},
+            {"x":"0 ", "result":true},
+            {"x":"+0", "result":true},
+            {"x":"-0", "result":true},
+            {"x":".", "result":true},
+            {"x":"0.0.0", "result":true}
+        ],
+        "decision": true,
+        "inverted": true,
+        "alternatives": [
+            {"bytes":10, "inverted":false, code:"=&'.' >. -&'0' } '.'"},
+            {"bytes":10, "inverted":true,  code:"'.'&~: * '.' ).. -&'0'"},
+            {"bytes":11, "inverted":true,  code:"'.'&~: <. '.' ).. -&'0'"},
+        ]
     }
 ]

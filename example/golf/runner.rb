@@ -11,6 +11,17 @@ take = ARGV.map { |e|
     /^-?\d+$/ === e ? e.to_i % problems.size : e
 }
 
+verbose = false
+take.reject! { |e|
+    if /^-?([v])$/ === e
+        case $1
+        when "v"
+            verbose = true
+        end
+        true
+    end
+}
+
 total_score = 0
 problems.each.with_index { |problem, i|
     name = problem["name"]
@@ -18,25 +29,33 @@ problems.each.with_index { |problem, i|
     float_precision = problem["float_precision"]
     id = problem["id"]
     tests = problem["tests"]
+    flags = ["-j", "-l"]
+    if problem["decision"]
+        flags << "-y"
+    end
     puts "== PROBLEM #{i}: #{name} (##{id}) =="
     success = 0
     total = tests.size
     score = nil
     tests << {} if tests.empty?
-    tests.each { |list|
+    tests.each.with_index(1) { |list, tdx|
         args = [ list["x"] ] rescue []
         args << list["y"] unless list["y"].nil?
+        args_repr = args.dup
         args.map! { |arg|
             escaped = arg.to_json.gsub(/\\|'/, '\0\0')
             "unjson'#{escaped}'"
         }
         result = list["result"].to_json
+        if problem["decision"] && problem["inverted"]
+            result = result == "false" ? "true" : "false"
+        end
         codepath = File.join base, "#{name}.myby"
         unless File.exist? codepath
             raise "Could not find file at #{codepath}"
         end
         # cmd = "#$MYBY -l #{codepath} #{args * " "}"
-        cmd = [$MYBY, "-j", "-l", codepath, *args]
+        cmd = [$MYBY, *flags, codepath, *args]
         if list["f"]
             cmd << "-f"
             cmd << list["f"]
@@ -70,19 +89,25 @@ problems.each.with_index { |problem, i|
         end
         
         if result != "null" && mismatch
-            STDERR.puts "Failed due to result mismatch:"
-            STDERR.puts "Expected:"
-            STDERR.puts result
-            STDERR.puts "Received:"
-            STDERR.puts stdout
+            if verbose
+                STDERR.puts "Failed due to result mismatch:"
+                STDERR.puts "Expected:"
+                STDERR.puts result
+                STDERR.puts "Received:"
+                STDERR.puts stdout
+            end
             failed = true
         end
         if failed
             # cmd.each.with_index(1) { |c, i|
                 # puts "Arg #{i}: #{c}"
             # }
-            STDERR.puts cmd.inspect
-            STDERR.puts stderr.gsub(/^/m, " " * 4).lines[0..5]
+            if verbose
+                STDERR.puts cmd.inspect
+                STDERR.puts stderr.gsub(/^/m, " " * 4).lines[0..5]
+            else
+                STDERR.puts "Failed ##{tdx}: #{args_repr.map(&:inspect).join ", "}\t❌#{stdout.lines.first}\t✔️#{result.lines.first}"
+            end
         else
             success += 1
         end
