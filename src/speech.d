@@ -338,6 +338,9 @@ struct Atom {
             (Atom[] a, Atom[] b) => Atom(
                 a.filter!(e => !b.canFind(e)).array
             ),
+            (string a, string b) => Atom(
+                a.filter!(e => !b.canFind(e)).to!string
+            ),
             // remove from
             (Atom[] a, b) => Atom(
                 a.filter!(e => e != atomFor(b)).array

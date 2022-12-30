@@ -532,7 +532,7 @@ Atom[][] matrixFor(Atom a) {
 }
 
 Atom[][] uninterleave(T)(Atom[] a, T s) {
-    uint stride = s.to!uint;
+    uint stride = cast(uint) s;
     Atom[][] result;
     result.length = stride;
     foreach(i, e; a) {
@@ -602,7 +602,7 @@ Atom[] padRightInfer(Atom[] arr, Atom by) {
     return arr;
 }
 
-Atom[] multisetDifference(Atom[] as, Atom[] bs) {
+T[] multisetDifference(T)(T[] as, T[] bs) {
     import std.bitmanip;
     BitArray amask, bmask;
     amask.length = as.length;
@@ -616,7 +616,7 @@ Atom[] multisetDifference(Atom[] as, Atom[] bs) {
         }
     }
 
-    Atom[] res;
+    Unconst!T[] res;
     res.length = amask.length - amask.count;
     uint i = 0;
     foreach(j, a; as) {

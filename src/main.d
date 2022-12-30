@@ -60,6 +60,7 @@ int main(string[] args) {
     bool decompile, decompileAlign;
     bool noCode;
     bool scriptKnow, scriptRunner, scriptDistribution;
+    bool forceTruthy;
     string outfile;
     string fpath;
     string code;
@@ -80,6 +81,7 @@ int main(string[] args) {
         "debug|d", "Prints debug information", &useDebug,
         "rundebug|r", "Runtime debug information", &useRuntimeDebug,
         "nocode|x", "Prevents program execution", &noCode,
+        "truthy|y", "Coalesces the return value to truthy/falsey", &forceTruthy,
         "f", "Sets verb F:", &fValue,
         "g", "Sets verb G:", &gValue,
         "h", "Sets verb H:", &hValue,
@@ -92,6 +94,9 @@ int main(string[] args) {
     );
     
     void writelnResult(Atom a) {
+        if(forceTruthy) {
+            a = Atom(a.truthiness);
+        }
         if(jsonOutput) {
             writeln(a.atomToJson);
         }

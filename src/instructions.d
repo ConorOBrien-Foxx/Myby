@@ -487,6 +487,7 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             .setDyad((a, b) => match!(
+                // pad left/right by amount 
                 (a, Atom[] b) => Atom(padLeftInfer(b, atomFor(a))),
                 (Atom[] a, b) => Atom(padRightInfer(a, atomFor(b))),
                 (a, string b) => Atom(padLeftInfer(b.atomChars, atomFor(a)).joinToString),
@@ -654,6 +655,7 @@ Verb getVerb(InsName name) {
             .setDyad((l, r) => match!(
                 // multiset subtraction
                 (Atom[] a, Atom[] b) => Atom(multisetDifference(a, b)),
+                (string a, string b) => Atom(multisetDifference(a, b)),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(1);
@@ -737,8 +739,24 @@ Verb getVerb(InsName name) {
                 (a) => Atom(BigInt(a.floor.to!string)),
                 _ => Nil.nilAtom,
             ))
-            // Lesser of 2
-            .setDyad((l, r) => min(l, r))
+            .setDyad((l, r) {
+                import core.exception : AssertError;
+                // Lesser of 2
+                try {
+                    return min(l, r);
+                }
+                catch(AssertError e) {
+                    return match!(
+                        // and
+                        (bool a, _) => Atom(a && r.truthiness),
+                        (_, bool b) => Atom(l.truthiness && b),
+                        (_1, _2) {
+                            throw e;
+                            return Nil.nilAtom;
+                        }
+                    )(l, r);
+                }
+            })
             .setIdentity(Infinity.positiveAtom)
             .setMarkedArity(2);
         
@@ -760,6 +778,9 @@ Verb getVerb(InsName name) {
                 }
                 catch(AssertError e) {
                     return match!(
+                        // or
+                        (bool a, _) => Atom(a || r.truthiness),
+                        (_, bool b) => Atom(l.truthiness || b),
                         // rotate right
                         (BigInt i, Atom[] a) => Atom(rotate(a, i)),
                         (Atom[] a, BigInt i) => Atom(rotate(a, i)),
