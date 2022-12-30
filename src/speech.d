@@ -1102,13 +1102,13 @@ string atomToString(_AtomValue a, bool forceLinear=false) {
     return a.match!(
         (Nil x) => x.toString(),
         (Infinity x) => x.toString(),
-        (BigInt x) => to!string(x),
         (bool x) => x ? "1b" : "0b",
-        (real x) => to!string(x),
         (Duration x) => x.toString(),
         (string x) => x,
         (Atom[] x) => arrayToString(x, forceLinear),
         (AVHash x) => hashToString(x),
+        // BigInt, real
+        x => x < 0 ? "_" ~ to!string(-x) : to!string(x),
     );
 }
 
