@@ -43,7 +43,8 @@ enum InsName {
     KeepAlphaNumeric, KeepUppercase, KeepLowercase, KeepBlank, Palindromize,
     Inside, ChunkBy, Left, Right, FromBase, ToBase, LeftMap, SysTime, Year,
     Month, Day, Hour, Minute, Second, Vowels, Consonants, Random,
-    Subset, Subseteq, Superset, Superseteq,
+    Subset, Subseteq, Superset, Superseteq, FactorExponents,
+    FactorExponentPairs, FactorExponentsPos, FactorExponentPairsPos,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -215,6 +216,10 @@ enum InsInfo[InsName] Info = [
     InsName.PrimesBelow:            InsInfo("primb",   0xFE79,    SpeechPart.Verb),
     InsName.PrimesBelowCount:       InsInfo("primbo",  0xFE7A,    SpeechPart.Verb),
     InsName.PrimeTotient:           InsInfo("primt",   0xFE7B,    SpeechPart.Verb),
+    InsName.FactorExponents:        InsInfo("pfe",     0xFE7C,    SpeechPart.Verb),
+    InsName.FactorExponentPairs:    InsInfo("pfeb",    0xFE7D,    SpeechPart.Verb),
+    InsName.FactorExponentsPos:     InsInfo("pfep",    0xFE7E,    SpeechPart.Verb),
+    InsName.FactorExponentPairsPos: InsInfo("pfebp",   0xFE7F,    SpeechPart.Verb),
     ////FE8* - advanced adj/conj////
     InsName.Benil:                  InsInfo("benil",   0xFE80,    SpeechPart.Adjective),
     InsName.Memoize:                InsInfo("M.",      0xFE81,    SpeechPart.Adjective),
@@ -999,6 +1004,58 @@ Verb getVerb(InsName name) {
                         .productOver
                     );
                 },
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.FactorExponents] = new Verb("pfe")
+            // Prime Factor Exponents (only, with zeroes)
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(
+                    a.primeFactorExponents(true)
+                     .map!(a => Atom(a[1]))
+                     .array
+                ),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.FactorExponentPairs] = new Verb("pfeb")
+            // Prime Factor Exponents (paired with factors, with zeroes)
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(
+                    a.primeFactorExponents(true)
+                     .map!(a => Atom([Atom(a[0]), Atom(a[1])]))
+                     .array
+                ),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.FactorExponentsPos] = new Verb("pfep")
+            // Prime Factor Exponents (only, without zeroes)
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(
+                    a.primeFactorExponents
+                     .map!(a => Atom(a[1]))
+                     .array
+                ),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
+            .setMarkedArity(1);
+        
+        verbs[InsName.FactorExponentPairsPos] = new Verb("pfebp")
+            // Prime Factor Exponents (paired with factors, without zeroes)
+            .setMonad(a => a.match!(
+                (BigInt a) => Atom(
+                    a.primeFactorExponents
+                     .map!(a => Atom([Atom(a[0]), Atom(a[1])]))
+                     .array
+                ),
                 _ => Nil.nilAtom,
             ))
             .setDyad((_1, _2) => Nil.nilAtom)

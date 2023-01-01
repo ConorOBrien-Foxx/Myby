@@ -78,6 +78,54 @@ T[] primeFactors(T)(T n) {
     return factors;
 }
 
+// TODO: code sharing with above? eh
+T[][] primeFactorExponents(T)(T n, bool includeZeroes = false) {
+    T[][] factorPairs;
+
+    if(n <= 1) {
+        return factorPairs;
+    }
+    
+    void addDivisibleFactors(S)(S divisor) {
+        pragma(inline, true);
+        T count = 0;
+        while(n % divisor == 0) {
+            n /= divisor;
+            count++;
+        }
+        // only include non-empty
+        if(count > 0 || includeZeroes) {
+            T[] factorPair;
+            // we cannot simply cast to T because of BigInt
+            factorPair.length = 2;
+            factorPair[0] = divisor;
+            factorPair[1] = count;
+            factorPairs ~= factorPair;
+        }
+    }
+    
+    static foreach(divisor; PreCheckPrimes) {
+        if(divisor <= n) {
+            addDivisibleFactors(divisor);
+        }
+    }
+    
+    for(T i = FirstCheckPrime; i * i <= n; i += 6) {
+        addDivisibleFactors(i);
+        addDivisibleFactors(i + 2);
+    }
+    
+    if(n > 2) {
+        T[] factorPair;
+        factorPair.length = 2;
+        factorPair[0] = n;
+        factorPair[1] = 1;
+        factorPairs ~= factorPair;
+    }
+    
+    return factorPairs;
+}
+
 T[] primeFactorsUnique(T)(T n) {
     T[] factors;
 
