@@ -118,7 +118,7 @@ problems.each.with_index { |problem, i|
             success += 1
         end
     }
-    total_score += score.to_i
+    total_score += score.to_f
     puts "#{success} / #{total} passed"
 }
 puts "Total score: #{total_score}b"
