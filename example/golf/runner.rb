@@ -22,6 +22,10 @@ take.reject! { |e|
     end
 }
 
+def round_all(str, to)
+    str.gsub(/-?[\d.]+/) { |f| f.to_f.round to }
+end
+
 total_score = 0
 problems.each.with_index { |problem, i|
     name = problem["name"]
@@ -77,15 +81,17 @@ problems.each.with_index { |problem, i|
             # TODO: this compares by strings, rather than
             # by interpreted JSON values. fix that
             result.index(stdout).nil?
+        elsif problem["unordered"]
+            # p stdout, result
+            stdout = JSON::parse(stdout).sort.to_json
+            result = JSON::parse(result).sort.to_json
         else
             stdout != result
         end
         if mismatch && !float_precision.nil?
-            stdout = stdout.to_f.round float_precision
-            result = result.to_f.round float_precision
+            stdout = round_all stdout, float_precision
+            result = round_all result, float_precision
             mismatch = stdout != result
-            stdout = "≈#{stdout}"
-            result = "≈#{result}"
         end
         
         if result != "null" && mismatch
