@@ -327,6 +327,8 @@ struct Atom {
         return match!(
             (string a, string b) => Atom(a ~ b),
             (Atom[] a, Atom[] b) => Atom(a ~ b),
+            (Atom[] a, b) => Atom(a ~ [atomFor(b)]),
+            (a, Atom[] b) => Atom([atomFor(a)] ~ b),
             (string a, b) => Atom(a ~ rhs.atomToString),
             (a, string b) => Atom(value.atomToString ~ b),
             (_1, _2) => Nil.nilAtom,
