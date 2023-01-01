@@ -2,6 +2,7 @@ module myby.integer;
 
 import std.bigint;
 import std.algorithm.searching : maxElement;
+import std.traits : isUnsigned;
 
 import myby.nibble;
 
@@ -122,7 +123,7 @@ Nibble[] numberListToNibbles(T)(T[] ns) {
     }
     else {
         arr ~= [0xC, 0xF];
-        arr ~= integerToNibbles(ns.length)[1..$];
+        arr ~= integerToNibbles(BigInt(ns.length))[1..$];
         foreach(n; ns) {
             arr ~= integerToNibbles(n)[1..$];
         }
@@ -165,9 +166,13 @@ BigInt[] nibblesToNumberList(Nibble[] nibbles, ref uint i) {
     return result;
 }
 
-Nibble[] integerToNibbles(T)(T n) {
+Nibble[] integerToNibbles(T)(T n)
+if(!isUnsigned!T) {
     import std.algorithm.searching : countUntil;
+    import std.conv : to;
     // import std.stdio;
+    // import myby.debugger;
+    // Debugger.print("Encoding integer: ", n);
     
     initializeExtraCache();
     
@@ -192,25 +197,33 @@ Nibble[] integerToNibbles(T)(T n) {
     }
     else {
         BigInt targetIndex;
+        // Debugger.print(typeid(n), " ", n, " ", n <= HIGHEST_NEGATIVE);
         if(n <= HIGHEST_NEGATIVE) {
+            // Debugger.print("Encoding negative ", n);
             targetIndex = HIGHEST_NEGATIVE - BigInt(n);
             arr ~= 0xE;
         }
         else {
             if(n <= extraCacheUpper[$ - 1]) {
+                // Debugger.print("Should find ", n, " in upper cache");
                 targetIndex = extraCacheUpper[].countUntil(n);
             }
             else {
+                // Debugger.print("Should find ", n, " beyond upper cache");
                 // TODO: figure out what this constant 0x119(281) is
                 // TODO: really actually do this, it depends on BaseConstants.length
                 // somehow. constant changed to 0x118(280).
                 // i guess i'll never do this. constant changed again to 0x115(277).
-                targetIndex = n - 0x115;
+                // post overridden, changed to 0x114(276)
+                targetIndex = n - 0x114;
                 if(n > OneMillion) targetIndex--;
             }
             arr ~= 0xF;
         }
+        assert(targetIndex >= 0, "Could not find " ~ n.to!string ~ " in cache");
         Nibble[] targetDigits = toBase16(targetIndex);
+        // Debugger.print("Target index: ", targetIndex);
+        // Debugger.print("Target digits: ", targetDigits);
         
         // encode the length
         for(int i = 0; i < targetDigits.length / 15; i++) {
@@ -219,6 +232,8 @@ Nibble[] integerToNibbles(T)(T n) {
         arr ~= cast(Nibble)(targetDigits.length % 15);
         arr ~= targetDigits;
     }
+    
+    // Debugger.print("Result of ", n, " = ", arr);
     return arr;
 }
 
