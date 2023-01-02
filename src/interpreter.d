@@ -227,6 +227,11 @@ LiterateBuilder toLiterateBuilder(Nibble[] nibs, Token[] tokens) {
                         ~ "'";
                     break;
                 
+                case InsName.Real:
+                    reps[i] = tok.dec.to!string;
+                    thisIsNumber = true;
+                    break;
+                
                 default:
                     assert(0, "Unhandled: " ~ tok.name.to!string);
             }

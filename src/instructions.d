@@ -34,7 +34,7 @@ enum InsName {
     GreaterThan, MemberIn, First, Last, LessEqual, GreaterEqual, Inequality,
     Pair, NextChain, NthChain, Exit, Put, Putch, Getch, Empty, Ascii, Alpha,
     ToJSON, FromJSON, ReadFile, WriteFile, DigitRange, Place, Hash, NthPrime,
-    IsPrime, PrimeFactors, PrimeFactorsCount, UniqPrimeFactors,
+    IsPrime, PrimeFactors, PrimeFactorsCount, UniqPrimeFactors, Divisors,
     UniqPrimeFactorsCount, PreviousPrime, NextPrime, FirstNPrimes,
     PrimesBelow, PrimesBelowCount, Benil, Memoize, Keep, Loop, BLoop, While,
     Time, InitialAlias, DefinedAlias, VerbDiagnostic, F, G, H, U, V, C, D,
@@ -128,7 +128,7 @@ enum InsInfo[InsName] Info = [
     InsName.LastChain:              InsInfo("$^",      0xF10,     SpeechPart.Verb),
     InsName.ThisChain:              InsInfo("$:",      0xF11,     SpeechPart.Verb),
     InsName.ChunkBy:                InsInfo("C",       0xF12,     SpeechPart.Adjective),
-    //F13
+    InsName.Divisors:               InsInfo("D",       0xF13,     SpeechPart.Verb),
     InsName.Diagonal:               InsInfo("/:",      0xF14,     SpeechPart.Adjective),
     InsName.Oblique:                InsInfo("/.",      0xF15,     SpeechPart.Adjective),
     InsName.Ternary:                InsInfo("?",       0xF16,     SpeechPart.MultiConjunction),
@@ -484,6 +484,15 @@ Verb getVerb(InsName name) {
                 ),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
+            .setMarkedArity(1);
+        
+        verbs[InsName.Divisors] = new Verb("D")
+            // Divisors (including input)
+            .setMonad(a => a.match!(
+                (BigInt b) => Atom(iota(1, b + 1).filter!(n => b % n == 0).map!Atom.array),
+                _ => Nil.nilAtom,
+            ))
+            .setDyad((_1, _2) => Nil.nilAtom)
             .setMarkedArity(1);
             
         verbs[InsName.Pad] = new Verb("P")
