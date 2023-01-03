@@ -4,13 +4,13 @@ TLDR, Current Verdict: Myby is decently competitive, sometimes even winning agai
 
 ```
                      W -  L - T /  Σ |     W%
-Myby vs. 05AB1E:    21 - 23 - 4 / 48 | 43.75%
+Myby vs. 05AB1E:    21 - 24 - 4 / 49 | 42.86%
 Myby vs. MATL:      20 -  3 - 1 / 24 | 83.33%
-Myby vs. Jelly:     13 - 27 - 7 / 47 | 27.66%
-Myby vs. Vyxal:     11 - 20 - 6 / 37 | 29.73%
-Myby vs. Husk:      11 - 10 - 1 / 22 | 50.00%
-Myby vs. Fig:        4 - 13 - 0 / 17 | 23.53%
-Myby vs. Nibbles:    3 -  6 - 0 /  9 | 33.33%
+Myby vs. Jelly:     12 - 27 - 8 / 47 | 25.53%
+Myby vs. Vyxal:     11 - 20 - 7 / 38 | 28.95%
+Myby vs. Husk:      11 - 10 - 2 / 23 | 47.83%
+Myby vs. Fig:        4 - 14 - 0 / 18 | 22.22%
+Myby vs. Nibbles:    2 -  6 - 1 /  9 | 22.22%
 ```
 
 Disclaimer: Results are not definitive, as it is a form of self-selection.
@@ -408,7 +408,12 @@ _Do not post any of the Myby solutions contained herein._
 
 | language | rank | bytes | code |
 |----------|------|-------|------|
+| [05AB1E (legacy)](https://codegolf.stackexchange.com/a/224001/31957) | | 1b | <code>Ë</code> |
+| [Brachylog](https://codegolf.stackexchange.com/a/224001/31957) | | 1b | <code>=</code> |
+| [Husk](https://codegolf.stackexchange.com/a/224001/31957) | | 1b | <code>E</code> |
+| [Jelly](https://codegolf.stackexchange.com/a/224001/31957) | | 1b | <code>E</code> |
 | Myby | | 1b | <code>e.</code> |
+| [Vyxal](https://codegolf.stackexchange.com/a/224001/31957) | | 1b | <code>≈</code> |
 | [Fig](https://codegolf.stackexchange.com/questions/224000/are-all-the-items-the-same/252543#252543) | | 1.646b | <code>LU</code> |
 | [Arn](https://codegolf.stackexchange.com/questions/224000/are-all-the-items-the-same/224005#224005) | | 2b | <code>:@</code> |
 | [Husk](https://codegolf.stackexchange.com/questions/224000/are-all-the-items-the-same/224348#224348) | | 2b | <code>hg</code> |
@@ -869,6 +874,7 @@ _Do not post any of the Myby solutions contained herein._
 | language | rank | bytes | code |
 |----------|------|-------|------|
 | [Jelly](https://codegolf.stackexchange.com/questions/199139/write-some-random-english/252402#252402) | | 8b | <code>ØḄØẹḂ?X&#41;</code> |
+| [Vyxal `rṀs`](https://codegolf.stackexchange.com/a/256289/78850) | | 8b | <code>ƛkvk⁰"i℅</code> |
 | Myby | | 9b | <code>&#62; &#40;?. con&#96;vow&#41;"@R</code> |
 | [Vyxal `s`](https://codegolf.stackexchange.com/questions/199139/write-some-random-english/251506#251506) | | 9b | <code>⟑₂¨ikvk¹℅</code> |
 | [Stax](https://codegolf.stackexchange.com/questions/199139/write-some-random-english/199448#199448) | | 10b | <code>ÇÅφ⌠↑Ñ°↕Yx</code> |

@@ -278,9 +278,17 @@ const handleCompare = (content, para) => {
             for(let row of rows) {
                 let lang = row.children[0].textContent;
                 let score = row.children[2].textContent;
-                if     (lang === first)  firstBytes  = scrapeByteCount(score);
-                else if(lang === second) secondBytes = scrapeByteCount(score);
+                if(lang === "Jelly" || lang === "Myby") {
+                    console.log(lang, row.children[3].textContent, scrapeByteCount(score));
+                }
+                if(lang === first && firstBytes === null) {
+                    firstBytes  = scrapeByteCount(score);
+                }
+                else if(lang === second && secondBytes === null) {
+                    secondBytes = scrapeByteCount(score);
+                }
             }
+            console.log(firstBytes, ";", secondBytes);
             if(firstBytes !== null && secondBytes !== null) {
                 if     (firstBytes  <  secondBytes) firstWins++;
                 else if(firstBytes === secondBytes) ties++;
