@@ -26,7 +26,7 @@ import myby.speech;
 
 enum InsName {
     Integer, ListLiteral, Real, String, Filter, Map, Add, Subtract, Multiply,
-    Divide, Exponentiate, Identity, Bond, OnPrefixes, OnSuffixes,
+    Divide, Exponentiate, Identity, Bond, OnPrefixes, OnSuffixes, MinMax,
     SplitCompose, OpenParen, ArityForce, Vectorize, Reflex, CloseParen,
     Compose, Under, Hook, MonadChain, Range, Modulus, LastChain, ThisChain,
     Link, Diagonal, Oblique, Ternary, Minimum, Maximum, OnLeft, OnRight,
@@ -203,6 +203,7 @@ enum InsInfo[InsName] Info = [
     InsName.Subseteq:               InsInfo("(..",     0xFE64,    SpeechPart.Verb),
     InsName.Superset:               InsInfo(").",      0xFE65,    SpeechPart.Verb),
     InsName.Superseteq:             InsInfo(")..",     0xFE66,    SpeechPart.Verb),
+    InsName.MinMax:                 InsInfo("minmax",  0xFE67,    SpeechPart.Verb),
     ////FE7* - primes
     InsName.NthPrime:               InsInfo("primn",   0xFE70,    SpeechPart.Verb),
     InsName.IsPrime:                InsInfo("primq",   0xFE71,    SpeechPart.Verb),
@@ -489,7 +490,12 @@ Verb getVerb(InsName name) {
         verbs[InsName.Divisors] = new Verb("D")
             // Divisors (including input)
             .setMonad(a => a.match!(
-                (BigInt b) => Atom(iota(1, b + 1).filter!(n => b % n == 0).map!Atom.array),
+                (BigInt b) => Atom(
+                    iota(BigInt(1), b + 1)
+                        .filter!(n => b % n == 0)
+                        .map!Atom
+                        .array
+                    ),
                 _ => Nil.nilAtom,
             ))
             .setDyad((_1, _2) => Nil.nilAtom)
@@ -1173,6 +1179,17 @@ Verb getVerb(InsName name) {
                 (_1, _2) => Nil.nilAtom
             )(a, b))
             .setMarkedArity(2);
+        
+        verbs[InsName.MinMax] = new Verb("minmax")
+            .setMonad(a => verbs[InsName.Pair](
+                verbs[InsName.Minimum](a),
+                verbs[InsName.Maximum](a)
+            ))
+            .setDyad((a, b) => verbs[InsName.Pair](
+                verbs[InsName.Minimum](a, b),
+                verbs[InsName.Maximum](a, b)
+            ))
+            .setMarkedArity(1);
         
         verbs[InsName.FromJSON] = new Verb("unjson")
             .setMonad(a => a.match!(
