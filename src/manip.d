@@ -416,6 +416,26 @@ Atom chunkVerb(Verb v, Atom a) {
     );
 }
 
+Atom moldToShape(Atom[] base, Atom shape) {
+    uint index = 0;
+    Atom[] flat = base.flatten;
+    assert(flat.length > 0 || shape.match!(
+        (Atom[] arr) => arr.length == 0,
+        _ => false
+    ), "Cannot mold from an empty array");
+    Atom mapHelper(Atom e) {
+        return e.match!(
+            (Atom[] arr) => Atom(arr.map!(a => mapHelper(a)).array),
+            (_) {
+                Atom res = flat[index];
+                index = (index + 1) % flat.length;
+                return res;
+            }
+        );
+    }
+    return mapHelper(shape);
+}
+
 string INSENSITIVE_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyz";
 string SENSITIVE_ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 Atom stringFromBase(B)(string n, B base) {
@@ -735,4 +755,65 @@ auto grade(alias Compare="a < b", T)(T[] arr) {
 alias gradeUp = grade;
 auto gradeDown(T)(T arr) {
     return arr.grade!"a > b";
+}
+
+Atom[] applyAt(Verb src, Verb index, Atom[] a) {
+    bool[] indicesWhere;
+    if(index.niladic) {
+        Atom indices = index();
+        // TODO: handle doubly listed indices differently?
+        indicesWhere.length = a.length;
+        indices.match!(
+            (Atom[] indices) {
+                foreach(i; indices) {
+                    indicesWhere[positiveMod(i.as!uint, indicesWhere.length)] = true;
+                }
+            },
+            (index) {
+                indicesWhere[moldIndex(index, indicesWhere.length)] = true;
+            },
+            _ => assert(0, "Non-index nilad received: " ~ to!string(indices))
+        );
+    }
+    else {
+        indicesWhere = index(Atom(a)).match!(
+            (Atom[] f) => f.map!(e => e.truthiness).array,
+            _ => assert(0, "Indices are non-array in @:")
+        );
+    }
+    
+    assert(a.length <= indicesWhere.length,
+        "Insufficient indices produced (expected at least " ~ a.length.to!string ~
+        " but got " ~ indicesWhere.length.to!string ~ ")");
+    
+    Atom[] transformed;
+    if(src.niladic) {
+        Atom nilad = src();
+        transformed = nilad.match!(
+            (Atom[] n) => n,
+            _ => [ nilad ]
+        );
+    }
+    else {
+        Atom[] filtered = iota(a.length)
+            .filter!(i => indicesWhere[i])
+            .map!(i => a[i])
+            .array;
+        Atom tf = Atom(src(Atom(filtered)));
+        transformed = tf.match!(
+            (Atom[] f) => f,
+            (string s) => s.atomChars,
+            _ => assert(0, "Transformed to non-array in `@:`: " ~ atomToString(tf))
+        );
+    }
+    
+    uint targetIndex = 0;
+    Atom[] result;
+    result.length = a.length;
+    foreach(i; 0..a.length) {
+        result[i] = indicesWhere[i]
+            ? transformed[targetIndex++ % transformed.length]
+            : a[i];
+    }
+    return result;
 }

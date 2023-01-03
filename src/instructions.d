@@ -35,7 +35,7 @@ enum InsName {
     Pair, NextChain, NthChain, Exit, Put, Putch, Getch, Empty, Ascii, Alpha,
     ToJSON, FromJSON, ReadFile, WriteFile, DigitRange, Place, Hash, NthPrime,
     IsPrime, PrimeFactors, PrimeFactorsCount, UniqPrimeFactors, Divisors,
-    UniqPrimeFactorsCount, PreviousPrime, NextPrime, FirstNPrimes,
+    UniqPrimeFactorsCount, PreviousPrime, NextPrime, FirstNPrimes, ApplyAt,
     PrimesBelow, PrimesBelowCount, Benil, Memoize, Keep, Loop, BLoop, While,
     Time, InitialAlias, DefinedAlias, VerbDiagnostic, F, G, H, U, V, C, D,
     Break, Gerund, LineFeed, PrimeTotient, IsAlpha, IsNumeric, IsAlphaNumeric,
@@ -135,7 +135,7 @@ enum InsInfo[InsName] Info = [
     InsName.Ternary:                InsInfo("?",       0xF16,     SpeechPart.MultiConjunction),
     InsName.Minimum:                InsInfo("<.",      0xF17,     SpeechPart.Verb),
     InsName.Maximum:                InsInfo(">.",      0xF18,     SpeechPart.Verb),
-    //F19
+    InsName.ApplyAt:                InsInfo("@:",      0xF19,     SpeechPart.Conjunction),
     //F1A
     InsName.Generate:               InsInfo("G",       0xF1B,     SpeechPart.Adjective),
     InsName.Inverse:                InsInfo("!.",      0xF1C,     SpeechPart.Adjective),
@@ -169,6 +169,7 @@ enum InsInfo[InsName] Info = [
     ////FE2* - string////
     InsName.Palindromize:           InsInfo("enpal",   0xFE20,    SpeechPart.Verb),
     InsName.Inside:                 InsInfo("inner",   0xFE21,    SpeechPart.Verb),
+    // InsName.MatchCase:              InsInfo("mcase",   0xFE22,    SpeechPart.Verb),
     ////FE3* - class tests////
     InsName.IsAlpha:                InsInfo("alq",     0xFE30,    SpeechPart.Verb),
     InsName.IsNumeric:              InsInfo("numq",    0xFE31,    SpeechPart.Verb),
@@ -318,12 +319,20 @@ Verb getVerb(InsName name) {
             .setIdentity(Atom(BigInt(0)))
             .setMarkedArity(2);
         
+        import std.uni : isUpper, isLower;
         verbs[InsName.Multiply] = new Verb("*")
             .setMonad((Atom a) => a.match!(
                 // Flatten
                 (Atom[] a) => Atom(flatten(a)),
                 // Sign
                 (BigInt b) => Atom(BigInt(b < 0 ? -1 : b == 0 ? 0 : 1)),
+                // Cases of
+                (string s) => Atom(s
+                    .map!(chr => chr.isUpper ? 1 : chr.isLower ? -1 : 0)
+                    .map!BigInt
+                    .map!Atom
+                    .array
+                ),
                 _ => Nil.nilAtom,
             ))
             .setDyad((Atom a, Atom b) => a * b)
@@ -479,13 +488,9 @@ Verb getVerb(InsName name) {
             ))
             .setDyad((l, r) => match!(
                 (a, b) => Atom(iota(a, b + 1).map!Atom.array),
-                (Atom[] a, Atom[] b) => Atom(arrayRange(a, b).map!Atom.array),
-                (string a, string b) => Atom(
-                    arrayRange(a.atomOrds, b.atomOrds)
-                    .map!atomUnords
-                    .map!Atom
-                    .array
-                ),
+                // one-based index
+                (Atom[] _1, _2) => Atom(BigInt(1)) + l ^^ r,
+                (string _1, _2) => Atom(BigInt(1)) + l ^^ r,
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(1);
@@ -515,6 +520,8 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             .setDyad((a, b) => match!(
+                // mold
+                (Atom[] to, Atom[] by) => moldToShape(to, Atom(by)),
                 // pad left/right by amount 
                 (a, Atom[] b) => Atom(padLeftInfer(b, atomFor(a))),
                 (Atom[] a, b) => Atom(padRightInfer(a, atomFor(b))),
@@ -548,6 +555,7 @@ Verb getVerb(InsName name) {
             // From base
             .setDyad((a, b) => a.match!(
                 (BigInt a) => fromBase(b, a),
+                // TODO: mixed base
                 _ => assert(0, "Invalid base: " ~ a.atomToString),
             ))
             .setInverseMutual(new Verb("#.!.")
@@ -572,6 +580,7 @@ Verb getVerb(InsName name) {
             ))
             // To base
             .setDyad((a, b) => match!(
+                // TODO: mixed base
                 (BigInt a, BigInt b) => Atom(b.toBase(a).map!Atom.array),
                 (_1, _2) => Nil.nilAtom,
             )(a, b))
@@ -1124,9 +1133,17 @@ Verb getVerb(InsName name) {
                 a => Atom(baseRange(a).map!Atom.array),
                 _ => Nil.nilAtom,
             ))
-            // Base Range
             .setDyad((n, base) => match!(
+                // Base Range
                 (n, base) => Atom(baseRange(n, base).map!Atom.array),
+                // Array Range
+                (Atom[] a, Atom[] b) => Atom(arrayRange(a, b).map!Atom.array),
+                (string a, string b) => Atom(
+                    arrayRange(a.atomOrds, b.atomOrds)
+                    .map!atomUnords
+                    .map!Atom
+                    .array
+                ),
                 (_1, _2) => Nil.nilAtom,
             )(n, base))
             .setMarkedArity(1);
@@ -2053,6 +2070,24 @@ Conjunction getConjunction(InsName name) {
                     .setMarkedArity(1)
                     .setChildren([f, g]);
             }
+        );
+        
+        conjunctions[InsName.ApplyAt] = new Conjunction(
+            (Verb src, Verb index) => new Verb("@:")
+                // Like APL's @ - https://aplwiki.com/wiki/At
+                .setMonad((src, index, a) => a.match!(
+                    (Atom[] a) => Atom(applyAt(src, index, a)),
+                    (string a) => Atom(applyAt(
+                        src,
+                        getAdjective(InsName.Map).transform(index),
+                        a.atomChars
+                    ).joinToString),
+                    _ => Nil.nilAtom,
+                ))
+                // TODO: dyadic case
+                .setDyad((src, index, _1, _2) => Nil.nilAtom)
+                .setMarkedArity(1)
+                .setChildren([src, index])
         );
         
         conjunctions[InsName.Scan] = new Conjunction(

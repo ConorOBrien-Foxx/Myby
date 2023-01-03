@@ -363,7 +363,29 @@ struct Atom {
         )(this, rhs);
     }
     Atom binaryFallback(string op : "/")(Atom rhs) {
+        import std.uni : toLower, toUpper;
         return match!(
+            // Cut sizes
+            (Atom[] a, Atom[] bs) {
+                Atom[] result;
+                uint index = 0;
+                foreach(b; bs) {
+                    Atom[] strand;
+                    uint amt = b.as!uint;
+                    foreach(j; 0..amt) {
+                        strand ~= a[index];
+                        index = (index + 1) % a.length;
+                    }
+                    result ~= Atom(strand);
+                }
+                return Atom(result);
+            },
+            // Impart case
+            (Atom[] a, string s) => Atom(
+                a.zip(s.atomChars).map!(t => t[0] / t[1]).array.joinToString
+            ),
+            (n, string s) =>
+                Atom(n < 0 ? s.toLower : n > 0 ? s.toUpper : s),
             // Chunk
             (Atom[] a, b) =>
                 Atom(a.chunks(to!size_t(b))
@@ -825,7 +847,7 @@ class Verb {
                 import myby.format;
                 writeln("Problem verb:\n", treeToBoxedString(this));
                 writeln(arguments);
-                assert(0, "no such argument arity " ~ to!string(arguments.length));
+                assert(0, "no such argument arity " ~ to!string(arguments.length) ~ " (did you mean to call f(Atom(...))?)");
         }
     }
     
