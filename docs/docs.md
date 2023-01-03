@@ -4,6 +4,25 @@
 
 This page contains documentation for Myby's commands and their various implemented behaviors.
 
+## [How does Myby compare to other languages?](./compare)
+
+Check out the link above! Current verdict: Myby is decently competitive, sometimes even winning against popular golfing languages, but doesn't consistently beat them, more often losing than winning. There's room for improvement, but it is already well-situated to at least be generally competitive. As of 1/3/2023 (win-loss-tie / total | win%):
+
+```
+                     W -  L - T /  Σ |     W%
+Myby vs. 05AB1E:    21 - 23 - 4 / 48 | 43.75%
+Myby vs. MATL:      20 -  3 - 1 / 24 | 83.33%
+Myby vs. Jelly:     13 - 27 - 7 / 47 | 27.66%
+Myby vs. Vyxal:     11 - 20 - 6 / 37 | 29.73%
+Myby vs. Husk:      11 - 10 - 1 / 22 | 50.00%
+Myby vs. Fig:        4 - 13 - 0 / 17 | 23.53%
+Myby vs. Nibbles:    3 -  6 - 0 /  9 | 33.33%
+```
+
+Disclaimer: Results are not definitive, as it is a form of self-selection.
+
+## How to Read
+
 Note: Mathematical operations result in a double if either `x` or `y` is a double, and is otherwise an integer. Also, for mathematical operations, bools are treated as `1` and `0` if `true` or `false` respectively.
 
 | Statistic | Meaning |
