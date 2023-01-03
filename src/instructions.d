@@ -45,6 +45,7 @@ enum InsName {
     Month, Day, Hour, Minute, Second, Vowels, Consonants, Random,
     Subset, Subseteq, Superset, Superseteq, FactorExponents,
     FactorExponentPairs, FactorExponentsPos, FactorExponentPairsPos,
+    Invariant, Variant,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -230,6 +231,8 @@ enum InsInfo[InsName] Info = [
     InsName.While:                  InsInfo("while",   0xFE85,    SpeechPart.Conjunction),
     InsName.Time:                   InsInfo("T.",      0xFE86,    SpeechPart.Adjective),
     InsName.VerbDiagnostic:         InsInfo("?:",      0xFE87,    SpeechPart.Adjective),
+    InsName.Invariant:              InsInfo("I",       0xFE88,    SpeechPart.Adjective),
+    InsName.Variant:                InsInfo("I.",      0xFE89,    SpeechPart.Adjective),
     ////FE9* - list manipulation////
     InsName.Link:                   InsInfo(";",       0xFE90,    SpeechPart.Verb),
     ////FEA* - reserved for aliases////
@@ -1626,6 +1629,22 @@ Adjective getAdjective(InsName name) {
                 .setMonad((Verb v, a) => v(a, a))
                 .setDyad((Verb v, x, y) => v(y, x))
                 .setMarkedArity(2)
+                .setChildren([v])
+        );
+        
+        adjectives[InsName.Invariant] = new Adjective(
+            (Verb v) => new Verb("I")
+                .setMonad((Verb v, a) => Atom(v(a) == a))
+                .setDyad((Verb v, a, b) => Nil.nilAtom)
+                .setMarkedArity(1)
+                .setChildren([v])
+        );
+        
+        adjectives[InsName.Variant] = new Adjective(
+            (Verb v) => new Verb("I.")
+                .setMonad((Verb v, a) => Atom(v(a) != a))
+                .setDyad((Verb v, a, b) => Nil.nilAtom)
+                .setMarkedArity(1)
                 .setChildren([v])
         );
         
