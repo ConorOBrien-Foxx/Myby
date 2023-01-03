@@ -1,0 +1,360 @@
+.+?
+@
+[C#]
+[R]
+[R]
+[sed] -E (C locale)
+><> (Fish)
+><> (Fish)
+><> Fish
+><>
+33 v1.0
+4
+8086 Assembly (NASM) + DOS
+8086 machine code
+ABAP
+Acc!!
+Aceto
+ActionScript 2.0
+Add++
+Ahead
+Aheui (esotope)
+AHK
+Alice
+AngularJS + Lodash
+ARBLE
+ARM Thumb machine code
+Arturo
+Attache
+awk
+Axiom
+Bash `--extglob`
+Bash + coreutils
+BASH + coreutils
+Bash + GNU utilities
+bash and GNU coreutils
+Bash on OS X
+bash
+Batch
+Beam
+Befunge-93
+Befunge-98 (FBBI)
+Bits
+Blossom
+BotEnginex11=154
+Brainf**k
+Brain-Flak
+brainfuck
+Branch
+Brian & Chuck
+Burlesque
+C (clang)
+C (gcc 5.4.0)
+C (gcc)
+C + ecpp
+c function
+C Sharp
+C
+C# - DotNet core
+C# (.Net 6)
+C# (.NET Core)
+C# (Visual C# Compiler)
+C# (Visual C# Interactive Compiler)
+C# / CS Script
+C# 7.3
+C#
+C++ (gcc)
+C++
+C++20 (gcc) `std::variant` array
+Check
+Cheddar
+Chevron
+Chip
+Clean
+Clojure
+Clojure/ClojureScript
+CMD.EXE
+Coffeescript
+CoffeeScript
+Commentator
+Common Lisp
+Convex
+convey
+CSASM v2.4.0.2
+Cubix
+Curry (PAKCS)
+D
+Dart (2.18.4)
+Dart
+dc
+Desmos
+Dis
+Elixir
+Emacs
+Erlang (escript)
+Excel (ms365)
+Excel VBA Immediate Window
+Excel VBA
+Excel
+F# (Mono)
+F#
+Factor + `math.polynomials`
+Factor + `math.primes.factors`
+Factor + `math.unicode`
+Factor + `pair-rocket sequences.repeating`
+Factor + `sequences.repeating`
+Factor
+Factorio
+ForceLang
+Forth (gforth)
+Fortran (GFortran)
+FORTRAN 90
+Fortran
+Fourier
+Funky
+FunStack alpha
+Gema
+GNU AWK
+GNU Make
+GNU sed
+Go
+Google Sheets
+Goruby
+Groovy
+GW-BASIC
+Haskell + hgl
+Haskell
+Hassium
+Hexagony
+Hoon
+HP50g RP
+HP50g RPL
+Icon
+Java (JDK)
+Java (OpenJDK 8)
+Java 10
+Java 19
+Java 7
+Java 8
+Java
+JavaScript (ES)
+Javascript (ES5)
+JavaScript (ES5)
+JavaScript (ES6)
+JavaScript (Node.js)
+JavaScript (non-trivial)
+JavaScript (V8)
+JavaScript ES
+Javascript ES6
+JavaScript ES6
+JavaScript
+Javascript:
+Jotlin
+Jq 1.5
+jq -n
+jq
+JS (ES6)
+Julia 0.4
+Julia 0.6
+Julia 1.0
+Julia
+Knight (v2)
+Knight
+Kotlin
+Labyrinth
+laskelH
+LaTeX
+LaTeX/171
+Lexurgy
+lin
+LINQ
+ListSharp
+Lua 5.2
+Lua
+Ly
+Marbelou
+Marbelous
+Mascarpone
+Math++
+Mathematica (13.1)
+Mathematica
+MATLAB / Octave
+Matlab
+MATLAB
+MBASIC
+Microscript II
+Microscript
+Minecraft Functions (18w11a
+Minim
+Minkolang 0.10
+Minkolang 0.12
+MMIX
+Modern Pascal 2.0
+Momema
+Mouse
+MS-DOS .COM (386 instructions)
+Mumps
+munge
+naz
+Neo4j Cypher
+Neo4j
+Nim
+Noether
+Octave / MATLAB
+Octave
+Oracle SQL 11.2
+PARI/GP
+Pascal
+Pepe
+Perl  39 + 3 =
+Perl `-aF:`
+Perl `-p`
+Perl 5 `-MList::Util=sum
+Perl 5 `-p`
+Perl 5 `-plF`
+Perl 5 + `-lF -M5.10.0`
+Perl 5 + `-p`
+Perl 5 -p
+Perl 5
+Perl 6
+Perl 6
+Perl
+PHP 7
+PHP 8.x
+PHP
+pl – Perl One-Liner Magic Wand
+Plain English
+PlatyPar
+PLIS
+POSIX Shell Command Language + Utilities
+POSIX Shell
+PostgreSQL
+PowerShell Core
+PowerShell v3+
+PowerShell
+Processing
+PROLOG (SWI)
+Prolog
+Proton
+Pushy
+Python 2 -
+Python 2
+Python 2.7
+Python 3 -
+Python 3
+Python 3.5+
+Python 3.8 (pre-release)
+Python 3.8
+Python NumPy
+Python
+Python3
+QBasic
+QBIC
+R ()
+R v
+R v4.2.0
+R
+Rabbit~
+Racket
+RAD
+Raku
+Raku<sub>(Perl 6)</sub>
+Rattle
+Rebol
+Red
+Retina 0.8.2
+Retina
+REXX
+Rockstar
+Röda
+RPL
+Ruby `-nl`
+Ruby `-p`
+Ruby `-pl`
+Ruby 1.9
+Ruby using '-n'
+Ruby
+Runic Enchantments
+Rust
+Rutger
+S.I.L.O.S
+Sage Notebook
+SageMat
+SageMath
+Scala
+sclin
+Scratch 2.0/3.0
+Scratch 3.0
+sed 4.2.2
+sed
+Setanta
+ShadyAsFuck
+Shakespeare Programming Language
+Shakespeare
+ShapeScript
+Shell + GNU coreutils
+Shell/Bash
+Shue
+SimpleTemplate 0.84
+SimpleTemplate
+Simplex v.0.7
+simply 0.11
+simply
+SmileBASIC
+SNOBOL4 (CSNOBOL4)
+Snowman 1.0.1
+SpecBAS -
+SpecBAS
+SPL
+SQL
+SQLite
+Stacked
+Standard ML (MLton)
+STATA
+Swift 4
+Swift
+Symbolic Python
+T<sub>E</sub>X (INIT<sub>E</sub>X)
+Taxi
+Tcl
+TeX
+Thon (Symbols) <sup>`s` flag</sup>
+Thon
+TI-BASIC
+Trivial Pip answers
+T-SQL
+Turing Machine But Way Worse
+Turing Machine Code
+Twig
+TXR Lisp
+Unix TMG
+Unreadable
+VBA
+Vim
+vimscript
+Vitsy + *sh
+Vitsy
+W `d`
+Whitespace
+Windows Batch (CMD)
+Windows PowerShell
+Wolfram Language (Mathematica)
+Wolfram Language
+Wolfram
+Wren
+x‑64 assembly machine code
+x86 .COM
+x86
+x86_64 machine language for Linux
+x86-16 machine code
+x86‑64 assembly machine code B
+x86-64 machine code
+Yabasic
+yup
+Zsh (builtins only)
+Zsh `--braceccl`
+Zsh `--extendedglob`
+Zsh `-o extendedglob`
+Zsh
+tinylisp
+Python 3.5

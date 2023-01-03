@@ -67,14 +67,14 @@ problems.each.with_index { |problem, i|
         stdout, stderr, status = Open3.capture3 *cmd
         stdout.chomp!
         failed = false
+        errored = false
         if status.exitstatus.zero?
             if score.nil?
                 score = stderr.scan(/(\d+(?:.\d+)?) byte/)[0][0]
                 puts "Score: #{score}b"
             end
         else
-            STDERR.puts "Failed due to error:"
-            STDERR.puts stderr
+            errored = true
             failed = true
         end
         mismatch = if problem["option"]
@@ -83,8 +83,9 @@ problems.each.with_index { |problem, i|
             result.index(stdout).nil?
         elsif problem["unordered"]
             # p stdout, result
-            stdout = JSON::parse(stdout).sort.to_json
-            result = JSON::parse(result).sort.to_json
+            stdout = JSON::parse(stdout).sort.to_json rescue stdout
+            result = JSON::parse(result).sort.to_json rescue result
+            stdout != result
         else
             stdout != result
         end
@@ -110,7 +111,10 @@ problems.each.with_index { |problem, i|
             # }
             if verbose
                 STDERR.puts cmd.inspect
-                STDERR.puts stderr.gsub(/^/m, " " * 4).lines[0..5]
+                STDERR.puts "Failed due to error:" if errored
+                STDERR.puts stderr
+            elsif errored
+                STDERR.puts "Failed ##{tdx}: #{args_repr.map(&:inspect).join ", "}\t❌#{stderr.lines[2]}"
             else
                 STDERR.puts "Failed ##{tdx}: #{args_repr.map(&:inspect).join ", "}\t❌#{stdout.lines.first}\t✔️#{result.lines.first}"
             end
@@ -121,4 +125,5 @@ problems.each.with_index { |problem, i|
     total_score += score.to_f
     puts "#{success} / #{total} passed"
 }
+total_score = total_score.to_i if total_score == total_score.to_i
 puts "Total score: #{total_score}b"

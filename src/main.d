@@ -59,8 +59,9 @@ int main(string[] args) {
     bool jsonOutput;
     bool decompile, decompileAlign;
     bool noCode;
-    bool scriptKnow, scriptRunner, scriptDistribution;
+    // bool scriptKnow, scriptRunner, scriptDistribution;
     bool forceTruthy;
+    bool measureSize;
     string outfile;
     string fpath;
     string code;
@@ -82,13 +83,14 @@ int main(string[] args) {
         "rundebug|r", "Runtime debug information", &useRuntimeDebug,
         "nocode|x", "Prevents program execution", &noCode,
         "truthy|y", "Coalesces the return value to truthy/falsey", &forceTruthy,
+        "size|s", "Measures the size of the program", &measureSize,
         "f", "Sets verb F:", &fValue,
         "g", "Sets verb G:", &gValue,
         "h", "Sets verb H:", &hValue,
         // quick aliases for other commands
-        "K", "know.rb", &scriptKnow,
-        "R", "runner.rb", &scriptRunner,
-        "D", "distr.rb", &scriptDistribution,
+        // "K", "know.rb", &scriptKnow,
+        // "R", "runner.rb", &scriptRunner,
+        // "D", "distr.rb", &scriptDistribution,
         //todo:remove
         "z", "temp", &temp,
     );
@@ -180,6 +182,17 @@ int main(string[] args) {
         stderr.writeln("Original: ", a);
         stderr.writeln("New:      ", b);
         return a == b ? 0 : 1;
+    }
+    
+    if(measureSize) {
+        Nibble[] nibs;
+        if(literate) {
+            nibs = parseLiterate(code);
+        }
+        else {
+            nibs = getNibbles(code);
+        }
+        writeln(nibs.length / 2.0);
     }
     
     if(compile) {
