@@ -349,6 +349,7 @@ Other approaches (often output first N or infinite sequence):
 | [Brachylog](https://codegolf.stackexchange.com/questions/103377/appending-string-lengths/103444#103444) | | 13b | `l<L$@:?rc.lL,` |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/103377/appending-string-lengths/252756#252756) | | 31b | `{$[9>t:#x;x,$1+t;x,$#x,($1+t)]}` |
 
+
 ## [concatenating-n-with-n-1](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1)
 
 | language | rank | bytes | code |
@@ -368,7 +369,7 @@ Other approaches (often output first N or infinite sequence):
 | [APL (Dyalog Classic)](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/167860#167860) | | 9b | `1,2,/⍕¨∘⍳` |
 | [Husk](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/167869#167869) | | 9b | `mSöd+d←dḣ` |
 | [MATL](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/167907#167907) | | 9b | `:"@qV@VhU` |
-| [CJam](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/167849#167849) | | 11b | `{{_)s+si}%}` |
+{% raw %}| [CJam](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/167849#167849) | | 11b | `{{_)s+si}%}` |{% endraw %}
 | [Gol><>](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/173507#173507) | | 11b | `IFLL?nLPN|;` |
 | [cQuents](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/167824#167824) | | 11b | `=1::($-1)~$` |
 | [APL (Dyalog)](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/167825#167825) | | 12b | `(⍎⍕,∘⍕1∘+)¨⍳` |
@@ -779,7 +780,7 @@ Other approaches (often output first N or infinite sequence):
 | [Pyth](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/62717#62717) | | 25b | `JsM.T_MjR2Qi_}RhM_BS-J0J2` |
 | [APL](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/63389#63389) | | 27b | `{2⊥S∊(⌈/,⌊/)0~⍨S←+/⍵⊤⍨32⍴2}` |
 | [CJam](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/62714#62714) | | 27b | `q~2fbWf%:.+_0-$(\W>|fe=W%2b` |
-| [GolfScript](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/63680#63680) | | 46b | ``` ~{2base-1%}%zip{{+}*}%-1%.$0-)\1<|`{&,}+%2base ``` |
+{% raw %}| [GolfScript](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/63680#63680) | | 46b | ``` ~{2base-1%}%zip{{+}*}%-1%.$0-)\1<|`{&,}+%2base ``` |{% endraw %}
 
 ## [sum-every-second-digit-in-a-number](https://codegolf.stackexchange.com/questions/255650/sum-every-second-digit-in-a-number)
 

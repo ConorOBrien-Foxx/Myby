@@ -168,7 +168,7 @@ needed.each { |prob|
         next if names.include? name
         names << name
         bytes = bytes.to_i if bytes == bytes.to_i
-        puts "| " + [
+        out_line =  "| " + [
             link.empty? ? name : "[#{name}](#{link})",
             "",
             "#{bytes}b",
@@ -177,6 +177,11 @@ needed.each { |prob|
                 line["`"] ? "``` #{line} ```" : line.empty? ? "" : "`#{line}`"
             }.join(" <br/> ")
         ].join(" | ").gsub("|  |", "| |") + " |"
+        # wrap for Jekyll Liquid
+        if out_line["{{"] || out_line["}}"]
+            out_line = "{% raw %}#{out_line}{% endraw %}"
+        end
+        puts out_line
     }
     puts
 }
