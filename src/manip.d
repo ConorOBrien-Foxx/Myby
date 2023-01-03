@@ -103,9 +103,9 @@ string joinToString(T)(T arr) {
 }
 
 BigInt pow(BigInt base, BigInt exp) {
-    if(exp == 0 && base < 0) assert(0, "TODO: negative infinity");
+    if(base == 0 && exp < 0) assert(0, "TODO: infinity");
     // round down to 0
-    if(exp < 0 && base > 1) return BigInt("0");
+    if(base != 0 && exp < 0) return BigInt("0");
     if(exp == 0) return BigInt("1");
     try {
         return base ^^ cast(ulong) exp;
