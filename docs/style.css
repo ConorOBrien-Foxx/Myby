@@ -38,6 +38,10 @@ code {
     border-radius: 5px;
 }
 
+table code {
+    white-space: pre-wrap;
+}
+
 header {
     text-align: center;
     font-size: 1.2em;

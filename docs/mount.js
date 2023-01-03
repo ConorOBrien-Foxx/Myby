@@ -102,7 +102,12 @@ const handleTableOfContents = (content, para) => {
             let depth = child.tagName[1] - tagNumber;
             let a = document.createElement("a");
             for(let gc of child.childNodes) {
-                a.appendChild(gc?.cloneNode(true) ?? gc);
+                gc = gc?.cloneNode(true) ?? gc;
+                // strip top level links
+                if(gc.tagName === "A") {
+                    gc = document.createTextNode(gc.textContent);
+                }
+                a.appendChild(gc);
             }
             a.href = `#${child.id}`;
             contents.push({ depth, a });
@@ -236,8 +241,10 @@ const handleCompare = (content, para) => {
         let lines = [];
         let pairs = Object.entries(collected);
         pairs.sort(([aLanguage, aDistr], [bLanguage, bDistr]) =>
-            bDistr.wins - aDistr.wins || bDistr.losses - aDistr.losses
-            || bDistr.ties - aDistr.ties || aLanguage.localeCompare(bLanguage, undefined, {sensitivity: 'base'})
+            bDistr.wins - aDistr.wins
+            || bDistr.losses - aDistr.losses
+            || bDistr.ties - aDistr.ties
+            || aLanguage.localeCompare(bLanguage, undefined, {sensitivity: "base"})
         );
         for(let [ lang, distr ] of pairs) {
             let line = `${first} wins (${distr.wins}) · Tie (${distr.ties}) · ${lang} wins (${distr.losses})`;
@@ -296,6 +303,8 @@ const handleCompare = (content, para) => {
 window.addEventListener("load", async function () {
     let file = await fetch(window.content);
     let text = await file.text();
+    text = text.replace(/\{% (end)?raw %\}/g, "");
+    // console.log(text);
     const content = document.getElementById("content");
     content.innerHTML = marked.parse(text);
     // handle tables of contents

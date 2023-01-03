@@ -36,6 +36,7 @@ unless File.exists? file_id
     total = []
     page = 1
     loop {
+        break if page > 25 # can't read that far yet
         STDERR.puts "page #{page}..."
         data = scrape ids, page
         total.concat data["items"]
@@ -82,7 +83,11 @@ normalize = {
     "Golfscript" => "GolfScript",
     "Arn 1.0 `-s`" => "Arn",
     "05AB1E(or 5?) bytes" => "05AB1E",
-    "APL NARS 52 char" => "APL NARS"
+    "APL NARS 52 char" => "APL (NARS)",
+    "APL NARS" => "APL (NARS)",
+    "APL(NARS)" => "APL (NARS)",
+    "APL (NARS2000 dialect)" => "APL (NARS)",
+    "NARS2000 APL" => "APL (NARS)",
 }
 
 byte_regexes = [
@@ -119,7 +124,7 @@ total.each { |item|
             .split(",")
             .first
             .gsub(/(with )?<\/?code>/, "`")
-            .gsub(/<\/?(?:strong|em)>|\s+-\s*$/, "")
+            .gsub(/<\/?(?:strong|em|b)>|\s+-\s*$/, "")
             .gsub(/&gt;/, ">")
             .gsub(/&lt;/, "<")
             .gsub(/&amp;/, "&")
@@ -156,6 +161,10 @@ total.each { |item|
     collect[qid].push [name, link, bytes.to_f, code.strip]
 }
 
+def escape_markdown(line)
+    line.gsub(/-|[|\[\]\(\)*_~#\\<>`]/) { |c| "&##{c.ord};" }
+end
+
 needed.each { |prob|
     puts "## [#{prob["name"]}](https://codegolf.stackexchange.com/questions/#{prob["id"]}/#{prob["name"]})"
     puts
@@ -168,13 +177,15 @@ needed.each { |prob|
         next if names.include? name
         names << name
         bytes = bytes.to_i if bytes == bytes.to_i
+        md_name = name.gsub(/<|>|\\/) { |c| "&##{c.ord};" }
         out_line =  "| " + [
-            link.empty? ? name : "[#{name}](#{link})",
+            link.empty? ? md_name : "[#{md_name}](#{link})",
             "",
             "#{bytes}b",
             code.split(/\r?\n/).map { |line|
-                line = CGI.unescapeHTML line
-                line["`"] ? "``` #{line} ```" : line.empty? ? "" : "`#{line}`"
+                # line = escape_markdown CGI.unescapeHTML line
+                line = escape_markdown line
+                "<code>#{line}</code>"
             }.join(" <br/> ")
         ].join(" | ").gsub("|  |", "| |") + " |"
         # wrap for Jekyll Liquid

@@ -358,3 +358,132 @@ Zsh `-o extendedglob`
 Zsh
 tinylisp
 Python 3.5
+GAP
+GNU Assembler(x86_64 Mac OS X)
+Ceylon
+gnuplot
+ARM Thumb-2 (NEON)
+Factor + `math.primes.factors math.unicode`
+Casio-Basic
+Shnap
+VBA (Excel)
+Factor + `benchmark.fib3`
+8086/8088 machine code
+Detour (non-competing)
+Regex `🐇` (ECMAScript<sup><sup>RME</sup></sup> / Perl / PCRE / Raku)
+DUP
+HOPS
+Ouroboros
+Implicit
+Cy
+Cylon (Non-Competing)
+Element(option two) or 11 (option one)
+RASEL
+Stackish
+beeswax
+BRASCA
+FALSE
+Intel 8087 FPU
+x86 machine code -
+AsciiDots
+Tidy
+Forked
+BitCycle
+Grok
+Recursiva
+µ6
+Pietcodels
+Reng v.2.1
+Alumin
+Flobnar
+Regenerate
+Detour
+bc
+Cubestack
+Braingolf
+Klein
+Cascade
+Barrel
+Dodos
+Forth
+Maple
+Ral
+Binary-Encoded Golfical
+Coconut
+International Phonetic Esoteric Language
+Joy
+jq `-n`
+rSNBATWPL
+Pxem
+Pug
+Ruby (as function)
+Quipu
+Lean
+Pinecone
+Whispers v3
+Chip-8
+R16K1S60 Assembly
+GeoGebra
+Befunge-98 (PyFunge)
+VBScript
+pure bash
+BitCycle `-u`
+Little Man Computer
+Flurry
+OIL
+bash pur
+ReRegex
+C#:
+C# 4
+PHP 4 ()
+Pure
+Alchemist
+GAS x86-64 for Linux (Machine code)
+Pascal (FPC)
+JVM Byte Code
+Oracle SQL 9.2
+Taktentus
+Reflections
+Emojicode
+Scratch
+Tampio
+Prismatic
+Jasmin
+Oration
+Trianguish
+COBOL (GNU)
+TypeScript's type system
+LOLCODE
+SunSip `-w -n`
+Pyramid Scheme
+ArnoldC
+Brainf*ck
+x86 Machine Code (ELF format)
+Seed
+33
+Haskell 1.2 (Gofer)
+R without using the `median` builtin
+8th
+Haxe
+Factor + `math.primes.lucas-lehmer`
+TI-Basic (TI-84 Plus CE)
+Perl 5 `-ap`
+JavaScript (ES7)
+Fortran 95
+Wolfram Mathematica
+gorbitsa-ROM
+Factor + `math.matrices`
+Io
+ASMD
+Molecule (v6+)
+Factor + `math.primes`
+Sage
+Bash ()
+Julia 1.x
+Python 2;
+Swift 2
+Python 2 (PyPy)
+(M)AWK
+HPPPL
+CellTail
+x86 assembly (32-bit)
