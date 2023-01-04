@@ -195,7 +195,8 @@ Verb foldFor(Verb v) {
                 )(id, en);
         }
         else {
-            return id.isNil
+            // TODO: this didn't used to check if arr empty. why?
+            return id.isNil || !arr.empty
                 ? arr.reduce!v
                 : reduce!v(id, arr);
         }
@@ -225,7 +226,7 @@ Verb foldFor(Verb v) {
         ))
         .setDyad((Verb v, a, b) => match!(
             // TODO:
-            (BigInt a, BigInt b) => Atom(BigInt("234")),
+            (BigInt a, BigInt b) => assert(0, "Unimplemented: Dyadic \\"),
             // table
             (Atom[] a, Atom[] b) =>
                 Atom(a.map!(l => Atom(b.map!(r => v(l, r)).array)).array),
