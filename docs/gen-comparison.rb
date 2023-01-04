@@ -80,6 +80,7 @@ normalize = {
     "q" => "Q",
     "k4" => "K4",
     "k" => "K",
+    "Cjam" => "CJam"
     "Golfscript" => "GolfScript",
     "Arn 1.0 `-s`" => "Arn",
     "05AB1E(or 5?) bytes" => "05AB1E",

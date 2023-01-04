@@ -804,5 +804,77 @@
         "alternatives": [
             {"bytes":6.5,   "code":"minmax ~:<H`:\\"}
         ]
+    },
+    {
+        "id": 115516,
+        "name": "is-this-number-an-integer-power-of-2",
+        "tests": [
+            {"x":-2, "result":true},
+            {"x":-1, "result":false},
+            {"x":0, "result":false},
+            {"x":1, "result":true},
+            {"x":2, "result":false},
+            {"x":3, "result":false},
+            {"x":4, "result":true}
+        ],
+        "decision": true,
+        "alternatives": [
+            {"bytes":5.5,   "code":"# e. _2 ^\" R@+"},
+            {"bytes":6.5,   "code":"1 = ( +\\ _2&#: )"}
+        ]
+    },
+    {
+        "id": 117879,
+        "name": "number-triangle-flip",
+        "tests": [
+            {"x":1, "result":1},
+            {"x":2, "result":3},
+            {"x":3, "result":2},
+            {"x":4, "result":6},
+            {"x":14, "result":12},
+            {"x":990, "result":947},
+            {"x":991, "result":1035}
+        ],
+        "extra_tests": [
+            {"x":1000, "result":1026},
+            {"x":1035, "result":991},
+            {"x":1036, "result":1081},
+            {"x":12345, "result":12305}
+        ],
+        "alternatives": [
+            {"bytes":7,     "code":"(* ^ -\"@P ^\"@^) R #"},
+            {"bytes":8.5,   "code":"(* ^ -\"@P ^\"@^) >:@^ #"},
+            {"bytes":8.5,   "code":"(* 1 + ^ -\"@P ^\"@^) ^ #"},
+            {"bytes":9.5,   "code":"1 + (* ^ -\"@P ^\"@^) ^ #"}
+        ]
+    },
+    {
+        "id": 255765,
+        "name": "replace-all-vowels-with-repeated-aeiou",
+        "tests": [
+            {
+                "x":     "Code Golf! I love Code Golf. It is the best.",
+                "result":"Cade Gilf! O luva Cedi Golf. Ut as the bist."
+            },
+            {
+                "x":     "This is a test! This is example number two.",
+                "result":"Thas es i tost! Thus as eximplo numbar twe."
+            }
+        ]
+    },
+    {
+        "id": 122703,
+        "name": "print-invisible-text",
+        "tests": [
+            {"x":"Hello, World!", "result":"             "},
+            {"x":"Hi", "result": "  "},
+            {
+                "x":"   Don't\nForget about\nExisting\nWhitespace!   ",
+                "result": "                                             "
+            },
+            {"x":"", "result":""},
+            {"x":"             ", "result":"             "},
+            {"x":"\n", "result":" "}
+        ]
     }
 ]

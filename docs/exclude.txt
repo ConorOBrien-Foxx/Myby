@@ -122,7 +122,6 @@ Google Sheets
 Goruby
 Groovy
 GW-BASIC
-Haskell + hgl
 Haskell
 Hassium
 Hexagony
@@ -430,6 +429,7 @@ pure bash
 BitCycle `-u`
 Little Man Computer
 Flurry
+Flurry `-bnb`
 OIL
 bash pur
 ReRegex
@@ -487,3 +487,26 @@ Python 2 (PyPy)
 HPPPL
 CellTail
 x86 assembly (32-bit)
+x64 ASSEMBLY (linux nasm)
+Windows batch
+Pascal B
+Poetic
+ZX(4K ROM version with sanity check)
+C (tcc)
+makina
+Clojurescript
+SmileBASIC 3
+JavaScript (ES8)
+shortC
+Shell utils
+x86-16 ASM
+Ruby -p
+Ruby (2.5.5)
+Python 3.8+
+Casio BASIC
+Scheme
+Javascript(ES7)
+Regex (ECMAScript / Java)
+x86_(32/64) machine code
+Julia 0.5
+x86-32 machine code

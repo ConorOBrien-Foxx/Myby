@@ -4,13 +4,13 @@ TLDR, Current Verdict: Myby is decently competitive, sometimes even winning agai
 
 ```
                      W -  L - T /  Σ |     W%
-Myby vs. 05AB1E:    21 - 24 - 4 / 49 | 42.86%
-Myby vs. MATL:      20 -  3 - 1 / 24 | 83.33%
-Myby vs. Jelly:     12 - 27 - 8 / 47 | 25.53%
-Myby vs. Vyxal:     11 - 20 - 7 / 38 | 28.95%
-Myby vs. Husk:      11 - 10 - 2 / 23 | 47.83%
-Myby vs. Fig:        4 - 14 - 0 / 18 | 22.22%
-Myby vs. Nibbles:    2 -  6 - 1 /  9 | 22.22%
+Myby vs. 05AB1E:    24 - 25 - 4 / 53 | 45.28%
+Myby vs. MATL:      21 -  3 - 1 / 25 | 84.00%
+Myby vs. Jelly:     17 - 27 - 7 / 51 | 33.33%
+Myby vs. Vyxal:     14 - 22 - 6 / 42 | 33.33%
+Myby vs. Husk:      13 - 11 - 1 / 25 | 52.00%
+Myby vs. Fig:        5 - 14 - 0 / 19 | 26.32%
+Myby vs. Nibbles:    3 -  6 - 1 / 10 | 30.00%
 ```
 
 Disclaimer: Results are not definitive, as it is a form of self-selection.
@@ -47,6 +47,7 @@ _Do not post any of the Myby solutions contained herein._
 | [MathGolf](https://codegolf.stackexchange.com/questions/252082/reconstruct-matrix-from-its-diagonals/252091#252091) | | 21b | <code>h½&#41;r■&#95;@mÅε&#45;&#95;╙+§&#92;mÄ╓m§</code> |
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/252082/reconstruct-matrix-from-its-diagonals/252090#252090) | | 22b | <code>⊖w↑i⊖↑⌽⍨≢↑⍥&#45;i←⍳w←≢∘⍉∘↑</code> |
 | [Pip `-x`](https://codegolf.stackexchange.com/questions/252082/reconstruct-matrix-from-its-diagonals/252114#252114) | | 22b | <code>Fi,YMX&#35;&#42;aFki+R,yPPOa@k</code> |
+| [Haskell + hgl](https://codegolf.stackexchange.com/questions/252082/reconstruct-matrix-from-its-diagonals/256312#256312) | | 25b | <code>1 &#35;&#35;&#35;&#35;      1&#35;&#35;&#35;&#35;</code> <br/> <code>2  &#35;&#35;&#35;       2&#35;&#35;&#35;</code> <br/> <code>3   &#35;&#35;  &#45;&#45;&gt;   3&#35;&#35;</code> <br/> <code>4    &#35;         4&#35;</code> <br/> <code>5               5</code> |
 
 ## [find-the-sum-of-the-divisors-of-n](https://codegolf.stackexchange.com/questions/142071/find-the-sum-of-the-divisors-of-n)
 
@@ -92,10 +93,8 @@ _Do not post any of the Myby solutions contained herein._
 | [flax](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/243108#243108) | | 3b | <code>1+ⁿ</code> |
 | [Fig](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/248952#248952) | | 3.292b | <code>G:1'+</code> |
 | [Chocolate](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/249230#249230) | | 4b | <code>G+c1</code> |
-| [TeaScript](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/62019#62019) | | 4b | <code>F&#40;x&#41;</code> <br/> <code></code> <br/> <code>F&#40;x&#41; //Find the Fibonacci number at the input</code> |
 | Myby | | 4.5b | <code>+&#92;&#35;!"&R&#45;</code> |
 | [Nibbles](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/254601#254601) | | 4.5b | <code>.&#126;&#126;1+&lt;2</code> |
-| [Alpax](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/76324#76324) | | 5b | <code>⇇+</code> <br/> <code>1¹</code> |
 | [Arn](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/209583#209583) | | 5b | <code>╔Tò”7</code> |
 | [Duocentehexaquinquagesimal](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/223675#223675) | | 5b | <code>±∊YO$</code> |
 | [Halfwit](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/243112#243112) | | 5.5b | <code>n&gt;&lt;?&#40;:}+</code> |
@@ -103,7 +102,6 @@ _Do not post any of the Myby solutions contained herein._
 | [J-uby](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/110149#110149) | | 6b | <code>:++2.&#42;</code> |
 | [cQuents](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/128238#128238) | | 6b | <code>=1:z+y</code> |
 | [tq](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/197601#197601) | | 6b | <code>01p+r&#41;</code> |
-| [𝔼𝕊𝕄𝕚𝕟](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/69915#69915) | | 6b | <code>Мȫï</code> |
 | [Thunno `Y`](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/256271#256271) | | 6.58b | <code>R{xyAx+Y</code> |
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/223225#223225) | | 7b | <code>+.!∘⌽⍨⍳</code> |
 | [Gol&#62;&#60;&#62;](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/193582#193582) | | 7b | <code>12K+:N!</code> |
@@ -112,10 +110,7 @@ _Do not post any of the Myby solutions contained herein._
 | [Pip](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/62707#62707) | | 9b | <code>W1o:y+YPo</code> |
 | [&#92;/&#92;/&#62;](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/188277#188277) | | 9b | <code>:@+1}:nau</code> |
 | [Brachylog](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/190928#190928) | | 10b | <code>0;1⟨t≡+⟩ⁱh</code> |
-| [Gogh](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/75719#75719) | | 10b | <code>¹Ƥ{Ƥ÷®+Ø}x</code> |
 | [Keg](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/189656#189656) | | 10b | <code>01{:. ,:"+</code> |
-| [CJam](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/74634#74634) | | 11b | <code>0X{&#95;@+}q&#126;&#42;;</code> |
-| [Fuzzy Octo Guacamole](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/77521#77521) | | 11b | <code>01&#40;!aZrZo;&#41;</code> |
 | [Sesos](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/86447#86447) | | 11b | <code>0000000: ae8583 ef6bc7 045fe7 b907                         ....k..&#95;...</code> <br/> <code></code> <br/> <code>Size   : 11 byte&#40;s&#41;</code> |
 | [BQN](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/240265#240265) | | 13b | <code>{⊑+´⊸∾⟜⊏⍟𝕩↕2}</code> |
 | [Pylons](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/71126#71126) | | 13b | <code>11fA..+@{A,i}</code> |
@@ -231,14 +226,13 @@ _Do not post any of the Myby solutions contained herein._
 | [Vyxal](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/239947#239947) | | 4b | <code>k4'æ</code> |
 | [MATL](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/96174#96174) | | 5b | <code>1e6Zq</code> |
 | [MathGolf](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/252152#252152) | | 5b | <code>►rg¶n</code> |
-| [gs2](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/55868#55868) | | 5b | <code>∟&#41;◄lT</code> |
 | [05AB1E](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/164545#164545) | | 6b | <code>6°ÅPε,</code> |
 | [Japt `-R`](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/211901#211901) | | 6b | <code>L³õ fj</code> |
 | [APL (NARS)](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/58785#58785) | | 7b | <code>⍸0π⍳1e6</code> |
 | [Jelly](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/128312#128312) | | 7b | <code>10&#42;6ÆRY</code> |
 | [Stax](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/157056#157056) | | 7b | <code>ç►╪&#40;Æ;Ç</code> |
 | [Pyt](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/157210#157210) | | 8b | <code>6ᴇřĐṗ&#42;žÁ</code> |
-| [Pyth](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/80877#80877) | | 9b | <code>V^T6IP&#95;NN</code> |
+| [Pyth](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/80739#80739) | | 9b | <code>V^T6IP&#95;NN</code> |
 | [APL](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/13030#13030) | | 15b | <code>p&#126;,p∘.×p←1↓⍳1e6</code> |
 | [APL (Dyalog)](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/55962#55962) | | 15b | <code>⍪&#40;⊢&#126;∘.×⍨&#41;1↓⍳1E6</code> |
 
@@ -408,12 +402,7 @@ _Do not post any of the Myby solutions contained herein._
 
 | language | rank | bytes | code |
 |----------|------|-------|------|
-| [05AB1E (legacy)](https://codegolf.stackexchange.com/a/224001/31957) | | 1b | <code>Ë</code> |
-| [Brachylog](https://codegolf.stackexchange.com/a/224001/31957) | | 1b | <code>=</code> |
-| [Husk](https://codegolf.stackexchange.com/a/224001/31957) | | 1b | <code>E</code> |
-| [Jelly](https://codegolf.stackexchange.com/a/224001/31957) | | 1b | <code>E</code> |
 | Myby | | 1b | <code>e.</code> |
-| [Vyxal](https://codegolf.stackexchange.com/a/224001/31957) | | 1b | <code>≈</code> |
 | [Fig](https://codegolf.stackexchange.com/questions/224000/are-all-the-items-the-same/252543#252543) | | 1.646b | <code>LU</code> |
 | [Arn](https://codegolf.stackexchange.com/questions/224000/are-all-the-items-the-same/224005#224005) | | 2b | <code>:@</code> |
 | [Husk](https://codegolf.stackexchange.com/questions/224000/are-all-the-items-the-same/224348#224348) | | 2b | <code>hg</code> |
@@ -468,6 +457,7 @@ _Do not post any of the Myby solutions contained herein._
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/241357/implement-an-argwhere-function/252828#252828) | | 6b | <code>{&amp;x'y}</code> |
 | [Pip `-xp`](https://codegolf.stackexchange.com/questions/241357/implement-an-argwhere-function/241430#241430) | | 7b | <code>bMa@&#42;:1</code> |
 | [J](https://codegolf.stackexchange.com/questions/241357/implement-an-argwhere-function/252935#252935) | | 11b | <code>1 :'I.u&quot;+y'</code> |
+| [Haskell + hgl](https://codegolf.stackexchange.com/questions/241357/implement-an-argwhere-function/241369#241369) | | 19b | <code>&#40;cx&lt;ixm pM&#41;.^m&lt;m gu</code> |
 | [J-uby](https://codegolf.stackexchange.com/questions/241357/implement-an-argwhere-function/252681#252681) | | 31b | <code>&#45;&gt;a,f{:select+&#40;:&#91;&#93;&amp;a&#124;f&#41;^&#40;+a&#41;.&#42;}</code> |
 
 ## [remove-odd-indices-and-double-the-even-indices](https://codegolf.stackexchange.com/questions/241267/remove-odd-indices-and-double-the-even-indices)
@@ -500,15 +490,11 @@ _Do not post any of the Myby solutions contained herein._
 | [Fig](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/253116#253116) | | 1.646b | <code>fy</code> |
 | [05AB1E](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/220744#220744) | | 2b | <code>ι˜</code> |
 | [Jelly](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/145396#145396) | | 3b | <code>ŒœF</code> |
+| [Vyxal](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/256290#256290) | | 3b | <code>y&quot;f</code> |
 | Myby | | 3.5b | <code>&#42;@^ /&2</code> |
 | [Husk](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/216349#216349) | | 4b | <code>ΣTC2</code> |
-| [Pyth](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/64324#64324) | | 5b | <code>o&#126;!ZQ</code> |
-| [CJam](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/64317#64317) | | 7b | <code>{2/ze&#95;}</code> |
-| [J](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/64331#64331) | | 8b | <code>/:0 1$&#126;&#35;</code> |
-| [K](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/64402#64402) | | 10b | <code>{x@&lt;2!!&#35;x}</code> |
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/216780#216780) | | 11b | <code>{⍵&#91;⍒2&#124;⍳≢⍵&#93;}</code> |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/252991#252991) | | 21b | <code>{t,x^t:x@&amp;&#40;0=2!&#41;'!&#35;x}</code> |
-| [𝔼𝕊𝕄𝕚𝕟](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/64366#64366) | | 22b | <code>Ѩťᶏש,Ѩą&#40;ï,2⸩</code> |
 
 ## [count-the-changes-in-an-array](https://codegolf.stackexchange.com/questions/146402/count-the-changes-in-an-array)
 
@@ -541,15 +527,10 @@ _Do not post any of the Myby solutions contained herein._
 | Myby | | 10b | <code>'&#92;n' &#42; &#40;&#35;&#96;&#45;" &#40;P &#35;&#92;.&#126; &#45; H&#41;&#41;</code> |
 | [J](https://codegolf.stackexchange.com/questions/55051/twisting-words/210403#210403) | | 13b | <code>&#93;&#96;&#124;.&quot;1@&#40;&#93;&#92;&#41;&#126;&#45;</code> |
 | [Japt](https://codegolf.stackexchange.com/questions/55051/twisting-words/165021#165021) | | 14b | <code>óV y £Yv ?X:Xw</code> |
-| [Pyth](https://codegolf.stackexchange.com/questions/55051/twisting-words/55055#55055) | | 15b | <code>VPc+z&#42;dQQ&#95;W&#126;!ZN</code> |
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/55051/twisting-words/164722#164722) | | 19b | <code>{↑⊢∘⌽&#92;↓↑⍵⊆⍨⌈⍺÷⍨⍳≢⍵}</code> |
-| [CJam](https://codegolf.stackexchange.com/questions/55051/twisting-words/55056#55056) | | 19b | <code>q&#126;1$S&#42;+/W&lt;{&#40;N@Wf%}h</code> |
 | [Brachylog](https://codegolf.stackexchange.com/questions/55051/twisting-words/210476#210476) | | 20b | <code>⟨{ġ&#124;,Ṣ↰}lᵛ⟩{i↔ⁱ⁾}ᶠ&#126;ṇ</code> |
 {% raw %}| [05AB1E](https://codegolf.stackexchange.com/questions/55051/twisting-words/210457#210457) | | 22b | <code>ô0UεRDg²s&#45;úXÈiR}X&gt;U}}»</code> |{% endraw %}
 | [Pip](https://codegolf.stackexchange.com/questions/55051/twisting-words/210419#210419) | | 34b | <code>Fla.sXb&#45;&#35;&#40;@RVa&lt;&gt;b&#41;&lt;&gt;b{Po?lRVlo!:o}</code> |
-| [Stuck](https://codegolf.stackexchange.com/questions/55051/twisting-words/55065#55065) | | 38b | <code>tg;&#95;lu&#95;@%u;&#45;&#95;0G&lt;&#42;' &#42;+0GKE"&#93;;2%;Y&#95;Y?p":</code> |
-| [Q](https://codegolf.stackexchange.com/questions/55051/twisting-words/55119#55119) | | 46b | <code>{&#45;1@neg&#91;y&#93;$@&#91;a;&#40;&amp;&#41;&#40;til&#40;&#35;&#41;a:y cut x&#41;mod 2;&#124;:&#93;;}</code> |
-| [O](https://codegolf.stackexchange.com/questions/55051/twisting-words/55122#55122) | | 60b | <code>z&quot;&quot;/rlJ&#40;Q/{n:x;Q&#40;{+}dxe{&#96;}{}?p}drQJQ%&#45;{' }dJQ/e{r}{}?Q&#40;{o}dp</code> |
 
 ## [determine-the-color-of-a-chess-square](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square)
 
@@ -562,21 +543,11 @@ _Do not post any of the Myby solutions contained herein._
 | [Vyxal](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/243039#243039) | | 11b | <code>C∑₂&#96;⟇ǎ↔β&#96;½i</code> |
 | [Keg](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/205200#205200) | | 12b | <code>+2%&#91;‘15‘&#124;‘1⑻</code> |
 | [05AB1E (legacy)](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/177996#177996) | | 13b | <code>“–°‡Ž“&#35;I35öÈè</code> |
-| [GS2](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/63779#63779) | | 15b | <code>de♦dark•light♠5</code> |
 | Myby | | 15.5b | <code>+&#92;@&#62; { 'dark' , 'light'</code> |
 | [Japt](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/165884#165884) | | 16b | <code>&#96;ä&&#35;149;&&#35;4;Krk&#96;qe g&#126;Uxc</code> |
 | [K (oK)](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/148016#148016) | | 16b | <code>&#96;dark&#96;light 2!+/</code> |
-| [O](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/63998#63998) | | 17b | <code>i&#35;2%"light'dark"?</code> |
-| [CJam](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/63773#63773) | | 18b | <code>r:&#45;&#41;"lightdark"5/=</code> |
-| [Pyth](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/63776#63776) | | 18b | <code>@c2"lightdark"iz35</code> |
-| [Seriously](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/63775#63775) | | 19b | <code>&quot;dark&quot;&quot;light&quot;2,O+%I</code> |
-| [MATL](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/67092#67092) | | 20b | <code>js2&#92;?'light'}'dark'&#93;</code> |
-| [GolfScript](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/63973#63973) | | 21b | <code>{^}&#42;&#126;1&amp;"lightdark"5/=</code> |
-| [Gol&#62;&#60;&#62;](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/63807#63807) | | 22b | <code>ii+2%Q"thgil"H&#124;"krad"H</code> |
-| [TeaScript](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/63789#63789) | | 23b | <code>®x,35&#41;%2?"dark":"light"</code> |
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/177999#177999) | | 24b | <code>⊃'dark' 'light'⌽⍨+/⎕UCS⍞</code> |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/253074#253074) | | 25b | <code>{$&#91;2!+/x;&quot;light&quot;;&quot;dark&quot;&#93;}</code> |
-| [𝔼𝕊𝕄𝕚𝕟](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/63805#63805) | | 34b | <code>ô&#40;שǀ&#40;ï,ḣ&#41;%2?&#96;dark&#96;:&#96;light”</code> |
 | [J](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/243032#243032) | | 37b | <code>&gt;@{&amp;&#40;'dark';'light'&#41;@{:@&#35;:@+/@&#40;a.&amp;i.&#41;</code> |
 
 ## [is-this-word-lexically-ordered](https://codegolf.stackexchange.com/questions/108675/is-this-word-lexically-ordered)
@@ -665,15 +636,10 @@ _Do not post any of the Myby solutions contained herein._
 | [Jelly](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/119591#119591) | | 4b | <code>œ&#45;QQ</code> |
 | [Vyxal](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/253348#253348) | | 4b | <code>UÞ⊍U</code> |
 | [05AB1E](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/166409#166409) | | 5b | <code>ʒ¢≠}Ù</code> |
-| [K5](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/60648#60648) | | 5b | <code>?d^?d</code> |
 | Myby | | 6.5b | <code>//&#35;&#40;&#60;:+&#92;&#41;"@=</code> |
 | [Japt](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/166320#166320) | | 7b | <code>â £kX â</code> |
 | [K (oK)](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/171379#171379) | | 7b | <code>&amp;1&lt;&#35;:'=</code> |
-| [Pyth](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/60649#60649) | | 7b | <code>S{.&#45;Q{Q</code> |
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/60637#60637) | | 9b | <code>∊&#40;⊂1↓⊣¨&#41;⌸</code> |
-| [CJam](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/60612#60612) | | 10b | <code>D{De=&#40;},&#95;&amp;</code> |
-| [K (not K5)](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/60934#60934) | | 10b | <code>x@&amp;1&lt;&#35;:'=x</code> |
-| [J](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/60764#60764) | | 13b | <code>&#126;.d&#35;&#126;1&lt;+/=/&#126;d</code> |
 
 ## [alphabet-checksum](https://codegolf.stackexchange.com/questions/253568/alphabet-checksum)
 
@@ -783,11 +749,6 @@ _Do not post any of the Myby solutions contained herein._
 | language | rank | bytes | code |
 |----------|------|-------|------|
 | Myby | | 14.5b | <code>&#35;. &#40;&#35; e.": &#62;. , 1 &#62;. &#60;.&#41; +"&#92; &#35;: @.</code> |
-| [J](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/62923#62923) | | 21b | <code>+/&#40;e.&gt;./,&lt;./@&#35;&#126;@&#41;&amp;.&#35;:</code> |
-| [Pyth](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/62717#62717) | | 25b | <code>JsM.T&#95;MjR2Qi&#95;}RhM&#95;BS&#45;J0J2</code> |
-| [APL](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/63389#63389) | | 27b | <code>{2⊥S∊&#40;⌈/,⌊/&#41;0&#126;⍨S←+/⍵⊤⍨32⍴2}</code> |
-| [CJam](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/62714#62714) | | 27b | <code>q&#126;2fbWf%:.+&#95;0&#45;$&#40;&#92;W&gt;&#124;fe=W%2b</code> |
-{% raw %}| [GolfScript](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/63680#63680) | | 46b | <code>&#126;{2base&#45;1%}%zip{{+}&#42;}%&#45;1%.$0&#45;&#41;&#92;1&lt;&#124;&#96;{&amp;,}+%2base</code> |{% endraw %}
 
 ## [sum-every-second-digit-in-a-number](https://codegolf.stackexchange.com/questions/255650/sum-every-second-digit-in-a-number)
 
@@ -874,7 +835,7 @@ _Do not post any of the Myby solutions contained herein._
 | language | rank | bytes | code |
 |----------|------|-------|------|
 | [Jelly](https://codegolf.stackexchange.com/questions/199139/write-some-random-english/252402#252402) | | 8b | <code>ØḄØẹḂ?X&#41;</code> |
-| [Vyxal `rṀs`](https://codegolf.stackexchange.com/a/256289/78850) | | 8b | <code>ƛkvk⁰"i℅</code> |
+| [Vyxal `rṀs`](https://codegolf.stackexchange.com/questions/199139/write-some-random-english/256289#256289) | | 8b | <code>ƛkvk⁰&quot;i℅</code> |
 | Myby | | 9b | <code>&#62; &#40;?. con&#96;vow&#41;"@R</code> |
 | [Vyxal `s`](https://codegolf.stackexchange.com/questions/199139/write-some-random-english/251506#251506) | | 9b | <code>⟑₂¨ikvk¹℅</code> |
 | [Stax](https://codegolf.stackexchange.com/questions/199139/write-some-random-english/199448#199448) | | 10b | <code>ÇÅφ⌠↑Ñ°↕Yx</code> |
@@ -902,11 +863,11 @@ _Do not post any of the Myby solutions contained herein._
 | [APL (dzaima/APL)](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/200057#200057) | | 9b | <code>⎕IO←0</code> |
 | [GolfScript](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/199785#199785) | | 9b | <code>2/{1/&#126;.}%</code> |
 | [Pip](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/237051#237051) | | 10b | <code>WV&#40;UWa!&#42;h&#41;</code> |
-| [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/237047#237047) | | 11b | <code>⊢&#40;/⍨&#41;1 2⍴⍨⍴</code> <br/> <code></code> <br/> <code>           ⍴   monadic: shape of the right argument &#40;number of elements&#41;</code> <br/> <code></code> <br/> <code>      1 2⍴⍨    repeat numbers 1 and 2 as many times as the right argument</code> <br/> <code></code> <br/> <code>⊢              the right argument</code> <br/> <code></code> <br/> <code> &#40;/⍨&#41;          replicate each element of the left argument as many times as </code> <br/> <code>               specified by the corresponding elements of the right argument</code> |
+| [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/237047#237047) | | 11b | <code>⊢&#40;/⍨&#41;1 2⍴⍨⍴</code> |
 | [APL (Dyalog)](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/198930#198930) | | 11b | <code>∊⊢⍴⍨¨1 2⍴⍨≢</code> |
 | [Z80Golf](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/199601#199601) | | 12b | <code>00000000: d52e 76e5 2e07 e5cd 0380 38f6            ..v.......8.</code> |
 | [APL+WIN](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/198773#198773) | | 13b | <code>&#40;&#40;⍴s&#41;⍴⍳2&#41;/s←⎕</code> |
-| [K4](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/198757#198757) | | 17b | <code>{,/&#35;'&#91;&#40;&#35;x&#41;&#35;1 2&#93;x}</code> <br/> <code></code> <br/> <code>{               } /lambda with implicit arg x</code> <br/> <code>      &#40;&#35;x&#41;        /count x</code> <br/> <code>          &#35;1 2    /takes &#35;x items of 1 2</code> <br/> <code>   &#35;'&#91;        &#93;x  /take &#91;...&#93; items of x</code> <br/> <code> ,/               /flatten</code> |
+| [K4](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/198757#198757) | | 17b | <code>{,/&#35;'&#91;&#40;&#35;x&#41;&#35;1 2&#93;x}</code> |
 
 ## [is-it-true-ask-pip](https://codegolf.stackexchange.com/questions/256166/is-it-true-ask-pip)
 
@@ -951,7 +912,7 @@ _Do not post any of the Myby solutions contained herein._
 | [APL (Dyalog Extended)](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256150#256150) | | 6b | <code>∨2⌷2⍭⊢</code> |
 | [Husk](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256218#256218) | | 6b | <code>↔OmLgp</code> |
 | [Jelly](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256149#256149) | | 6b | <code>ÆE¹ƇṢU</code> |
-| [Japt](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256160#256160) | | 8b | <code>k ü mÊñn</code> |
+| [Japt](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256299#256299) | | 8b | <code>k òÎmÊÍÔ</code> |
 | [Pyt](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256155#256155) | | 8b | <code>Đϼ1&#92;⇹ḋɔŞ</code> |
 | [J](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256159#256159) | | 12b | <code>&#95;&#95;&#92;:&#126;@{:@q:&#93;</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256161#256161) | | 56b | <code>Ｎθ≔²ηＷ⊖θ¿﹪θη≦⊕η«≔⁰ζＷ¬﹪θη«≦⊕ζ≧÷ηθ»⊞υζ»≔⟦⟧ζＷ⁻υζＦ№υ⌈ι⊞ζ⌈ιＩζ</code> |
@@ -993,17 +954,91 @@ _Do not post any of the Myby solutions contained herein._
 
 | language | rank | bytes | code |
 |----------|------|-------|------|
+| [Thunno `D` `E`](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/256296#256296) | | 2.47b | <code>zni</code> |
 | Myby | | 5.5b | <code>minmax &#60;I.&#92;</code> |
 | [Jelly](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/216925#216925) | | 6b | <code>OƑƇṢ.ị</code> |
-| [Seriously](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/71200#71200) | | 6b | <code>,ì;M@m</code> |
 | [Vyxal](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/231131#231131) | | 6b | <code>0+∩₍gG  &#35; main program</code> |
 | [Brachylog](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/231133#231133) | | 7b | <code>ℕˢ⟨⌋≡⌉⟩</code> |
-| [Pyth](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/71177#71177) | | 10b | <code>hM&#95;BS^I&#35;1Q</code> |
+| [Japt](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/256294#256294) | | 11b | <code>'m¬iÔm!rUfâ</code> |
 | [APL (Dyalog)](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/120673#120673) | | 13b | <code>&#40;⌊/,⌈/&#41;⎕AV&#126;⍨∊</code> |
-| [CJam](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/71175#71175) | | 13b | <code>{&#95;:z&amp;$2&#42;&#95;,&#40;%}</code> |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/216975#216975) | | 19b | <code>&#40;&amp;/;&#124;/&#41;@&#92;:&#40;&#96;i=@:'&#41;&#35;</code> |
-| [Jolf](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/71248#71248) | | 20b | <code>γ fxd='nF&#126;tH0ͺZkγZKγ</code> <br/> <code> &#95;fx                 filter the input</code> <br/> <code>    d='nF&#126;tH0        checking for number type</code> <br/> <code>γ                    call that "γ"</code> <br/> <code>             ͺ       pair</code> <br/> <code>              ZkγZKγ  the min and max of the array</code> |
-| [𝔼𝕊𝕄𝕚𝕟](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/71258#71258) | | 20b | <code>&#91;МƲ&#40;ï⇔⒡≔=+$⸩,МƵï</code> |
-| [Japt](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/71231#71231) | | 23b | <code>&#91;V=Uf&#95;bZÃn@X&#45;Y}&#41;g Vw g&#93;</code> |
-| [MATL](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/71180#71180) | | 23b | <code>"@Y:tX%1&#41;2&#92;?x&#93;N$htX&lt;wX&gt;</code> |
 
+## [is-this-number-an-integer-power-of-2](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2)
+
+| language | rank | bytes | code |
+|----------|------|-------|------|
+| [05AB1E](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/216718#216718) | | 4b | <code>2&#40;вO</code> |
+| [Vyxal](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/256288#256288) | | 4b | <code>2Nτ∑</code> |
+| Myby | | 4.5b | <code>&#35; e. &#95;2 ^" R</code> |
+| [Jelly](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/115544#115544) | | 5b | <code>æḟ&#45;2=</code> |
+| [Japt `-!`](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/231626#231626) | | 6b | <code>ì´J Åx</code> |
+| [Brachylog](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/243457#243457) | | 7b | <code>ḃb&#45;₂ᵐ×?</code> |
+| [Pyth](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/116767#116767) | | 7b | <code>!tsjQ&#95;2</code> |
+| [MATL](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/115526#115526) | | 8b | <code>2&#95;y&#124;:q^m</code> |
+| [APL (Dyalog Extended)](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/216673#216673) | | 10b | <code>⊢∊¯2&#42;⍳∘&#124;</code> |
+| [CJam](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/115949#115949) | | 12b | <code>li&#95;z2mLi&#45;2&#35;=</code> |
+| [K (ngn/k)](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/216680#216680) | | 14b | <code>{&#124;/x=&#42;&#92;1,x&#35;&#45;2}</code> |
+| [Risky](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/241961#241961) | | 14b | <code>&#95;&#95;&#45;+&#95;&#45;2{&#91;?+&#95;0:&#95;&#95;0+&#95;0+&#95;&#95;?+&#95;0</code> |
+| [J](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/243459#243459) | | 17b | <code>+/@&#40;=&#95;2:^i.@&gt;:@&#124;&#41;</code> |
+
+## [number-triangle-flip](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip)
+
+| language | rank | bytes | code |
+|----------|------|-------|------|
+| Myby | | 5b | <code>&#40; &#42; ^ &#45;"@/ ^ &#41; R &#35;</code> |
+| [Husk](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/151763#151763) | | 6b | <code>!ṁ↔´CN</code> |
+| [Jelly](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/117881#117881) | | 7b | <code>RṁR€UFi</code> |
+| [Vyxal](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/256260#256260) | | 8b | <code>dɾ:ẇRfJi</code> |
+| [05AB1E](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/117932#117932) | | 9b | <code>·LD£í˜¹&lt;è</code> |
+| [Japt](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/256301#256301) | | 11b | <code>gUòò@T±1ÃcÔ</code> |
+| [MATL](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/117882#117882) | | 11b | <code>EX^.5+kUG&#45;Q</code> |
+| [Pyt](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/151759#151759) | | 12b | <code>←Đ2&#42;√½+⌊²&#45;&#126;⁺</code> |
+| [J](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/256297#256297) | | 19b | <code>1&#45;&#93;&#45;0.5&#42;:@&lt;.@+%:@+:</code> |
+| [APL (Dyalog)](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/119407#119407) | | 27b | <code>⊢⊃⊃∘&#40;,/{⌽&#40;+/⍳⍵&#45;1&#41;+⍳⍵}¨∘⍳&#41;</code> |
+
+## [replace-all-vowels-with-repeated-aeiou](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou)
+
+| language | rank | bytes | code |
+|----------|------|-------|------|
+| Myby | | 10.5b | <code>&#42; / &#40;+ &#35; vow&#41;@:&#40;R e. vow&#41;</code> |
+| [Vyxal](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/255766#255766) | | 11b | <code>⟑A&#91;kv¥i$•&amp;›</code> |
+| [05AB1E](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/256078#256078) | | 17b | <code>žMIlåÅÏžM¾è¼s.uiu</code> |
+| [Japt v2.0a0](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/255779#255779) | | 21b | <code>r&#92;v@T°g&#96;aeiŒ&#96;c^H&#42;XèXu</code> |
+| [Pip](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/255773#255773) | | 21b | <code>aR&#45;XV{YVW@UvaNz?yUCy}</code> |
+| [Jelly](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/255800#255800) | | 23b | <code>ØciⱮðḟ0ØėṁŒs&gt;5$}¡&quot;Ɗż@œp</code> |
+| [APL (Dyalog Extended)](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/255912#255912) | | 25b | <code>××&#40;≢⍴v⍨&#41;@&#40;&#124;∊&#40;v←'aeiou'&#41;⍨&#41;</code> |
+| [Pyth](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/255784#255784) | | 25b | <code>sm?}r0dK&quot;uaeio&quot;r@K=hZrId1</code> |
+| [Charcoal](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/255777#255777) | | 28b | <code>≔uaeioθ⭆Ｓ⎇№θ↧ι§⎇№αι↥θθＬ⊞Ｏυιι</code> |
+
+## [print-invisible-text](https://codegolf.stackexchange.com/questions/122703/print-invisible-text)
+
+| language | rank | bytes | code |
+|----------|------|-------|------|
+| [APL (Dyalog) 13.2](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/125028#125028) | | 1b | <code>∊</code> |
+| [Japt](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/122708#122708) | | 1b | <code>ç</code> |
+| [Japt `-m`](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/254114#254114) | | 1b | <code>S</code> |
+| [str](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/253329#253329) | | 1b | <code>s</code> |
+| Myby | | 1.5b | <code>' '"</code> |
+| [Jelly](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/122739#122739) | | 2b | <code>⁶ṁ</code> |
+| [V](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/122759#122759) | | 2b | <code>Ò</code> |
+| [Vyxal](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/247098#247098) | | 2b | <code>LI</code> |
+| [Nibbles](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/254356#254356) | | 2.5b | <code>.$' '</code> |
+| [05AB1E](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/122720#122720) | | 3b | <code>vð?</code> |
+| [APL (Dyalog)](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/122744#122744) | | 3b | <code>0/⍪</code> |
+| [GolfScript](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/215309#215309) | | 3b | <code>,n&#42;</code> |
+| [Keg](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/195896#195896) | | 3b | <code>&#40; ,</code> |
+| [Pyth](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/122823#122823) | | 3b | <code>&#42;dl</code> |
+| [RProgN 2](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/143161#143161) | | 3b | <code>L•&#42;</code> |
+| [Fig](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/254122#254122) | | 3.292b | <code>;M/</code> |
+| [CJam](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/122729#122729) | | 4b | <code>q,S&#42;</code> |
+| [Husk](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/215298#215298) | | 4b | <code>R' L</code> |
+| [J](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/174454#174454) | | 4b | <code>LF"0</code> |
+| [MATL](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/168176#168176) | | 4b | <code>nqZ"</code> |
+| [Gol&#62;&#60;&#62;](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/202811#202811) | | 5b | <code>iEH&#126;a</code> |
+| [APL](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/122730#122730) | | 6b | <code>' '⍴⍨≢</code> |
+| [Duocentehexaquinquagesimal](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/223584#223584) | | 7b | <code>1Â×^c¤E</code> |
+| [Q](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/123595#123595) | | 9b | <code>{" "}each</code> |
+| [Z80Golf](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/167349#167349) | | 9b | <code>00000000: d5cd 0380 3001 763e 20                   ....0.v&gt;</code> |
+| [Carrot](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/133567#133567) | | 12b | <code>&#35;^//&#40;&#41;/gS&quot; &quot;</code> |
+| [K (ngn/k)](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/253242#253242) | | 13b | <code>{x,&#40;1+&#35;x&#41;&#35;&quot;&quot;}</code> |
+| [pb](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/122813#122813) | | 17b | <code>^w&#91;B!0&#93;{&gt;}&lt;vb&#91;32&#93;</code> |
