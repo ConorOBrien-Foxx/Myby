@@ -80,8 +80,9 @@ normalize = {
     "q" => "Q",
     "k4" => "K4",
     "k" => "K",
-    "Cjam" => "CJam"
+    "Cjam" => "CJam",
     "Golfscript" => "GolfScript",
+    "gs2" => "GS2",
     "Arn 1.0 `-s`" => "Arn",
     "05AB1E(or 5?) bytes" => "05AB1E",
     "APL NARS 52 char" => "APL (NARS)",
@@ -92,16 +93,16 @@ normalize = {
 }
 
 byte_regexes = [
-    /([.\d]+)[,\s]*bytes?/i,
+    /([.\d]+)(?:[\\\/$<>span]*)[,\s]*bytes?/i,
     /([.\d]+)\s*(char(acter)?|key(stroke)?)s?/i,
     /\(\s*([.\d]+)\s*\)/,
     /(?:,|-)\s*([.\d]+)\s*/,
     /\s*([.\d]+)\s*/,
 ]
 body_regexes = [
-    /<pre><code>([\s\S]+?)<\/code><\/pre>/,
-    /<code>([\s\S]+?)<\/code>/,
-    /<pre>([\s\S]+?)<\/pre>/
+    /<pre.*?><code.*?>([\s\S]+?)<\/code><\/pre>/,
+    /<code.*?>([\s\S]+?)<\/code>/,
+    /<pre.*?>([\s\S]+?)<\/pre>/
 ]
 total.each { |item|
     qid = item["question_id"]
@@ -135,6 +136,12 @@ total.each { |item|
         next if exclude.include? name.downcase
     elsif header[/\d/].nil?
         # there must be a number to grade it, else we do not care
+        # but maybe we can:
+        # name = header
+        if byte_regexes[0...2].any? { |r| r =~ body }
+            bytes = $1
+            name = header
+        end
     else
         STDERR.puts "Unhandled: #{header}"
         STDERR.puts link
@@ -163,7 +170,7 @@ total.each { |item|
 }
 
 def escape_markdown(line)
-    line.gsub(/-|[|\[\]\(\)*_~#\\<>`]/) { |c| "&##{c.ord};" }
+    line.gsub(/-|[|\[\]\(\)*_~\\<>`]/) { |c| "&##{c.ord};" }
 end
 
 needed.each { |prob|
@@ -177,7 +184,12 @@ needed.each { |prob|
     entries.map { |name, link, bytes, code|
         next if names.include? name
         names << name
-        bytes = bytes.to_i if bytes == bytes.to_i
+        if bytes == bytes.to_i
+            bytes = bytes.to_i
+        else
+            # force precision
+            bytes = bytes.to_f.round 2
+        end
         md_name = name.gsub(/<|>|\\/) { |c| "&##{c.ord};" }
         out_line =  "| " + [
             link.empty? ? md_name : "[#{md_name}](#{link})",

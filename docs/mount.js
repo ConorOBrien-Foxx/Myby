@@ -157,7 +157,7 @@ const handleCompare = (content, para) => {
                 .map(e => e.textContent)
         )
     ];
-    langs.sort();
+    langs.sort((a, b) => a.localeCompare(b, undefined, {sensitivity: "base"}));
     
     const widget = document.createElement("div");
     
@@ -173,6 +173,7 @@ const handleCompare = (content, para) => {
     const langTies = document.createElement("span");
     const secondLangCapture = document.createElement("span");
     const secondLangWins = document.createElement("span");
+    const firstLangWinRate = document.createElement("span");
     
     const longResult = document.createElement("div");
     longResult.style.display = "none";
@@ -194,7 +195,8 @@ const handleCompare = (content, para) => {
     result.appendChild(secondLangCapture);
     result.appendChild(document.createTextNode(" wins ("));
     result.appendChild(secondLangWins);
-    result.appendChild(document.createTextNode(")"));
+    result.appendChild(document.createTextNode(") · Winrate: "));
+    result.appendChild(firstLangWinRate);
     
     widget.appendChild(div);
     widget.appendChild(result);
@@ -278,9 +280,11 @@ const handleCompare = (content, para) => {
             for(let row of rows) {
                 let lang = row.children[0].textContent;
                 let score = row.children[2].textContent;
+                /*
                 if(lang === "Jelly" || lang === "Myby") {
                     console.log(lang, row.children[3].textContent, scrapeByteCount(score));
                 }
+                */
                 if(lang === first && firstBytes === null) {
                     firstBytes  = scrapeByteCount(score);
                 }
@@ -288,16 +292,20 @@ const handleCompare = (content, para) => {
                     secondBytes = scrapeByteCount(score);
                 }
             }
-            console.log(firstBytes, ";", secondBytes);
+            // console.log(firstBytes, ";", secondBytes);
             if(firstBytes !== null && secondBytes !== null) {
                 if     (firstBytes  <  secondBytes) firstWins++;
                 else if(firstBytes === secondBytes) ties++;
                 else if(firstBytes  >  secondBytes) secondWins++;
             }
         }
+        let winRate = firstWins / (firstWins + ties + secondWins);
         firstLangWins.textContent = firstWins;
         langTies.textContent = ties;
         secondLangWins.textContent = secondWins;
+        let iWinRate = Math.floor(winRate * 100).toString();
+        let fWinRate = Math.round(winRate * 10000 % 100).toString();
+        firstLangWinRate.textContent = iWinRate.padStart(2, "0") + "." + fWinRate.padEnd(2, "0") + "%";
     };
     
     firstLangInput.addEventListener("change", handleChange);

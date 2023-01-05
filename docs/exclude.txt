@@ -170,7 +170,6 @@ LINQ
 ListSharp
 Lua 5.2
 Lua
-Ly
 Marbelou
 Marbelous
 Mascarpone
@@ -510,3 +509,22 @@ Regex (ECMAScript / Java)
 x86_(32/64) machine code
 Julia 0.5
 x86-32 machine code
+C# .NET
+Underload
+Commodore 64/VICBASIC (and compatible C= 8-bits)
+Bash + Unix utilities
+AutoHotkey
+Röda 0.12
+Java  11
+Terrapin logo
+Forte
+Sinclair ZX81/Timex TS1000/1500
+LOGO
+JavaScript (SpiderMonkey)
+brev
+MATLAB/Octave
+Leaf Lang
+Casio-Basic (fx-CP400)
+SAS
+LISP
+Julia 0.6.0  ()
