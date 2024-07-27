@@ -103,9 +103,9 @@ LiterateToken[] tokenizeLiterate(T)(T str) {
     LiterateToken[] tokens;
     string[] aliases;
     
-    uint i = 0;
+    ulong i = 0;
     
-    bool hasIndex(uint ip) {
+    bool hasIndex(ulong ip) {
         return ip < str.length;
     }
     
@@ -196,8 +196,8 @@ LiterateToken[] tokenizeLiterate(T)(T str) {
                         case '\'': build ~= '\''; break;
                         case '\\': build ~= '\\'; break;
                         case 'x':
-                            uint d1 = toHexDigit(str[++i]);
-                            uint d2 = toHexDigit(str[++i]);
+                            ulong d1 = toHexDigit(str[++i]);
+                            ulong d2 = toHexDigit(str[++i]);
                             build ~= cast(char)(d1 * 16 + d2);
                             break;
                         default:
@@ -290,7 +290,7 @@ Nibble[] parseLiterate(T)(T str) {
     Nibble[] code;
     Nibble[][string] aliases;
     
-    Nibble[] aliasFor(uint index) {
+    Nibble[] aliasFor(ulong index) {
         // FEA0-FEBF
         Nibble[] res = [0xF, 0xE, 0x0, 0x0];
         res[2] = cast(Nibble)(0xA + index / 16);
@@ -309,7 +309,7 @@ Nibble[] parseLiterate(T)(T str) {
         // remove trailnig close parentheses
         .stripRight!(a => a.type == LiterateType.Identifier && a.info.nibs == Info[InsName.CloseParen].nibs);
     
-    uint i = 0;
+    ulong i = 0;
     while(i < tokens.length) {
         auto tok = tokens[i];
         Debugger.print(i, ": ", tok);
@@ -358,7 +358,7 @@ Nibble[] parseLiterate(T)(T str) {
                 break;
             
             case LiterateType.AliasDefine:
-                uint index = aliases.length;
+                ulong index = aliases.length;
                 Nibble[] aliasCode = aliasFor(index);
                 aliases[tok.str] = aliasCode;
                 code ~= aliasCode;
@@ -383,7 +383,7 @@ Nibble[] parseLiterateOld(T)(T str) {
     Nibble[] code;
     Nibble[][string] aliases;
     
-    Nibble[] aliasFor(uint index) {
+    Nibble[] aliasFor(ulong index) {
         // FEA0-FEBF
         Nibble[] res = [0xF, 0xE, 0x0, 0x0];
         res[2] = cast(Nibble)(0xA + index / 16);
@@ -392,9 +392,9 @@ Nibble[] parseLiterateOld(T)(T str) {
         return res;
     }
     
-    uint finalParenCount = 0;
-    uint initialParenCount = 0;
-    uint i = 0;
+    ulong finalParenCount = 0;
+    ulong initialParenCount = 0;
+    ulong i = 0;
     
     void readAlphabetic(ref string name) {
         while(i < str.length && 'a' <= str[i] && str[i] <= 'z') {
@@ -489,8 +489,8 @@ Nibble[] parseLiterateOld(T)(T str) {
                         case '\'': build ~= '\''; break;
                         case '\\': build ~= '\\'; break;
                         case 'x':
-                            uint d1 = toHexDigit(str[++i]);
-                            uint d2 = toHexDigit(str[++i]);
+                            ulong d1 = toHexDigit(str[++i]);
+                            ulong d2 = toHexDigit(str[++i]);
                             build ~= cast(char)(d1 * 16 + d2);
                             break;
                         default:
@@ -585,7 +585,7 @@ Nibble[] parseLiterateOld(T)(T str) {
                     // aliases end with :
                     if(name[$-1] == ':') {
                         string finalName = name[0..$-1];
-                        uint index = aliases.length;
+                        ulong index = aliases.length;
                         Nibble[] aliasCode = aliasFor(index);
                         aliases[finalName] = aliasCode;
                         code ~= aliasCode;

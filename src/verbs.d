@@ -270,7 +270,7 @@ Verb getVerb(InsName name) {
         verbs[InsName.Pad] = new Verb("P")
             .setMonad(a => a.match!(
                 (Atom[] a) {
-                    uint longest = a.map!(e => e.match!(c => c.length, _ => 0u)).maxElement;
+                    ulong longest = a.map!(e => e.match!(c => c.length, _ => 0u)).maxElement;
                     return Atom(a.map!(
                         row => verbs[InsName.Pad](row, longest)
                     ).array);
@@ -329,7 +329,7 @@ Verb getVerb(InsName name) {
                 (BigInt a) => Atom(a.toBase(2).map!Atom.array),
                 (Atom[] a) {
                     Atom[] list = a.map!(n => verbs[InsName.ToBase](n)).array;
-                    uint longest = list.map!(e => e.match!(c => c.length, _ => 0u)).maxElement;
+                    ulong longest = list.map!(e => e.match!(c => c.length, _ => 0u)).maxElement;
                     return Atom(list.map!(
                         row => verbs[InsName.Pad](longest, row)
                     ).array);

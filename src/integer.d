@@ -62,7 +62,7 @@ enum HIGHEST_NEGATIVE = -3;
 
 static uint[256] extraCacheLower;
 static BigInt[ExtraConstants.maxElement - extraCacheLower.length] extraCacheUpper;
-static uint firstFreeOffset;
+static ulong firstFreeOffset;
 void initializeExtraCache() {
     import std.algorithm.searching : canFind;
     

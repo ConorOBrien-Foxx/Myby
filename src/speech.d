@@ -855,7 +855,7 @@ class Verb {
         return evaluate(args);
     }
     
-    Atom gerund(T...)(uint index, T arguments) {
+    Atom gerund(T...)(ulong index, T arguments) {
         index %= children.length;
         return children[index](arguments);
     }
@@ -1086,7 +1086,7 @@ string arrayToString(Atom[] x, bool forceLinear=false) {
     
     // else, handle 2D arrays
     dstring[][] prepad;
-    uint[] columnWidths;
+    ulong[] columnWidths;
     foreach(row; x) {
         bool success = row.tryMatch!((Atom[] row) {
             dstring[] prepadRow;

@@ -53,21 +53,26 @@ Nibble[] stringToNibblesNaive(string str) {
     import std.algorithm.searching : countUntil;
     import std.stdio;
     
-    int index = -1;
+    // TODO: simplify this logic with a search call
+    bool indexFound = false;
+    ulong index = 0;
     foreach(i, term; ValidTerminators) {
         index = i;
+        indexFound = true;
         foreach(ch; str) {
             if(ch == term) {
-                index = -1;
+                indexFound = false;
                 break;
             }
         }
         
-        if(index != -1) break;
+        if(indexFound) {
+            break;
+        }
     }
     
     // we cannot proceed if both terminators exist in the string
-    if(index < 0) {
+    if(!indexFound) {
         return [];
     }
     auto term = ValidTerminators[index];

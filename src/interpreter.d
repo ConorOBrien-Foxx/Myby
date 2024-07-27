@@ -142,7 +142,7 @@ string toLiterateAligned(Nibble[] nibs, Token[] tokens) {
         string[] upper;
         string[] lower;
         foreach(g, r; lockstep(guide, reps)) {
-            uint longer = max(g.length, r.length);
+            ulong longer = max(g.length, r.length);
             upper ~= g.padRight(' ', longer).to!string;
             lower ~= r.padRight(' ', longer).to!string;
         }
@@ -160,7 +160,7 @@ string toLiterateAligned(Nibble[] nibs, Token[] tokens) {
     foreach(i, rep; lb.reps) {
         // Debugger.print("Rep:  ", rep);
         Token tok = tokens[i];
-        int nextIndex = i + 1 < tokens.length
+        ulong nextIndex = i + 1 < tokens.length
             ? tokens[i + 1].index
             : nibs.length;
         Debugger.print("Tok: ", tok);

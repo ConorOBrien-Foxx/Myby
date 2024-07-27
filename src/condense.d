@@ -32,8 +32,8 @@ struct CondenserState {
 struct Condenser {
     Verb[] chains;
     Verb[] verbs;
-    uint index;
-    uint[BigInt] chainAliases;
+    ulong index;
+    ulong[BigInt] chainAliases;
     CondenserState state;
     
     void condense(Token[] chain) {

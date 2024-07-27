@@ -320,7 +320,7 @@ Adjective getAdjective(InsName name) {
                 .setMonad((Verb v, a) {
                     auto info = v.info;
                     auto chainNumberBig = v(a).as!BigInt;
-                    uint index = moldIndex(chainNumberBig, v.info.chains.length);
+                    ulong index = moldIndex(chainNumberBig, v.info.chains.length);
                     Verb res = v.info.chains[index];
                     return res(a);
                 })
@@ -343,10 +343,10 @@ Adjective getAdjective(InsName name) {
                           [[4], [3, 8], [2, 7, 12], [1, 6, 11], [5, 10], [9]]
                         */
 
-                        uint upper = mat.length + mat[0].length - 1;
+                        ulong upper = mat.length + mat[0].length - 1;
                         Atom[] result;
                         // int for signed arithmetic below
-                        int width = mat[0].length;
+                        int width = cast(int) mat[0].length;
                         for(int o = 0; o < upper; o++) {
                             Atom[] oblique;
                             int j = max(0, width - 1 - o);
@@ -376,7 +376,7 @@ Adjective getAdjective(InsName name) {
                                 a => a.length,
                                 _ => 0,
                             ));
-                            int width = zip(widthArr.dropBackOne(), widthArr.dropOne())
+                            long width = zip(widthArr.dropBackOne(), widthArr.dropOne())
                                 .countUntil!"a[0] > a[1]";
                             if(width < 0) {
                                 width = 1;
@@ -385,8 +385,8 @@ Adjective getAdjective(InsName name) {
                                 width++;
                             }
                             foreach(d, diagonal; arr) {
-                                int j = max(0, width - 1 - cast(int)d);
-                                int i = max(0, cast(int)d - width + 1);
+                                long j = max(0, width - 1 - d);
+                                long i = max(0, d - width + 1);
                                 vInv(diagonal).match!(
                                     (Atom[] diagonal) {
                                         foreach(k, cell; diagonal) {
@@ -426,12 +426,12 @@ Adjective getAdjective(InsName name) {
                           5   6   7   8   =>  /5/6/ 7/11/
                           9  10  11  12        /9/10/
                         */
-                        uint upper = mat.length + mat[0].length - 1;
+                        ulong upper = mat.length + mat[0].length - 1;
                         Atom[] result;
-                        for(uint o = 0; o < upper; o++) {
+                        for(ulong o = 0; o < upper; o++) {
                             Atom[] oblique;
-                            int j = min(o, mat[0].length - 1);
-                            int i = max(0, o - j);
+                            long j = min(o, mat[0].length - 1);
+                            long i = max(0, o - j);
                             while(i < mat.length && j >= 0) {
                                 oblique ~= mat[i][j];
                                 i++;
@@ -461,8 +461,8 @@ Adjective getAdjective(InsName name) {
                                 .countUntil!"a[0] > a[1]"
                                 + 1;
                             foreach(d, oblique; arr) {
-                                int j = min(d, width - 1);
-                                int i = max(d - j, 0);
+                                long j = min(d, width - 1);
+                                long i = max(d - j, 0);
                                 vInv(oblique).match!(
                                     (Atom[] oblique) {
                                         foreach(k, cell; oblique) {

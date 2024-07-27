@@ -8,13 +8,13 @@ import std.range : padRight, repeat;
 import std.stdio;
 
 struct BoxedString {
-    uint tineIndex;
+    ulong tineIndex;
     dstring[] lines;
     
-    this(T)(uint ti, T[] li) {
+    this(T)(ulong ti, T[] li) {
         auto unicodeLines = li.map!(to!dstring);
         tineIndex = ti;
-        uint maxSize = unicodeLines.map!"a.length".maxElement;
+        ulong maxSize = unicodeLines.map!"a.length".maxElement;
         lines = unicodeLines
             .map!(a => a.padRight(dchar(' '), maxSize))
             .map!(to!dstring)
@@ -28,7 +28,7 @@ auto treeToBoxedStringHelper(T)(T tree) {
         return BoxedString(0, ["─ " ~ tree.head]);
     }
     
-    uint size = tree.head.length;
+    ulong size = tree.head.length;
     dstring prepend = "─ " ~ to!dstring(tree.head) ~ " ─";
     dstring pad = to!dstring(repeat(' ', prepend.length));
     
@@ -74,7 +74,7 @@ auto treeToBoxedStringHelper(T)(T tree) {
         }
     }
     
-    uint myTine = lines.length / 2;
+    ulong myTine = lines.length / 2;
     foreach(i, ref line; lines) {
         line = (i == myTine ? prepend : pad) ~ line;
         line = line
