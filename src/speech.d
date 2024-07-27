@@ -1077,11 +1077,21 @@ bool is2DArray(Atom[] x) {
     return x.all!isArray;
 }
 
+bool is1DArray(Atom[] x) {
+    return !x.any!isArray;
+}
+
 string arrayToString(Atom[] x, bool forceLinear=false) {
-    if(forceLinear || !x.is2DArray) {
+    // import std.stdio : writeln;
+    // writeln(forceLinear, " ; ", x, " ; ", x.is1DArray);
+    if(forceLinear || !(x.is2DArray || x.is1DArray)) {
         string inner = x.map!(a => a.atomToString(true))
             .join(", ");
         return '[' ~ inner ~ ']';
+    }
+
+    if(x.is1DArray) {
+        return x.map!(a => a.atomToString(true)).join(" ");
     }
     
     // else, handle 2D arrays

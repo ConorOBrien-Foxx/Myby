@@ -3,7 +3,7 @@ module myby.repl;
 import std.stdio : readln, write, writeln;
 
 import myby.interpreter;
-import myby.speech : Verb;
+import myby.speech : Verb, atomToString;
 
 const string REPL_HEAD = "::: ";
 // TODO: accept parameters from command line (e.g. useRuntimeDebug)
@@ -19,8 +19,10 @@ int runMybyREPL() {
             continue;
         }
         
+        // TODO: intelligently invoke as monadic chain since there are never any args in this context
+        // e.g.: `> 'main'` should know it's monadic invocation (ends with a noun, maybe?)
         Verb mainVerb = chains[$ - 1];
-        writeln(mainVerb());
+        writeln(mainVerb().atomToString);
     }
 
     return 0;
