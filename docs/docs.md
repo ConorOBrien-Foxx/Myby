@@ -789,12 +789,19 @@ NB.=> 5555
 | Hex Representation | `F6` |
 | Nibble Cost | 2 |
 | Symbolic Usage | `>a`; `x>y` |
-| Marked Arity | 1 |
+| Marked Arity | 2 |
 
 | Signature | Explanation |
 |----|----|
 | list → string | Join. (Joins `a` by the empty string, converting each element to a string.) |
+| string → list | Ords. (Produces a list of the Unicode ordinate values of the characters of `a`.) |
 | any, any → bool | Greater than. (Errors if incomparable.) |
+
+#### Examples
+```myby
+> 'asdf' @.
+NB.=> 97 115 100 102
+```
 
 ### `<:` - Less Or Equal
 
