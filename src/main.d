@@ -21,6 +21,7 @@ import myby.json : atomToJson;
 import myby.literate;
 import myby.nibble;
 import myby.speech;
+import myby.repl : runMybyREPL;
 
 auto getoptSafeError(T...)(ref string[] args, T opts) {
     try {
@@ -62,6 +63,7 @@ int main(string[] args) {
     // bool scriptKnow, scriptRunner, scriptDistribution;
     bool forceTruthy;
     bool measureSize;
+    bool useRepl;
     string outfile;
     string fpath;
     string code;
@@ -70,6 +72,7 @@ int main(string[] args) {
     auto info = getoptSafeError(
         args,
         std.getopt.config.bundling,
+        "repl|R", "Uses REPL to interactively write Myby code", &useRepl,
         "tree|t", "Display tree-form", &dispTree,
         "jsonout|j", "Outputs data in a JSON friendly format", &jsonOutput,
         "compile|c", "Compile literate program", &compile,
@@ -111,6 +114,10 @@ int main(string[] args) {
         Debugger.enable();
     }
     Debugger.print("args: ", args);
+
+    if(useRepl) {
+        return runMybyREPL();
+    }
     
     int help() {
         defaultGetoptPrinter(
