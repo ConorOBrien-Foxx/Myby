@@ -34,6 +34,14 @@ auto getoptSafeError(T...)(ref string[] args, T opts) {
     }
 }
 
+void debugChains(Verb[] chains) {
+    foreach(chainIndex, v; chains) {
+        stderr.writeln("Chain ", chainIndex, ":");
+        stderr.writeln("  MA=", v.markedArity, " Niladic=", v.niladic);
+        stderr.writeln(v.treeDisplay());
+    }
+}
+
 string[] ScriptAliases = [
     "know",
     "runner",
@@ -213,10 +221,7 @@ int main(string[] args) {
         if(dispTree) {
             Interpreter i = new Interpreter(nibs);
             i.shunt;
-            foreach(chainIndex, v; i.condense) {
-                stderr.writeln("Chain ", chainIndex, ":");
-                stderr.writeln(v.treeDisplay());
-            }
+            debugChains(i.condense);
         }
         output(res);
         return 0;
@@ -292,11 +297,7 @@ int main(string[] args) {
     }
     */
     if(Debugger.printing || dispTree) {
-        foreach(chainIndex, v; chains) {
-            writeln("Chain ", chainIndex, ":");
-            writeln(v.treeDisplay());
-            // debugInfo(v);
-        }
+        debugChains(chains);
     }
     
     if(useRuntimeDebug) {

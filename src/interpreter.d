@@ -329,6 +329,7 @@ class Interpreter {
     Nibble[] code;
     Token[] stack;
     bool shunted;
+    Condenser condenser;
     
     this(Nibble[] c) {
         code = c;
@@ -492,14 +493,13 @@ class Interpreter {
         
         Debugger.print("Initial stack:");
         Debugger.print(stack);
-        Condenser c;
         stack
             .split(Token.Break)
-            .each!(chain => c.condense(chain));
+            .each!(chain => condenser.condense(chain));
         
-        c.assignLinkInfo();
+        condenser.assignLinkInfo();
         
-        return c.chains;
+        return condenser.chains;
     }
     
     static Atom evaluate(string str, Atom[] args = []) {
