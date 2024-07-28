@@ -871,6 +871,18 @@ Verb getVerb(InsName name) {
             // TODO: copy last chains' marked arity
             .setMarkedArity(1);
             
+        verbs[InsName.LastChainAsNilad] = new Verb("$_")
+            // Last Chain
+            .setMonad((Verb v, a) {
+                return v.info.last();
+            })
+            .setDyad((Verb v, a, b) {
+                return v.info.last();
+            })
+            // TODO: copy last chains' marked arity
+            .setMarkedArity(1)
+            .setNiladic(true);
+            
         verbs[InsName.ThisChain] = new Verb("$:")
             // Self Chain
             .setMonad((Verb v, a) => v.info.self(a))

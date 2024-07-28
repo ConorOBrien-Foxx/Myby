@@ -46,6 +46,7 @@ enum InsName {
     Subset, Subseteq, Superset, Superseteq, FactorExponents,
     FactorExponentPairs, FactorExponentsPos, FactorExponentPairsPos,
     Invariant, Variant,
+    LastChainAsNilad,
     None,
 }
 enum SpeechPart { Verb, Adjective, Conjunction, MultiConjunction, Syntax }
@@ -166,6 +167,7 @@ enum InsInfo[InsName] Info = [
     ////FE1* - reflection////
     InsName.NextChain:              InsInfo("$v",      0xFE10,    SpeechPart.Verb),
     InsName.NthChain:               InsInfo("$N",      0xFE11,    SpeechPart.Adjective),
+    InsName.LastChainAsNilad:       InsInfo("$_",      0xFE12,    SpeechPart.Verb),
     ////FE2* - string////
     InsName.Palindromize:           InsInfo("enpal",   0xFE20,    SpeechPart.Verb),
     InsName.Inside:                 InsInfo("inner",   0xFE21,    SpeechPart.Verb),
