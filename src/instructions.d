@@ -328,6 +328,7 @@ MultiConjunction getMultiConjunction(InsName name) {
                         );
                     })
                     .setMarkedArity(1)
+                    .setNiladic(verbs[$ - 1].niladic)
                     .setChildren(verbs);
             }
         );
