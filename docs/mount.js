@@ -27,6 +27,22 @@ hljs.registerLanguage("myby", (h) => {
         unicodeRegex: true,
         contains: [
             {
+                // derived from https://github.com/highlightjs/highlight.js/blob/main/src/languages/python-repl.js
+                className: "meta.prompt",
+                starts: {
+                    // a space separates the REPL prefix from the actual code
+                    // this is purely for cleaner HTML output
+                    end: / |$/,
+                    starts: {
+                        end: "$",
+                        subLanguage: "myby",
+                    }
+                },
+                variants: [
+                    { begin: /^(:::|\.\.\.)( input\(\d+\/\d+\):)?(?=[ ]|$)/ },
+                ]
+            },
+            {
                 className: "comment",
                 variants: [
                     { begin: /NB.<?=>/ },
@@ -56,6 +72,7 @@ hljs.registerLanguage("myby", (h) => {
             {
                 className: "literal",
                 variants: [
+                    // { begin: /^(?<=:::\s*)[a-z]+:/ },
                     { begin: /^\s*[a-z]+:/ },
                     // { begin: /[!TM]\.|[\\][:.]|\\\.\.|\$N|[?\\G"\[\]]/ },
                     { begin: /benil|keep|loop|!\.|":|\$N|\0\.|\0:|\?:|M\.|T\.|U:|V:|\[\.|\\\.|\\:|\]\.|`:|"|C|G|V|\\|~/ },
@@ -88,7 +105,7 @@ const assert = (cond, ...msg) => {
     if(!cond) {
         throw new Error(msg.join(" "));
     }
-}
+};
 
 const handleTableOfContents = (content, para) => {
     let header = para.previousElementSibling;

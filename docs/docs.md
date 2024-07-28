@@ -99,21 +99,21 @@ To describe the behavior of commands, the format **A** → **B** is used to deno
 ```
 
 ```myby
-NB. A multiplication table using the two given arrays:
-1 2 3 4 *\ 5 6 7
-NB.=>  5  6  7
-NB.=> 10 12 14
-NB.=> 15 18 21
-NB.=> 20 24 28
-NB. Using monadic ^, One Range, a multiplication table along the given input:
-*\~ ^
-NB. E.g., input = 6:
-NB.=> 1  2  3  4  5  6
-NB.=> 2  4  6  8 10 12
-NB.=> 3  6  9 12 15 18
-NB.=> 4  8 12 16 20 24
-NB.=> 5 10 15 20 25 30
-NB.=> 6 12 18 24 30 36
+::: 1 2 3 4 *\ 5 6 7
+ 5  6  7
+10 12 14
+15 18 21
+20 24 28
+::: *\~ ^
+... input(1/2): 6
+... input(2/2):
+NB. skipping input(2/2)
+1  2  3  4  5  6
+2  4  6  8 10 12
+3  6  9 12 15 18
+4  8 12 16 20 24
+5 10 15 20 25 30
+6 12 18 24 30 36
 ```
 
 
@@ -160,28 +160,28 @@ NB.=> 6 12 18 24 30 36
 #### Examples
 
 ```myby
-1 2 3 4 ;": 5 6 7 8
-NB.=> 1 5 6 7 8
-NB.=> 2 5 6 7 8
-NB.=> 3 5 6 7 8
-NB.=> 4 5 6 7 8
-1 2 3 4 (# ; '│'&; O)": 5 6 7 8
-NB.=> 1 │ 5 6 7 8
-NB.=> 2 │ 5 6 7 8
-NB.=> 3 │ 5 6 7 8
-NB.=> 4 │ 5 6 7 8
+::: 1 2 3 4 ;": 5 6 7 8
+1 5 6 7 8
+2 5 6 7 8
+3 5 6 7 8
+4 5 6 7 8
+::: 1 2 3 4 (# ; '\u2502'&; O)": 5 6 7 8
+1 │ 5 6 7 8
+2 │ 5 6 7 8
+3 │ 5 6 7 8
+4 │ 5 6 7 8
 NB. compare to regular zip:
-1 2 3 4 (# ; '│'&; O)"  5 6 7 8
-NB.=> 1 │ 5
-NB.=> 2 │ 6
-NB.=> 3 │ 7
-NB.=> 4 │ 8
+::: 1 2 3 4 (# ; '\u2502'&; O)"  5 6 7 8
+1 │ 5
+2 │ 6
+3 │ 7
+4 │ 8
 NB. emulate right map (u~":~):
-1 2 3 4 (# + '│'&; O)~":~ 5 6 7 8
-NB.=> 1 2 3 4 │ 5
-NB.=> 1 2 3 4 │ 6
-NB.=> 1 2 3 4 │ 7
-NB.=> 1 2 3 4 │ 8
+::: 1 2 3 4 (# + '\u2502'&; O)~":~ 5 6 7 8
+1 2 3 4 │ 5
+1 2 3 4 │ 6
+1 2 3 4 │ 7
+1 2 3 4 │ 8
 ```
 
 ### `V` - Vectorize
@@ -201,22 +201,23 @@ NB.=> 1 2 3 4 │ 8
 #### Examples
 
 ```myby
-1 2 3 4 + 5 6 7 8
-NB.=> [1, 2, 3, 4, 5, 6, 7, 8]
-1 2 3 4 +V 5 6 7 8
-NB.=> [6, 8, 10, 12]
-(1 2  3 4  5 6 / 2) (,&(echo [ echo@'-----') ] +V) (9 3  2 _2  4 9 / 2)
-NB.=> 1 2
-NB.=> 3 4
-NB.=> 5 6
-NB.=> -----
-NB.=> 9  3
-NB.=> 2 _2
-NB.=> 4  9
-NB.=> -----
-NB.=> 10  5
-NB.=>  5  2
-NB.=>  9 15
+::: 1 2 3 4 + 5 6 7 8
+1 2 3 4 5 6 7 8
+::: 1 2 3 4 +V 5 6 7 8
+6 8 10 12
+NB. vectorization is fully deep
+::: 1 2  3 4  5 6 / 2
+1 2
+3 4
+5 6
+::: 9 3  2 _2  4 9 / 2
+9  3
+2 _2
+4  9
+::: (1 2  3 4  5 6 / 2) +V (9 3  2 _2  4 9 / 2)
+10  5
+ 5  2
+ 9 15
 ```
 
 ### `\.` - On Prefixes
@@ -246,12 +247,6 @@ NB.=>  9 15
 |----|----|
 | verb(1) → (verb(1) : list → list) | Apply to suffixes. (For each non-empty suffix list `h` of `a`, from largest to smallest, compute `u@h`.) |
 
-#### Examples
-
-```myby
-nextprime: (> * primq[.) G
-```
-
 ### `~` - Reflex
 
 | Statistic | Value |
@@ -269,11 +264,13 @@ nextprime: (> * primq[.) G
 #### Examples
 
 ```myby
-+\~ ^@4         NB.<=> (^@4) +\ (^@4)
-NB.=> 2 3 4 5
-NB.=> 3 4 5 6
-NB.=> 4 5 6 7
-NB.=> 5 6 7 8
+::: +\~@1 2 5 9         NB.<=> (1 2 5 9) +\ (1 2 5 9)
+ 2  3  6 10
+ 3  4  7 11
+ 6  7 10 14
+10 11 14 18
+::: 3 -~ 5
+2
 ```
 
 ### `` `: `` - Arity Force
@@ -290,11 +287,11 @@ NB.=> 5 6 7 8
 | verb(N) → verb(3-N) | Invert marked arity. (If `u` has marked arity `N`, then returns a verb that is identical to `u`, but with marked arity `3-N`; that is, dyadic if marked monadic, and monadic if marked dyadic.) |
 
 ```myby
-+" @ ('hello my world' / ' ')
-NB.=> [5, 2, 5]
+::: +" @ ('hello my world' / ' ')
+5 2 5
 NB. ma(+) = 2, so ma(+") = 2, and hence (+" ...) would treated as +"&(...)
-+`:" 'hello my world' / ' '
-NB.=> [5, 2, 5]
+::: +`:" 'hello my world' / ' '
+5 2 5
 NB. ma(+`:) = 1, so ma(+`:") = 1, thus (+" ...) is treated as +"@(...)
 ```
 
@@ -315,18 +312,20 @@ NB. ma(+`:) = 1, so ma(+`:") = 1, thus (+" ...) is treated as +"@(...)
 
 ```myby
 NB. chunk by even-ness
-%&2C  4 7 6 8 1 3 9 5 2 8 6 3
-NB.=> 4
-NB.=> 7
-NB.=> 6 8
-NB.=> 1 3 9 5
-NB.=> 2 8 6
-NB.=> 3
-NB. Or:
-NB.=> [[4],[7],[6,8],[1,3,9,5],[2,8,6],[3]]
+::: %&2C  4 7 6 8 1 3 9 5 2 8 6 3
+4
+7
+6 8
+1 3 9 5
+2 8 6
+3
+::: json $_
+[[4],[7],[6,8],[1,3,9,5],[2,8,6],[3]]
 NB. chunk by equality
-#C 'hello!'
-NB.=> ['h', 'e', 'll', 'o', '!']
+::: #C 'hello!'
+h e ll o !
+::: json $_
+["h","e","ll","o","!"]
 ```
 
 ### `[.` - On Left
@@ -353,7 +352,7 @@ NB.=> ['h', 'e', 'll', 'o', '!']
 
 | Signature | Explanation |
 |----|----|
-| verb(1) → verb(2) | Left application. (With arguments `x` and `y`, computes `u@y`.) |
+| verb(1) → verb(2) | Right application. (With arguments `x` and `y`, computes `u@y`.) |
 
 ### `!.` - Inverse
 
@@ -385,6 +384,14 @@ NB.=> ['h', 'e', 'll', 'o', '!']
 |----|----|
 | verb(2) → verb(1) | Generate integer matching. (Given an integer `a`, starting with an integer `i=0`, increment `i` until `i u a` is false.) |
 | verb(2) → verb(1)/2 | Generate integer matching. (Same as above, but starting with `i=y`.) |
+
+#### Examples
+
+```myby
+::: nextprime: (> * primq[.) G
+::: nextprime" 1 2 3 4 5 6 7
+2 3 5 5 7 7 11
+```
 
 ### `benil` - Nil replacement
 
@@ -428,20 +435,20 @@ NB.=> ['h', 'e', 'll', 'o', '!']
 #### Examples
 
 ```myby
-1 >:[ while < T." (10 ^" ^@6)
-NB.=>                    46 μs and 8 hnsecs      10
-NB.=>                   280 μs and 2 hnsecs     100
-NB.=>             2 ms, 893 μs, and 1 hnsec    1000
-NB.=>           32 ms, 915 μs, and 3 hnsecs   10000
-NB.=>          293 ms, 121 μs, and 3 hnsecs  100000
-NB.=>  2 secs, 786 ms, 419 μs, and 7 hnsecs 1000000
-1 ^;#O\@(>:[ while < T.)" (10 ^" ^@6)
-NB.=>  3.76e-05      10
-NB.=> 0.0002594     100
-NB.=> 0.0028898    1000
-NB.=> 0.0291495   10000
-NB.=>  0.277542  100000
-NB.=>   2.76366 1000000
+::: 1 >:[. while < T." (10 ^" ^@6)
+                 31 μs and 2 hnsecs      10
+                216 μs and 4 hnsecs     100
+         1 ms, 787 μs, and 7 hnsecs    1000
+        13 ms, 405 μs, and 6 hnsecs   10000
+        130 ms, 64 μs, and 6 hnsecs  100000
+1 sec, 294 ms, 954 μs, and 9 hnsecs 1000000
+::: 1 ^;#O\@(>:[. while < T.)" (10 ^" ^@6)
+ 3.07e-05      10
+ 0.000266     100
+0.0025488    1000
+0.0129008   10000
+   0.1247  100000
+  1.30357 1000000
 ```
 
 ## Conjunctions and Multi Conjunctions
@@ -588,26 +595,25 @@ NB.=>   2.76366 1000000
 | string → string | Lowercase |
 | number → list(number) | Range \[0,a). (Reversed if a < 0.) |
 | number, number → list(number) | Range [x,y] |
-| list, list → list; string, string → string | Multi Range. (Treats `x` as the minimums and `y` as the maximums of a mixed base system, and generates all the entries from `x` to `y`. See the Examples below.) |
+| list, any → number; string, any → number | One-index. (First index of y in x, starting with the first index being 1; 0 if not found.) |
 
 #### Examples
 
 ```myby
-R5
-NB.=> [0, 1, 2, 3, 4]
-3 R 6
-NB.=> [3, 4, 5, 6]
-1 2 R 2 5
-NB.=> 1 2
-NB.=> 1 3
-NB.=> 1 4
-NB.=> 1 5
-NB.=> 2 2
-NB.=> 2 3
-NB.=> 2 4
-NB.=> 2 5
-'aa' R 'cc'
-NB.=> [aa, ab, ac, ba, bb, bc, ca, cb, cc]
+::: R5
+0 1 2 3 4
+::: R_3
+2 1 0
+::: 3R6
+3 4 5 6
+::: 15 39 22 R 0
+0
+::: 15 39 22 R 22
+3
+::: 'hello' R 'h'
+1
+::: 'hello' R 'e'
+2
 ```
 
 ### `%` - Modulus
@@ -643,13 +649,13 @@ NB.=> [aa, ab, ac, ba, bb, bc, ca, cb, cc]
 #### Examples
 
 ```myby
-;@5
-NB.=> [5]
+::: json ;@5
+[5]
 NB. @ is necessary here, since ;'s marked arity is 2, and (;5) redirects to ;&5
-4 ; 'a'
-NB.=> [4, a]
-1 ; 2 ; 3 ; 4
-NB.=> [1, 2, 3, 4]
+::: 4 ; 'a'
+4 a
+::: 1 ; 2 ; 3 ; 4
+1 2 3 4
 ```
 
 ### `!` - Binomial
@@ -671,22 +677,22 @@ NB.=> [1, 2, 3, 4]
 #### Examples
 
 ```myby
-!\~ R15 @.  NB. Binomial table over [0,14]
-NB.=> 1 1 1 1 1  1  1  1  1   1   1   1   1    1    1
-NB.=> 0 1 2 3 4  5  6  7  8   9  10  11  12   13   14
-NB.=> 0 0 1 3 6 10 15 21 28  36  45  55  66   78   91
-NB.=> 0 0 0 1 4 10 20 35 56  84 120 165 220  286  364
-NB.=> 0 0 0 0 1  5 15 35 70 126 210 330 495  715 1001
-NB.=> 0 0 0 0 0  1  6 21 56 126 252 462 792 1287 2002
-NB.=> 0 0 0 0 0  0  1  7 28  84 210 462 924 1716 3003
-NB.=> 0 0 0 0 0  0  0  1  8  36 120 330 792 1716 3432
-NB.=> 0 0 0 0 0  0  0  0  1   9  45 165 495 1287 3003
-NB.=> 0 0 0 0 0  0  0  0  0   1  10  55 220  715 2002
-NB.=> 0 0 0 0 0  0  0  0  0   0   1  11  66  286 1001
-NB.=> 0 0 0 0 0  0  0  0  0   0   0   1  12   78  364
-NB.=> 0 0 0 0 0  0  0  0  0   0   0   0   1   13   91
-NB.=> 0 0 0 0 0  0  0  0  0   0   0   0   0    1   14
-NB.=> 0 0 0 0 0  0  0  0  0   0   0   0   0    0    1
+::: !\~ R15 @.    NB. Binomial table over [0,14]
+1 1 1 1 1  1  1  1  1   1   1   1   1    1    1
+0 1 2 3 4  5  6  7  8   9  10  11  12   13   14
+0 0 1 3 6 10 15 21 28  36  45  55  66   78   91
+0 0 0 1 4 10 20 35 56  84 120 165 220  286  364
+0 0 0 0 1  5 15 35 70 126 210 330 495  715 1001
+0 0 0 0 0  1  6 21 56 126 252 462 792 1287 2002
+0 0 0 0 0  0  1  7 28  84 210 462 924 1716 3003
+0 0 0 0 0  0  0  1  8  36 120 330 792 1716 3432
+0 0 0 0 0  0  0  0  1   9  45 165 495 1287 3003
+0 0 0 0 0  0  0  0  0   1  10  55 220  715 2002
+0 0 0 0 0  0  0  0  0   0   1  11  66  286 1001
+0 0 0 0 0  0  0  0  0   0   0   1  12   78  364
+0 0 0 0 0  0  0  0  0   0   0   0   1   13   91
+0 0 0 0 0  0  0  0  0   0   0   0   0    1   14
+0 0 0 0 0  0  0  0  0   0   0   0   0    0    1
 ```
 
 ### `{` - First
@@ -737,15 +743,15 @@ NB.=> 0 0 0 0 0  0  0  0  0   0   0   0   0    0    1
 #### Examples
 
 ```myby
-3 = '3'
-NB.=> 0b
-6 = 3 + 3
-NB.=> 1b
-= 1 2 3 2 4 1 @.
-NB.=> 1 0 0 0 0 1
-NB.=> 0 1 0 1 0 0
-NB.=> 0 0 1 0 0 0
-NB.=> 0 0 0 0 1 0
+::: 3 = '3'
+0b
+::: 6 = 3 + 3
+1b
+::: = 1 2 3 2 4 1 @.
+1 0 0 0 0 1
+0 1 0 1 0 0
+0 0 1 0 0 0
+0 0 0 0 1 0
 ```
 
 ### `<` - Less Than
@@ -772,13 +778,12 @@ NB.=> 0 0 0 0 1 0
 #### Examples
 
 ```myby
-'[3, 4]' = <@(3;4)
-NB.=> 1b
--&.< 1234
-NB.=> 4321
-(# + -&.<)@1234
-NB.=> 5555
-3.5
+::: '[3, 4]' = <@(3;4)
+1b
+::: -&.< 1234
+4321
+::: (# + -&.<)@1234
+5555
 ```
 
 ### `>` - Greater Than
@@ -799,8 +804,8 @@ NB.=> 5555
 
 #### Examples
 ```myby
-> 'asdf' @.
-NB.=> 97 115 100 102
+::: > 'asdf' @.
+97 115 100 102
 ```
 
 ### `<:` - Less Or Equal
@@ -812,7 +817,6 @@ NB.=> 97 115 100 102
 ### `>.` - Maximum
 
 ### `$^` - Last Chain
-
 
 | Statistic | Value |
 |----|----|
@@ -835,6 +839,47 @@ $^ ^ 2      NB. square first line
 NB. equivalent to
 NB.=> (#+5)^2
 ```
+
+### `$_` - Last Chain as Nilad
+
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `FE12` |
+| Nibble Cost | 3 |
+| Symbolic Usage | `$_a`; `x$_y` |
+| Marked Arity | 1 (Subject to change) |
+| Niladic | true |
+
+| Signature | Explanation |
+|----|----|
+| any → any; any, any → any | Last Chain as Nilad. (Calls the previous line of the program, disregarding any arguments given to it.) |
+
+### `$:` - This Chain
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `F11` |
+| Nibble Cost | 4 |
+| Symbolic Usage | `$:a`; `x$:y` |
+| Marked Arity | 1 (Subject to change) |
+
+| Signature | Explanation |
+|----|----|
+| any → any; any, any → any | This Chain. (Recursion; calls the same line of the program with the given arguments.) |
+
+### `$v` - Next Chain
+| Statistic | Value |
+|----|----|
+| Speech Part | Verb |
+| Hex Representation | `FE10` |
+| Nibble Cost | 4 |
+| Symbolic Usage | `$va`; `x$vy` |
+| Marked Arity | 1 (Subject to change) |
+
+| Signature | Explanation |
+|----|----|
+| any → any; any, any → any | Next Chain. (Calls the *next* line of the program with the given arguments.) |
 
 ### `echo`
 
