@@ -200,6 +200,13 @@ LiterateToken[] tokenizeLiterate(T)(T str) {
                             ulong d2 = toHexDigit(str[++i]);
                             build ~= cast(char)(d1 * 16 + d2);
                             break;
+                        case 'u':
+                            ulong d1 = toHexDigit(str[++i]);
+                            ulong d2 = toHexDigit(str[++i]);
+                            ulong d3 = toHexDigit(str[++i]);
+                            ulong d4 = toHexDigit(str[++i]);
+                            build ~= cast(dchar)(d1 * 4096 + d2 * 256 + d3 * 1 + d4);
+                            break;
                         default:
                             assert(0, "Unknown escape: \\" ~ str[i]);
                     }
