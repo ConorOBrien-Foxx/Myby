@@ -8,7 +8,7 @@ existing = File.read("./comparison.md").scan(/## \[(.+?)\]/).map(&:first)
 
 needed = problems.reject { |prob| existing.include? prob["name"] }
 ids = needed.map { _1["id"] }
-
+    
 if ids.empty?
     puts "No updates needed, exiting"
     exit
@@ -28,10 +28,12 @@ def scrape(ids, page)
         "order=desc&sort=activity" +
         "&site=codegolf&" +
         "filter=!3uiiRrdzLXJgGFmRm"
-    JSON::parse URI.open(api).read
+    content = URI.open(api).read
+    File.write "_lastscrape.json", content
+    JSON::parse content
 end
 
-unless File.exists? file_id
+unless File.exist? file_id
     STDERR.puts "Cached file does not exist, making request"
     total = []
     page = 1
@@ -72,6 +74,7 @@ exclude = File.read("exclude.txt").downcase.strip.lines.map(&:strip)
 normalize = {
     "APL(Dyalog Unicode)" => "APL (Dyalog Unicode)",
     "Dyalog APL" => "APL (Dyalog)",
+    "Dyalog APL v18" => "APL (Dyalog)",
     "Dyalog APL Classic" => "APL (Dyalog Classic)",
     "Vitsy + *sh" => "Vitsy",
     "V (vim)" => "Vim",
@@ -84,6 +87,8 @@ normalize = {
     "Golfscript" => "GolfScript",
     "gs2" => "GS2",
     "Arn 1.0 `-s`" => "Arn",
+    "Uiua <sup>SBCS</sup>" => "Uiua",
+    "Uiua<sup>SBCS</sup>" => "Uiua",
     "05AB1E(or 5?) bytes" => "05AB1E",
     "APL NARS 52 char" => "APL (NARS)",
     "APL NARS" => "APL (NARS)",
@@ -92,12 +97,13 @@ normalize = {
     "NARS2000 APL" => "APL (NARS)",
 }
 
+# TODO: match "Trivial Built-in Answers"
 byte_regexes = [
-    /([.\d]+)(?:[\\\/$<>span]*)[,\s]*bytes?/i,
-    /([.\d]+)\s*(char(acter)?|key(stroke)?)s?/i,
-    /\(\s*([.\d]+)\s*\)/,
-    /(?:,|-)\s*([.\d]+)\s*/,
-    /\s*([.\d]+)\s*/,
+    /([.,\d]+)(?:[\\\/$<>span]*)[,\s]*bytes?/i,
+    /([.,\d]+)\s*(char(acter)?|key(stroke)?)s?/i,
+    /\(\s*([.\d][.,\d]*)\s*\)/,
+    /(?:,|-)\s*([.\d][.,\d]*)\s*/,
+    /\s*([.\d][.,\d]*)\s*/,
 ]
 body_regexes = [
     /<pre.*?><code.*?>([\s\S]+?)<\/code><\/pre>/,
@@ -150,9 +156,9 @@ total.each { |item|
     # skip invalid
     next if name.nil?
     
-    unless /^[.\d]+$/ =~ bytes
+    unless /^[.,\d]+$/ =~ bytes
         STDERR.puts "Cannot find byte count:"
-        STDERR.puts [name, bytes, link].inspet
+        STDERR.puts [name, bytes, link].inspect
         next
     end
     
@@ -166,11 +172,26 @@ total.each { |item|
         next
     end
     
-    collect[qid].push [name, link, bytes.to_f, code.strip]
+    collect[qid].push [name, link, bytes.gsub(/,/, "").to_f, code.strip]
 }
 
 def escape_markdown(line)
     line.gsub(/-|[|\[\]\(\)*_~\\<>`]/) { |c| "&##{c.ord};" }
+end
+
+def get_ranks(byte_counts)
+    rank = 0
+    drift = 1
+    final_ranks = ([nil] + byte_counts).each_cons(2).map { |a,b|
+        if a == b
+            drift += 1
+        else
+            rank += drift
+            drift = 1
+        end
+        rank
+    }
+    final_ranks
 end
 
 needed.each { |prob|
@@ -181,9 +202,16 @@ needed.each { |prob|
     entries = collect[prob["id"]]
     names = []
     entries.sort_by! { |name, link, bytes, code| [bytes, name] }
-    entries.map { |name, link, bytes, code|
-        next if names.include? name
-        names << name
+    entries.reject! { |name, link, bytes, code|
+        if names.include? name
+            true
+        else
+            names << name
+            false
+        end
+    }
+    ranks = get_ranks entries.map { |name, link, bytes, code| bytes }
+    entries.zip(ranks).map { |(name, link, bytes, code), rank|
         if bytes == bytes.to_i
             bytes = bytes.to_i
         else
@@ -193,7 +221,7 @@ needed.each { |prob|
         md_name = name.gsub(/<|>|\\/) { |c| "&##{c.ord};" }
         out_line =  "| " + [
             link.empty? ? md_name : "[#{md_name}](#{link})",
-            "",
+            rank,
             "#{bytes}b",
             code.split(/\r?\n/).map { |line|
                 # line = escape_markdown CGI.unescapeHTML line

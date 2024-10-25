@@ -183,6 +183,8 @@ const handleCompare = (content, para) => {
     const secondLangInput = document.createElement("select");
     const theWorldButton = document.createElement("button");
     theWorldButton.textContent = "vs. the World";
+    const theTopButton = document.createElement("button");
+    theTopButton.textContent = "vs. the Top";
     
     const result = document.createElement("div");
     const firstLangCapture = document.createElement("span");
@@ -190,6 +192,7 @@ const handleCompare = (content, para) => {
     const langTies = document.createElement("span");
     const secondLangCapture = document.createElement("span");
     const secondLangWins = document.createElement("span");
+    const totalEncounters = document.createElement("span");
     const firstLangWinRate = document.createElement("span");
     
     const longResult = document.createElement("div");
@@ -201,6 +204,8 @@ const handleCompare = (content, para) => {
     div.appendChild(secondLangInput);
     div.appendChild(document.createTextNode("! Or: "));
     div.appendChild(theWorldButton);
+    div.appendChild(document.createTextNode(" "));
+    div.appendChild(theTopButton);
 
     // e.g. Myby wins (#D) Tie (#D) Jelly wins (#D)
     result.appendChild(firstLangCapture);
@@ -212,7 +217,9 @@ const handleCompare = (content, para) => {
     result.appendChild(secondLangCapture);
     result.appendChild(document.createTextNode(" wins ("));
     result.appendChild(secondLangWins);
-    result.appendChild(document.createTextNode(") · Winrate: "));
+    result.appendChild(document.createTextNode(") · Total: "));
+    result.appendChild(totalEncounters);
+    result.appendChild(document.createTextNode(" · Winrate: "));
     result.appendChild(firstLangWinRate);
     
     widget.appendChild(div);
@@ -228,6 +235,62 @@ const handleCompare = (content, para) => {
     }
     firstLangInput.value = "Myby";
     secondLangInput.value = "Jelly";
+    
+    theTopButton.addEventListener("click", function () {
+        longResult.style.display = "block";
+        result.style.display = "none";
+        let first = firstLangInput.value;
+        
+        let collected = {};
+        let topLangs = ["Myby", "05AB1E", "Jelly", "Vyxal", "Pyth", "Japt", "Husk", "MATL", "CJam", "Brachylog", "Fig", "Nibbles"];
+        
+        let tables = document.querySelectorAll("table");
+        for(let table of tables) {
+            let rows = [...table.querySelectorAll("tbody tr")];
+            let firstRow = rows.find(row => row.children[0].textContent === first);
+            if(!firstRow) {
+                continue;
+            }
+            let firstBytes = scrapeByteCount(firstRow.children[2].textContent);
+            for(let row of rows) {
+                let lang = row.children[0].textContent;
+                let score = row.children[2].textContent;
+                if(lang !== first && topLangs.includes(lang)) {
+                    let bytes = scrapeByteCount(score);
+                    collected[lang] ??= { wins: 0, ties: 0, losses: 0 };
+                    if     (firstBytes  <  bytes) collected[lang].wins++;
+                    else if(firstBytes === bytes) collected[lang].ties++;
+                    else if(firstBytes  >  bytes) collected[lang].losses++;
+                }
+            }
+        }
+        
+        let lines = [];
+        let pairs = Object.entries(collected);
+        pairs.sort(([aLanguage, aDistr], [bLanguage, bDistr]) =>
+            (bDistr.wins + bDistr.losses + bDistr.ties) - (aDistr.wins + aDistr.losses + aDistr.ties) 
+            /*
+            bDistr.wins - aDistr.wins
+            || bDistr.losses - aDistr.losses
+            || bDistr.ties - aDistr.ties*/
+            || aLanguage.localeCompare(bLanguage, undefined, {sensitivity: "base"})
+        );
+        let longest = Math.max(...pairs.map(([ lang, distr ]) => lang.length));
+        let padTo = longest + first.length + 6;
+        lines.push(" ".repeat(padTo) + "  W -  L -  T /  Σ |      W%");
+        for(let [ lang, distr ] of pairs) {
+            // let line = `${first} wins (${distr.wins}) · Tie (${distr.ties}) · ${lang} wins (${distr.losses})`;
+            let sum = distr.wins + distr.ties + distr.losses;
+            let winRate = (Math.round(distr.wins / sum * 10000) / 100).toFixed(2) + "%";
+            let line = `${first} vs. ${lang}:`.padEnd(padTo) + ` ${distr.wins.toString().padStart(2)} - ${distr.losses.toString().padStart(2)} - ${distr.ties.toString().padStart(2)} / ${sum.toString().padStart(2)} | ${winRate.padStart(7)}`;
+            lines.push(line);
+        }
+        let code = document.createElement("code");
+        code.textContent = lines.join("\n");
+        let pre = document.createElement("pre");
+        pre.appendChild(code);
+        longResult.appendChild(pre);
+    });
     
     theWorldButton.addEventListener("click", function () {
         longResult.style.display = "block";
@@ -320,6 +383,7 @@ const handleCompare = (content, para) => {
         firstLangWins.textContent = firstWins;
         langTies.textContent = ties;
         secondLangWins.textContent = secondWins;
+        totalEncounters.textContent = firstWins + ties + secondWins;
         let iWinRate = Math.floor(winRate * 100).toString();
         let fWinRate = Math.round(winRate * 10000 % 100).toString();
         firstLangWinRate.textContent = iWinRate.padStart(2, "0") + "." + fWinRate.padEnd(2, "0") + "%";

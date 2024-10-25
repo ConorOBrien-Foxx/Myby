@@ -337,17 +337,20 @@ Whitespace
 Windows Batch (CMD)
 Windows PowerShell
 Wolfram Language (Mathematica)
+Wolfram Language (Mathematica) v13.3+
 Wolfram Language
 Wolfram
 Wren
 x‑64 assembly machine code
 x86 .COM
+x86 machine code:
 x86
 x86_64 machine language for Linux
 x86-16 machine code
 x86‑64 assembly machine code B
 x86-64 machine code
 Yabasic
+Z80
 yup
 Zsh (builtins only)
 Zsh `--braceccl`
@@ -528,3 +531,30 @@ Casio-Basic (fx-CP400)
 SAS
 LISP
 Julia 0.6.0  ()
+TypeScript’s type system
+ELF executable (x64)
+Z80 machine language
+x86_32 machine code
+Java 8 (OpenJDK 8)
+Ruby 2.7
+Malbolge Unshackled
+Swift 5.10
+Headass
+*><>
+Trilangle
+YASEPL
+Elm
+Scala 3
+Zsh coreutils
+Raku (Perl 6) (rakudo)
+Commodore BASIC
+Bash +coreutils
+jq -Rr
+jq -R
+sed `-r`
+Kamilalisp
+jonesforth
+Grass
+Swift 5.9
+Regex (any)
+Prolog

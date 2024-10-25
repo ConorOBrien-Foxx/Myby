@@ -1,36 +1,3 @@
-# Introduction
-
-*Looking for [Overview](./)?*
-
-TLDR, Current Verdict: Myby is decently competitive, sometimes even winning against popular golfing languages, but doesn't consistently beat them, more often losing than winning. There's room for improvement, but it is already well-situated to at least be generally competitive. As of 10/24/2024 (win-loss-tie / total | win%):
-
-```
-                     W -  L -  T /  Σ |      W%
-Myby vs. 05AB1E:    23 - 20 - 11 / 54 |  42.59%
-Myby vs. Jelly:     17 - 20 - 16 / 53 |  32.08%
-Myby vs. Vyxal:     10 - 24 - 11 / 45 |  22.22%
-Myby vs. Pyth:      37 -  0 -  4 / 41 |  90.24%
-Myby vs. Japt:      23 - 10 -  2 / 35 |  65.71%
-Myby vs. Husk:      14 -  8 -  6 / 28 |  50.00%
-Myby vs. MATL:      23 -  1 -  2 / 26 |  88.46%
-Myby vs. CJam:      22 -  0 -  0 / 22 | 100.00%
-Myby vs. Brachylog: 13 -  3 -  4 / 20 |  65.00%
-Myby vs. Fig:        4 - 12 -  4 / 20 |  20.00%
-Myby vs. Nibbles:    4 -  9 -  2 / 15 |  26.67%
-```
-
-Disclaimer: Results are not definitive, as it is a form of self-selection.
-
-# Comparison Explorer
-
-{COMPARE}
-
-_Do not post any of the Myby solutions contained herein._
-
-# Problem Listing
-
-{TOC}
-
 ## [xor-multiplication](https://codegolf.stackexchange.com/questions/50240/xor-multiplication)
 
 | language | rank | bytes | code |
@@ -109,7 +76,7 @@ _Do not post any of the Myby solutions contained herein._
 | [Chocolate](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/249230#249230) | 13 | 4b | <code>G+c1</code> |
 | Myby | 13 | 4b | <code>+&#92;#!"&R&#45;</code> |
 | [Nibbles](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/254601#254601) | 13 | 4b | <code>.&#126;&#126;1+&lt;2</code> |
-| [TeaScript](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/62019#62019) | 13 | 4b | <code>F&#40;x&#41;</code> |
+| [TeaScript](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/62019#62019) | 13 | 4b | <code>F&#40;x&#41;</code> <br/> <code></code> <br/> <code>F&#40;x&#41; //Find the Fibonacci number at the input</code> |
 | [Alpax](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/76324#76324) | 17 | 5b | <code>⇇+</code> <br/> <code>1¹</code> |
 | [Arn](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/209583#209583) | 17 | 5b | <code>╔Tò”7</code> |
 | [Duocentehexaquinquagesimal](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/223675#223675) | 17 | 5b | <code>±∊YO$</code> |
