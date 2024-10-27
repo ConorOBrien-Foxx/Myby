@@ -303,8 +303,9 @@ struct Atom {
         if(isNumeric && rhs.isNumeric) {
             // real casts all args to real
             static foreach(Type; FiniteIntegralTypes) {
-                if(isType!Type || rhs.isType!Type
-                || op == "/" && is(Type == real) && this % rhs != Atom(0)) {
+                if(isType!Type || rhs.isType!Type || is(Type == real) && (
+                    op == "/" && this % rhs != Atom(0) || op == "^^" && rhs < Atom(0)
+                )) {
                     Type a = this.as!Type;
                     Type b = rhs.as!Type;
                     static if(op == "%") {
