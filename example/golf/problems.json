@@ -916,7 +916,8 @@
             {"x":-2, "result":[-3]},
             {"x":-8262922, "result":[-8262923]}
         ],
-        "option": true
+        "option": true,
+        "note": "Alternative 5b: `(# + *) 1 # ?`"
     },
     {
         "id": "dcmc000002",

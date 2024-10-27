@@ -39,7 +39,11 @@ Given an integer `x`, increment if positive, or decrement if negative; if zero, 
 
 | language | rank | bytes | code |
 |----------|------|-------|------|
-| Myby | 1 | 5b | `(# + *) 1 # ?` |
+| Actually | | 4b | `;s!+` |
+| Myby | | 4.5b | `* + # + 0 = #` |
+| J | | 5b | `+*+0&=` |
+| Uiua | | 7b | `++⊸=0⟜±` |
+| TinyAPL | | 9b | `-⟜~⍤≥∘0⊸+` |
 
 ## [abbreviate-a-username](https://discord.com/channels/133419285409169408/133425018863353856/1280991880036749461)
 
