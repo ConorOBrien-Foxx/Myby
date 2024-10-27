@@ -385,8 +385,9 @@ Adjective getAdjective(InsName name) {
                                 width++;
                             }
                             foreach(d, diagonal; arr) {
-                                long j = max(0, width - 1 - d);
-                                long i = max(0, d - width + 1);
+                                long signedD = cast(long) d;
+                                long j = max(0, width - 1 - signedD);
+                                long i = max(0, signedD - width + 1);
                                 vInv(diagonal).match!(
                                     (Atom[] diagonal) {
                                         foreach(k, cell; diagonal) {
@@ -403,7 +404,7 @@ Adjective getAdjective(InsName name) {
                             }
                             return Atom(mat.map!Atom.array);
                         },
-                        (string s) => assert(0, "TODO: Un-Diagonal liens of string"),
+                        (string s) => assert(0, "TODO: Un-Diagonal lines of string"),
                         _ => Nil.nilAtom,
                     ))
                     .setDyad((_1, _2) => Nil.nilAtom)
@@ -462,12 +463,12 @@ Adjective getAdjective(InsName name) {
                                 + 1;
                             foreach(d, oblique; arr) {
                                 long j = min(d, width - 1);
-                                long i = max(d - j, 0);
+                                long i = max(cast(long)d - j, 0);
                                 vInv(oblique).match!(
                                     (Atom[] oblique) {
                                         foreach(k, cell; oblique) {
                                             setFill(mat, i + k);
-                                            setFill(mat[i + k], j - k);
+                                            setFill(mat[i + k], j - cast(long)k);
                                             mat[i + k][j - k] = cell;
                                         }
                                     },
