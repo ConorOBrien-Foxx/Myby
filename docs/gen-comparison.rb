@@ -10,7 +10,7 @@ existing = File.read("./comparison.md").scan(/## \[(.+?)\]/).map(&:first)
 
 needed = problems
     .reject { |prob| existing.include? prob["name"] }
-    .select { |prop| prob["id"]["csge"] }
+    .select { |prob| prob["id"]["csge"] }
 ids = needed.map { _1["id"][/\d+/] }
     
 if ids.empty?

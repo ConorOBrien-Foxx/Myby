@@ -114,7 +114,7 @@ problems.each.with_index { |problem, i|
                 STDERR.puts "Failed due to error:" if errored
                 STDERR.puts stderr
             elsif errored
-                STDERR.puts "Failed ##{tdx}: #{args_repr.map(&:inspect).join ", "}\t❌#{stderr.lines[2]}"
+                STDERR.puts "Failed ##{tdx}: #{args_repr.map(&:inspect).join ", "}\t❌ error: #{stderr.lines.join}"
             else
                 STDERR.puts "Failed ##{tdx}: #{args_repr.map(&:inspect).join ", "}\t❌#{stdout.lines.first}\t✔️#{result.lines.first}"
             end

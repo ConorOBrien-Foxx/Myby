@@ -1,3 +1,46 @@
+## [increment-away-from-zero](https://discord.com/channels/133419285409169408/133425018863353856/1299972126924607508)
+
+Given an integer `x`, increment if positive, or decrement if negative; if zero, either increment or decrement (your choice).
+—Conor
+
+| language | rank | bytes | code |
+|----------|------|-------|------|
+| Myby | 1 | 5b | `(# + *) 1 # ?` |
+
+## [abbreviate-a-username](https://discord.com/channels/133419285409169408/133425018863353856/1280991880036749461)
+
+Given any kind of string input of 2 or more characters, output the first two characters, followed by ..., followed by the last two characters. E.g., `abc` becomes `ab..bc` and `hallelujah` becomes `ha...ah`.
+—Quintec
+
+| language | rank | bytes | code |
+|----------|------|-------|------|
+| Choir | 1 | 7b | `2H/.../2T` |
+| Vyxal | 2 | 10b | ``z₌th`Π...Π`` |
+| K (ngn/K) | 3 | 13b | `"..."/2 -2#\:` |
+| Myby | 3 | 13b | `0 1&{+'...'+_2 _1&{` |
+| Uiua | 5 | 14b | `$"_..._"∩↙2,¯2` |
+| Actually | 6 | 15b | `2@│H(±(t'.3*(++` |
+| J | 6 | 15b | `2&$,'...',_2&{.` |
+
+## [ultrafactorial](https://discord.com/channels/133419285409169408/133425018863353856/1020446785468108800)
+
+Given an integer `x` ≥ 0, compute `x! ^ x!` (aka, the Ultrafactorial). [OEIS](https://oeis.org/A046882).
+
+| language | rank | bytes | code |
+|----------|------|-------|------|
+| Myby | 1 | 2b | `*\^*\` |
+| J | 2 | 3b | `!^!` |
+| Vyxal | 2 | 3b | `¡:e` |
+
+## [enumerate-semiprimes](https://discord.com/channels/133419285409169408/133425018863353856/1006272903718899782)
+
+Given an integer `n`, output all semiprimes (aka numbers which are the product of exactly two primes) strictly less than `n`. [OEIS](https://oeis.org/A001358).
+
+| language | rank | bytes | code |
+|----------|------|-------|------|
+| Vyxal | 1 | 4b | `'ǐḢ₃` |
+| Myby | 2 | 5b | `(2 = primo)\ R` |
+
 ## [xor-multiplication](https://codegolf.stackexchange.com/questions/50240/xor-multiplication)
 
 | language | rank | bytes | code |
@@ -13,6 +56,7 @@
 | [J](https://codegolf.stackexchange.com/questions/50240/xor-multiplication/50243#50243) | 9 | 14b | <code>&#42;/&#40;&#126;://.@&#41;&amp;.#:</code> |
 | [Pyt](https://codegolf.stackexchange.com/questions/50240/xor-multiplication/257569#257569) | 10 | 37b | <code>ɓąƖĐŁř⁻↔2⇹^&#42;&#42;ĐŁ2%¬?ŕ:ŕÁ0á;ĐŁ&#96;ŕʁ⊻ĐŁ⁻łŕ</code> |
 | [golflua](https://codegolf.stackexchange.com/questions/50240/xor-multiplication/50249#50249) | 11 | 68b | <code>x,y=I.r&#40;&quot;&#42;n&quot;,&quot;&#42;n&quot;&#41;r=0&#126;@i=0,31r=B.x&#40;r,x&#42;B.ls&#40;B.rs&#40;y,i&#41;%2,i+1&#41;&#41;$w&#40;r/2&#41;</code> |
+
 ## [reconstruct-matrix-from-its-diagonals](https://codegolf.stackexchange.com/questions/252082/reconstruct-matrix-from-its-diagonals)
 
 | language | rank | bytes | code |
@@ -28,6 +72,7 @@
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/252082/reconstruct-matrix-from-its-diagonals/252090#252090) | 9 | 22b | <code>⊖w↑i⊖↑⌽⍨≢↑⍥&#45;i←⍳w←≢∘⍉∘↑</code> |
 | [Pip `-x`](https://codegolf.stackexchange.com/questions/252082/reconstruct-matrix-from-its-diagonals/252114#252114) | 9 | 22b | <code>Fi,YMX#&#42;aFki+R,yPPOa@k</code> |
 | [Haskell + hgl](https://codegolf.stackexchange.com/questions/252082/reconstruct-matrix-from-its-diagonals/256312#256312) | 11 | 25b | <code>lH&#40;F&#126;&lt;zdm&lt;&lt;lpW&#91;&#93;&lt;lg&#41;&lt;mm p</code> |
+
 ## [find-the-sum-of-the-divisors-of-n](https://codegolf.stackexchange.com/questions/142071/find-the-sum-of-the-divisors-of-n)
 
 | language | rank | bytes | code |
@@ -57,6 +102,7 @@
 | [GolfScript](https://codegolf.stackexchange.com/questions/142071/find-the-sum-of-the-divisors-of-n/211111#211111) | 23 | 15b | <code>&#126;.,{.3$&#92;%!&#42;+}&#42;+</code> |
 | [CJam](https://codegolf.stackexchange.com/questions/142071/find-the-sum-of-the-divisors-of-n/142153#142153) | 24 | 16b | <code>ri:X{&#41;&#95;X&#92;%!&#42;}%:+</code> |
 | [J](https://codegolf.stackexchange.com/questions/142071/find-the-sum-of-the-divisors-of-n/142109#142109) | 25 | 23b | <code>&#91;:+/&#93;&#40;&#40;&#91;:=&amp;0&#93;&#124;&#91;&#41;#&#93;&#41;1+i.</code> |
+
 ## [fibonacci-function-or-sequence](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence)
 
 | language | rank | bytes | code |
@@ -76,7 +122,7 @@
 | [Chocolate](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/249230#249230) | 13 | 4b | <code>G+c1</code> |
 | Myby | 13 | 4b | <code>+&#92;#!"&R&#45;</code> |
 | [Nibbles](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/254601#254601) | 13 | 4b | <code>.&#126;&#126;1+&lt;2</code> |
-| [TeaScript](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/62019#62019) | 13 | 4b | <code>F&#40;x&#41;</code> <br/> <code></code> <br/> <code>F&#40;x&#41; //Find the Fibonacci number at the input</code> |
+| [TeaScript](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/62019#62019) | 13 | 4b | <code>F&#40;x&#41;</code> |
 | [Alpax](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/76324#76324) | 17 | 5b | <code>⇇+</code> <br/> <code>1¹</code> |
 | [Arn](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/209583#209583) | 17 | 5b | <code>╔Tò”7</code> |
 | [Duocentehexaquinquagesimal](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/223675#223675) | 17 | 5b | <code>±∊YO$</code> |
@@ -107,6 +153,7 @@
 | [Pyth](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/202953#202953) | 42 | 13b | <code>A&#40;Z1&#41;#HA&#40;H+HG</code> |
 | [Actually](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/206943#206943) | 45 | 16b | <code>&quot;1,&quot;◙01W;a+;◙',◙</code> |
 | [APL (Dyalog)](https://codegolf.stackexchange.com/questions/85/fibonacci-function-or-sequence/264762#264762) | 46 | 17b | <code>{&#40;{⍵,+/¯2↑⍵}⍣⍵&#41;⍺}</code> |
+
 ## [minimum-excluded-number](https://codegolf.stackexchange.com/questions/38325/minimum-excluded-number)
 
 | language | rank | bytes | code |
@@ -134,6 +181,7 @@
 | [Z80 machine language](https://codegolf.stackexchange.com/questions/38325/minimum-excluded-number/267292#267292) | 20 | 11b | <code>AF C5 E5 ED B1 E1 C1 C0 3C 18 F6</code> |
 | [J](https://codegolf.stackexchange.com/questions/38325/minimum-excluded-number/38344#38344) | 22 | 13b | <code>f=:0{i.@21&amp;&#45;.</code> |
 | [APL (Dyalog)](https://codegolf.stackexchange.com/questions/38325/minimum-excluded-number/118303#118303) | 23 | 19b | <code>&#40;0⍳⍨⊢=⍳∘⍴&#41;∘&#40;⊂∘⍋⌷⊢&#41;∪</code> |
+
 ## [compute-the-median](https://codegolf.stackexchange.com/questions/106149/compute-the-median)
 
 | language | rank | bytes | code |
@@ -157,6 +205,7 @@
 | [K](https://codegolf.stackexchange.com/questions/106149/compute-the-median/139469#139469) | 17 | 23b | <code>{avg x&#40;&lt;x&#41;@&#95;.5&#42;&#45;1 0+#x}</code> |
 | [APL](https://codegolf.stackexchange.com/questions/106149/compute-the-median/138636#138636) | 18 | 26b | <code>{3&gt;≢⍵:&#40;+/÷≢&#41;⍵⋄∇1↓¯1↓⍵&#91;⍋⍵&#93;}</code> |
 | [APL (NARS)](https://codegolf.stackexchange.com/questions/106149/compute-the-median/173142#173142) | 19 | 62b | <code>{2÷⍨x&#91;⌊k&#93;+&#40;⌈k←2÷⍨1+≢⍵&#41;⌷x←⍵&#91;⍋⍵&#93;}</code> |
+
 ## [find-the-nth-mersenne-prime](https://codegolf.stackexchange.com/questions/251594/find-the-nth-mersenne-prime)
 
 | language | rank | bytes | code |
@@ -170,6 +219,7 @@
 | [Brachylog](https://codegolf.stackexchange.com/questions/251594/find-the-nth-mersenne-prime/251623#251623) | 7 | 14b | <code>;2{;X≜^&#45;₁ṗ}ᶠ⁽t</code> |
 | [Japt](https://codegolf.stackexchange.com/questions/251594/find-the-nth-mersenne-prime/251684#251684) | 7 | 14b | <code>Èõ!²mÉ øX&#42;j}iU</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/251594/find-the-nth-mersenne-prime/251601#251601) | 9 | 26b | <code>Ｎθ≔¹ηＷθ«≔⊕⊗ηη≧⁻﹪±Π…¹ηηθ»Ｉη</code> |
+
 ## [product-of-divisors](https://codegolf.stackexchange.com/questions/130454/product-of-divisors)
 
 | language | rank | bytes | code |
@@ -192,6 +242,7 @@
 | [Pyth](https://codegolf.stackexchange.com/questions/130454/product-of-divisors/130456#130456) | 16 | 6b | <code>&#42;Fs{yP</code> |
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/130454/product-of-divisors/216672#216672) | 17 | 7b | <code>f←×/∘∪⊢∨⍳</code> |
 | [J](https://codegolf.stackexchange.com/questions/130454/product-of-divisors/130474#130474) | 18 | 19b | <code>&#42;/}.I.&#40;=&lt;.&#41;&#40;%i.@&gt;:&#41;</code> |
+
 ## [antisymmetry-of-a-matrix](https://codegolf.stackexchange.com/questions/208982/antisymmetry-of-a-matrix)
 
 | language | rank | bytes | code |
@@ -212,6 +263,7 @@
 | [K](https://codegolf.stackexchange.com/questions/208982/antisymmetry-of-a-matrix/254630#254630) | 14 | 7b | <code>{x&#126;&#45;+x}</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/208982/antisymmetry-of-a-matrix/209014#209014) | 15 | 10b | <code>⁼θＥθＥθ±§λκ</code> |
 | [J-uby](https://codegolf.stackexchange.com/questions/208982/antisymmetry-of-a-matrix/254622#254622) | 16 | 28b | <code>:=&#126;&amp;&#40;:transpose&#124;:&#42;&amp;&#40;:&#42;&amp;:&#45;@&#41;&#41;</code> |
+
 ## [list-of-primes-under-a-million](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million)
 
 | language | rank | bytes | code |
@@ -231,6 +283,7 @@
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/273447#273447) | 13 | 12b | <code>&#96;pri&#40;&#42;/6#10&#41;</code> |
 | [Pyth](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/138691#138691) | 13 | 12b | <code>V^T6IqlPN1N</code> |
 | [APL (Dyalog)](https://codegolf.stackexchange.com/questions/5977/list-of-primes-under-a-million/55962#55962) | 15 | 15b | <code>⍪&#40;⊢&#126;∘.×⍨&#41;1↓⍳1E6</code> |
+
 ## [mathematical-combination](https://codegolf.stackexchange.com/questions/1744/mathematical-combination)
 
 | language | rank | bytes | code |
@@ -242,6 +295,7 @@
 | [APL](https://codegolf.stackexchange.com/questions/1744/mathematical-combination/1746#1746) | 5 | 3b | <code>⎕!⎕</code> |
 | Myby | 5 | 3b | <code>!&#126;&#92;,</code> |
 | [CJam](https://codegolf.stackexchange.com/questions/1744/mathematical-combination/206509#206509) | 7 | 19b | <code>l&#126;&#92;&#95;m!@@&#92;&#95;m!@@&#45;m!&#42;/</code> |
+
 ## [pwas-eht-tirsf-dna-tasl-setterl-fo-hace-dorw](https://codegolf.stackexchange.com/questions/185674/pwas-eht-tirsf-dna-tasl-setterl-fo-hace-dorw)
 
 | language | rank | bytes | code |
@@ -262,6 +316,7 @@
 | [QuadR](https://codegolf.stackexchange.com/questions/185674/pwas-eht-tirsf-dna-tasl-setterl-fo-hace-dorw/185681#185681) | 14 | 20b | <code>&#40;&#92;w&#41;&#40;&#92;w&#42;&#41;&#40;&#92;w&#41;</code> <br/> <code>&#92;3&#92;2&#92;1</code> |
 | [Z80Golf](https://codegolf.stackexchange.com/questions/185674/pwas-eht-tirsf-dna-tasl-setterl-fo-hace-dorw/185773#185773) | 15 | 43b | <code>00000000: 2100 c0cd 0380 3822 5745 cd03 8038 09fe  !.....8"WE...8..</code> <br/> <code>00000010: 2028 0570 4723 18f2 736b 707e 23a7 2803   &#40;.pG#..skp&#126;#.&#40;.</code> <br/> <code>00000020: ff18 f87a ff3e 20ff 18d6 76              ...z.&gt; ...v</code> |
 | [APL+WIN](https://codegolf.stackexchange.com/questions/185674/pwas-eht-tirsf-dna-tasl-setterl-fo-hace-dorw/185713#185713) | 16 | 50b | <code>&#40;∊¯1↑¨s&#41;,¨1↓¨&#40;¯1↓¨s&#41;,¨↑¨s←&#40;&#40;+&#92;s=' '&#41;⊂s←' ',⎕&#41;&#126;¨' '</code> |
+
 ## [carryless-factors](https://codegolf.stackexchange.com/questions/252189/carryless-factors)
 
 | language | rank | bytes | code |
@@ -271,6 +326,7 @@
 | [05AB1E](https://codegolf.stackexchange.com/questions/252189/carryless-factors/252209#252209) | 3 | 18b | <code>LʒULε0sbv·yX&#42;^}Q}à</code> |
 | [Vyxal](https://codegolf.stackexchange.com/questions/252189/carryless-factors/252213#252213) | 3 | 18b | <code>'£?ƛ0$b&#40;dn¥&#42;꘍&#41;?=;a</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/252189/carryless-factors/252210#252210) | 5 | 48b | <code>ＮθＦθ«≔θηＦ⮌×⊕ιＸ²…·⁰⁻Ｌ↨θ²Ｌ↨⊕ι²≔⌊⟦η⁻｜ηκ＆ηκ⟧η¿¬η⟦Ｉ⊕ι</code> |
+
 ## [scan-a-ragged-list](https://codegolf.stackexchange.com/questions/240612/scan-a-ragged-list)
 
 | language | rank | bytes | code |
@@ -281,6 +337,7 @@
 | [05AB1E](https://codegolf.stackexchange.com/questions/240612/scan-a-ragged-list/240666#240666) | 4 | 29b | <code>0U&quot;εdiXćy+š¬ëXD¬šUy®.V}sU&quot;©.V</code> |
 | [BQN](https://codegolf.stackexchange.com/questions/240612/scan-a-ragged-list/240620#240620) | 5 | 34b | <code>{×≠𝕩?&#40;⊑𝕩&#41;𝕤{=𝕨?𝕩∾˜⋈𝔽𝕨;𝕨+0∾𝕩}𝕊1↓𝕩;𝕩}</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/240612/scan-a-ragged-list/240632#240632) | 6 | 51b | <code>⊞υ⊞Ｏθ⁰Ｆυ«≔⊟ιηＦＬι«≔§ικζ¿⁼ζ⁺ζ⟦⟧⊞υ⊞Ｏζη«≧⁺ζη§≔ικη»»»⭆¹θ</code> |
+
 ## [find-the-first-duplicated-element](https://codegolf.stackexchange.com/questions/136713/find-the-first-duplicated-element)
 
 | language | rank | bytes | code |
@@ -305,6 +362,7 @@
 | [APL](https://codegolf.stackexchange.com/questions/136713/find-the-first-duplicated-element/137189#137189) | 18 | 15b | <code>{⊃⍵&#91;&#40;⍳⍴⍵&#41;&#126;⍵⍳⍵&#93;}</code> |
 | [APL (Dyalog Classic)](https://codegolf.stackexchange.com/questions/136713/find-the-first-duplicated-element/137174#137174) | 19 | 18b | <code>w&#91;⊃&#40;⍳∘≢&#126;⍳⍨&#41;w←¯1,⎕&#93;</code> |
 | [APL (NARS)](https://codegolf.stackexchange.com/questions/136713/find-the-first-duplicated-element/149477#149477) | 20 | 104b | <code>f←{1≠⍴⍴⍵:¯1⋄v←&#40;⍵⍳⍵&#41;&#45;⍳⍴⍵⋄m←v⍳&#40;v&lt;0&#41;/v⋄m≡⍬:¯1⋄&#40;1⌷m&#41;⌷⍵}</code> |
+
 ## [number-to-string-in-aaaaa-way](https://codegolf.stackexchange.com/questions/252758/number-to-string-in-aaaaa-way)
 
 | language | rank | bytes | code |
@@ -328,6 +386,7 @@
 | [Ly](https://codegolf.stackexchange.com/questions/252758/number-to-string-in-aaaaa-way/252833#252833) | 17 | 25b | <code>iry5L&#91;f5f&#45;&#91;'Ao,&#93;&#93;pp&#91;'0+o&#93;</code> |
 | [J](https://codegolf.stackexchange.com/questions/252758/number-to-string-in-aaaaa-way/252876#252876) | 18 | 29b | <code>'Aabcdefghi'{&#126;&#93;,&#126;&#91;:0&quot;0&#91;:i.5&#45;#</code> |
 | [J-uby](https://codegolf.stackexchange.com/questions/252758/number-to-string-in-aaaaa-way/252798#252798) | 19 | 34b | <code>:&#42;&amp;&#40;:+&amp;96&#124;:chr&#41;&#124;:join&#124;&#126;:rjust&amp;?A&amp;5</code> |
+
 ## [appending-string-lengths](https://codegolf.stackexchange.com/questions/103377/appending-string-lengths)
 
 | language | rank | bytes | code |
@@ -345,6 +404,7 @@
 | [Brachylog](https://codegolf.stackexchange.com/questions/103377/appending-string-lengths/103444#103444) | 11 | 13b | <code>l&lt;L$@:?rc.lL,</code> |
 | [Ly](https://codegolf.stackexchange.com/questions/103377/appending-string-lengths/252757#252757) | 12 | 14b | <code>iysp&amp;ol&#96;Syl+u;</code> |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/103377/appending-string-lengths/252756#252756) | 13 | 31b | <code>{$&#91;9&gt;t:#x;x,$1+t;x,$#x,&#40;$1+t&#41;&#93;}</code> |
+
 ## [concatenating-n-with-n-1](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1)
 
 | language | rank | bytes | code |
@@ -364,6 +424,7 @@
 | [APL (Dyalog Classic)](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/167860#167860) | 13 | 9b | <code>1,2,/⍕¨∘⍳</code> |
 | [Husk](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/167869#167869) | 13 | 9b | <code>mSöd+d←dḣ</code> |
 | [MATL](https://codegolf.stackexchange.com/questions/167818/concatenating-n-with-n-1/167907#167907) | 13 | 9b | <code>:"@qV@VhU</code> |
+
 ## [repeat-values-in-array](https://codegolf.stackexchange.com/questions/252442/repeat-values-in-array)
 
 | language | rank | bytes | code |
@@ -389,6 +450,7 @@
 | [Charcoal](https://codegolf.stackexchange.com/questions/252442/repeat-values-in-array/252448#252448) | 18 | 9b | <code>ＩΣＥθＥ§ηκι</code> |
 | [GolfScript](https://codegolf.stackexchange.com/questions/252442/repeat-values-in-array/265987#265987) | 18 | 9b | <code>&#126;zip{&#41;&#42;}%</code> |
 | [Pip `-p`](https://codegolf.stackexchange.com/questions/252442/repeat-values-in-array/253564#253564) | 21 | 16b | <code>{FA&#40;{aRLb}MZab&#41;}</code> |
+
 ## [are-all-the-items-the-same](https://codegolf.stackexchange.com/questions/224000/are-all-the-items-the-same)
 
 | language | rank | bytes | code |
@@ -414,6 +476,7 @@
 | [J](https://codegolf.stackexchange.com/questions/224000/are-all-the-items-the-same/247055#247055) | 19 | 6b | <code>1=#&amp;&#126;.</code> |
 | [Ly](https://codegolf.stackexchange.com/questions/224000/are-all-the-items-the-same/247067#247067) | 19 | 6b | <code>a0I=u;</code> |
 | [J-uby](https://codegolf.stackexchange.com/questions/224000/are-all-the-items-the-same/252831#252831) | 21 | 15b | <code>:uniq&#124;&#126;:&#91;&#93;&amp;1&#124;:!</code> |
+
 ## [modulus-summation](https://codegolf.stackexchange.com/questions/150563/modulus-summation)
 
 | language | rank | bytes | code |
@@ -442,6 +505,7 @@
 | [Ly](https://codegolf.stackexchange.com/questions/150563/modulus-summation/230061#230061) | 22 | 13b | <code>ns,&#91;:lf%f,&#93;&amp;+</code> |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/150563/modulus-summation/252786#252786) | 23 | 16b | <code>{+/{x!g}'1+!g&#45;1}</code> |
 | [J-uby](https://codegolf.stackexchange.com/questions/150563/modulus-summation/252747#252747) | 24 | 24b | <code>&#40;:&#45;&amp;&#40;:&amp; &amp;:%&#124;:+&amp;:sum&#41;&#41;%:+</code> |
+
 ## [implement-an-argwhere-function](https://codegolf.stackexchange.com/questions/241357/implement-an-argwhere-function)
 
 | language | rank | bytes | code |
@@ -460,6 +524,7 @@
 | [Haskell + hgl](https://codegolf.stackexchange.com/questions/241357/implement-an-argwhere-function/241369#241369) | 12 | 19b | <code>&#40;cx&lt;ixm pM&#41;.^m&lt;m gu</code> |
 | [tinylisp 2](https://codegolf.stackexchange.com/questions/241357/implement-an-argwhere-function/256592#256592) | 13 | 29b | <code>&#40;&#92;&#40;L F&#41;&#40;f&#40;. F&#40;p nth L&#41;&#41;&#40;r&#40;# L</code> |
 | [J-uby](https://codegolf.stackexchange.com/questions/241357/implement-an-argwhere-function/252681#252681) | 14 | 31b | <code>&#45;&gt;a,f{:select+&#40;:&#91;&#93;&amp;a&#124;f&#41;^&#40;+a&#41;.&#42;}</code> |
+
 ## [remove-odd-indices-and-double-the-even-indices](https://codegolf.stackexchange.com/questions/241267/remove-odd-indices-and-double-the-even-indices)
 
 | language | rank | bytes | code |
@@ -489,6 +554,7 @@
 | [APL+WIN](https://codegolf.stackexchange.com/questions/241267/remove-odd-indices-and-double-the-even-indices/241279#241279) | 23 | 14b | <code>2/&#40;&#126;2&#124;⍳⍴m&#41;/m←⍞</code> |
 | [J-uby](https://codegolf.stackexchange.com/questions/241267/remove-odd-indices-and-double-the-even-indices/252979#252979) | 24 | 21b | <code>&#126;:gsub&amp;'&#92;1&#92;1'&amp;/.&#40;.&#41;?/</code> |
 | [𝔼𝕊𝕄𝕚𝕟](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/64366#64366) | 25 | 22b | <code>Ѩťᶏש,Ѩą&#40;ï,2⸩</code> |
+
 ## [separate-a-list-into-even-indexed-and-odd-indexed-parts](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts)
 
 | language | rank | bytes | code |
@@ -505,6 +571,7 @@
 | [Haskell + hgl](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/256379#256379) | 10 | 8b | <code>mp&lt;$%uak</code> |
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/216780#216780) | 11 | 11b | <code>{⍵&#91;⍒2&#124;⍳≢⍵&#93;}</code> |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/64315/separate-a-list-into-even-indexed-and-odd-indexed-parts/252991#252991) | 12 | 21b | <code>{t,x^t:x@&amp;&#40;0=2!&#41;'!#x}</code> |
+
 ## [count-the-changes-in-an-array](https://codegolf.stackexchange.com/questions/146402/count-the-changes-in-an-array)
 
 | language | rank | bytes | code |
@@ -530,6 +597,7 @@
 | [J](https://codegolf.stackexchange.com/questions/146402/count-the-changes-in-an-array/146457#146457) | 18 | 10b | <code>&#91;:+/2&#126;:/&#92;&#93;</code> |
 | [Pip](https://codegolf.stackexchange.com/questions/146402/count-the-changes-in-an-array/256624#256624) | 18 | 10b | <code>&#95;MS&#95;!=BMPg</code> |
 | [J-uby](https://codegolf.stackexchange.com/questions/146402/count-the-changes-in-an-array/252807#252807) | 21 | 21b | <code>:chunk+I&#124;&#126;:drop&amp;1&#124;:+@</code> |
+
 ## [twisting-words](https://codegolf.stackexchange.com/questions/55051/twisting-words)
 
 | language | rank | bytes | code |
@@ -544,6 +612,7 @@
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/55051/twisting-words/164722#164722) | 8 | 19b | <code>{↑⊢∘⌽&#92;↓↑⍵⊆⍨⌈⍺÷⍨⍳≢⍵}</code> |
 | [CJam](https://codegolf.stackexchange.com/questions/55051/twisting-words/55056#55056) | 8 | 19b | <code>q&#126;1$S&#42;+/W&lt;{&#40;N@Wf%}h</code> |
 | [Brachylog](https://codegolf.stackexchange.com/questions/55051/twisting-words/210476#210476) | 10 | 20b | <code>⟨{ġ&#124;,Ṣ↰}lᵛ⟩{i↔ⁱ⁾}ᶠ&#126;ṇ</code> |
+
 ## [determine-the-color-of-a-chess-square](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square)
 
 | language | rank | bytes | code |
@@ -576,6 +645,7 @@
 | [Haskell + hgl](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/256342#256342) | 26 | 31b | <code>main=io$&#40;Wr&quot;dark light&quot;!&#41;&lt;mF Or</code> |
 | [𝔼𝕊𝕄𝕚𝕟](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/63805#63805) | 27 | 34b | <code>ô&#40;שǀ&#40;ï,ḣ&#41;%2?&#96;dark&#96;:&#96;light”</code> |
 | [J](https://codegolf.stackexchange.com/questions/63772/determine-the-color-of-a-chess-square/243032#243032) | 28 | 37b | <code>&gt;@{&amp;&#40;'dark';'light'&#41;@{:@#:@+/@&#40;a.&amp;i.&#41;</code> |
+
 ## [is-this-word-lexically-ordered](https://codegolf.stackexchange.com/questions/108675/is-this-word-lexically-ordered)
 
 | language | rank | bytes | code |
@@ -598,6 +668,7 @@
 | [APL (NARS)](https://codegolf.stackexchange.com/questions/108675/is-this-word-lexically-ordered/150956#150956) | 16 | 19b | <code>{&#40;⊂⍵&#91;⍋⍵&#93;&#41;∊&#40;⊂⍵&#41;,⊂⌽⍵}</code> |
 | [Q](https://codegolf.stackexchange.com/questions/108675/is-this-word-lexically-ordered/151043#151043) | 17 | 20b | <code>{x in&#40;asc;desc&#41;@&#92;:x}</code> |
 | [J-uby](https://codegolf.stackexchange.com/questions/108675/is-this-word-lexically-ordered/262028#262028) | 18 | 28b | <code>&#40;:&gt;&gt;+&#40;A&#124;:==%:sort&#41;&amp;:any?&#41;%:&#126;</code> |
+
 ## [triangle-a-number](https://codegolf.stackexchange.com/questions/137632/triangle-a-number)
 
 | language | rank | bytes | code |
@@ -620,6 +691,7 @@
 | [Pyt](https://codegolf.stackexchange.com/questions/137632/triangle-a-number/151755#151755) | 15 | 6b | <code>ąĐŁř↔·</code> |
 | [Gol&#62;&#60;&#62;](https://codegolf.stackexchange.com/questions/137632/triangle-a-number/161484#161484) | 17 | 8b | <code>IEh@+:@+</code> |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/137632/triangle-a-number/253184#253184) | 17 | 8b | <code>+/+&#92;.'$:</code> |
+
 ## [bl-lu-ur-rr-ry-yv-vi-is-si-io-on-blur-the-text](https://codegolf.stackexchange.com/questions/203893/bl-lu-ur-rr-ry-yv-vi-is-si-io-on-blur-the-text)
 
 | language | rank | bytes | code |
@@ -645,6 +717,7 @@
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/203893/bl-lu-ur-rr-ry-yv-vi-is-si-io-on-blur-the-text/203933#203933) | 19 | 32b | <code>{¯2↓2↓⊃,/{⍵' '⍵}¨⍵∩⎕A,819⌶⎕A,⎕D}</code> |
 | [J](https://codegolf.stackexchange.com/questions/203893/bl-lu-ur-rr-ry-yv-vi-is-si-io-on-blur-the-text/204364#204364) | 19 | 32b | <code>&#91;:}:&#91;:,/2,&amp;' '&#92;&#93;&#45;.&#45;.&amp;AlphaNum&#95;j&#95;</code> |
 | [Q](https://codegolf.stackexchange.com/questions/203893/bl-lu-ur-rr-ry-yv-vi-is-si-io-on-blur-the-text/203929#203929) | 21 | 38b | <code>{" "sv &#45;2&#95;2#'next&#92;&#91;x inter .Q.an &#95;52&#93;}</code> |
+
 ## [new-password-idea-word-walker](https://codegolf.stackexchange.com/questions/165793/new-password-idea-word-walker)
 
 | language | rank | bytes | code |
@@ -661,6 +734,7 @@
 | [CJam](https://codegolf.stackexchange.com/questions/165793/new-password-idea-word-walker/214311#214311) | 10 | 22b | <code>qS/{&#95;&#41;;1&gt;W%+T&#95;&#41;:T@&#42;=}%</code> |
 | [K](https://codegolf.stackexchange.com/questions/165793/new-password-idea-word-walker/166018#166018) | 11 | 28b | <code>{x{&#42;&#124;y#x,1&#95;&#124;1&#95;x}'1+!#x}@" "&#92;</code> |
 | [J](https://codegolf.stackexchange.com/questions/165793/new-password-idea-word-walker/166095#166095) | 12 | 43b | <code>&#91;:&#40;&gt;{&#126;"&#95;1#@&gt;&#124;i.@#&#41;&#91;:&#40;,}.@}:&#41;&amp;.&gt;&#91;:&lt;;.&#95;1' '&amp;,</code> |
+
 ## [non-unique-duplicate-elements](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements)
 
 | language | rank | bytes | code |
@@ -681,6 +755,7 @@
 | [Haskell + hgl](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/256322#256322) | 14 | 11b | <code>nb&lt;&lt;fdf&#126;&lt;nb</code> |
 | [Pip `-p`](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/256323#256323) | 14 | 11b | <code>UQ:&#95;Ng&gt;1FIg</code> |
 | [J](https://codegolf.stackexchange.com/questions/60610/non-unique-duplicate-elements/60764#60764) | 16 | 13b | <code>&#126;.d&#35;&#126;1&lt;+/=/&#126;d</code> |
+
 ## [alphabet-checksum](https://codegolf.stackexchange.com/questions/253568/alphabet-checksum)
 
 | language | rank | bytes | code |
@@ -703,6 +778,7 @@
 | [Pip](https://codegolf.stackexchange.com/questions/253568/alphabet-checksum/253713#253713) | 16 | 16b | <code>zPK$+&#40;A&#42;a&#45;97&#41;%26</code> |
 | [J](https://codegolf.stackexchange.com/questions/253568/alphabet-checksum/253759#253759) | 17 | 19b | <code>&#40;26&#124;+/&#41;&amp;.&#40;&#95;97+3&amp;u:&#41;</code> |
 | [APL (Dyalog)](https://codegolf.stackexchange.com/questions/253568/alphabet-checksum/256740#256740) | 18 | 28b | <code>{a&#91;1+26&#124;+/1&#45;⍨&#40;a←¯1∘⎕C⎕A&#41;⍳⍵&#93;}</code> |
+
 ## [8086-segment-address](https://codegolf.stackexchange.com/questions/255850/8086-segment-address)
 
 | language | rank | bytes | code |
@@ -715,6 +791,7 @@
 | [Japt `-x`](https://codegolf.stackexchange.com/questions/255850/8086-segment-address-to-linear/255866#255866) | 6 | 13b | <code>q': ÔËnG &#42;GpE</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/255850/8086-segment-address-to-linear/255871#255871) | 7 | 14b | <code>⍘↨Ｅ⪪Ｓ:⍘ι⊗⁸⊗⁸⊗⁸</code> |
 | [Pip](https://codegolf.stackexchange.com/questions/255850/8086-segment-address-to-linear/272579#272579) | 7 | 14b | <code>&#40;a^':&#41;FB16FD16</code> |
+
 ## [simple-csv-dsv-importer](https://codegolf.stackexchange.com/questions/111707/simple-csv-dsv-importer)
 
 | language | rank | bytes | code |
@@ -726,6 +803,7 @@
 | [MATL](https://codegolf.stackexchange.com/questions/111707/simple-csv-dsv-importer/111724#111724) | 4 | 4b | <code>H&amp;XX</code> |
 | [05AB1E](https://codegolf.stackexchange.com/questions/111707/simple-csv-dsv-importer/111708#111708) | 6 | 5b | <code>vy²¡ˆ</code> |
 | [CJam](https://codegolf.stackexchange.com/questions/111707/simple-csv-dsv-importer/111781#111781) | 6 | 5b | <code>l&#126;l./</code> |
+
 ## [replace-0s-in-a-string-with-their-consecutive-counts](https://codegolf.stackexchange.com/questions/255822/replace-0s-in-a-string-with-their-consecutive-counts)
 
 | language | rank | bytes | code |
@@ -745,6 +823,7 @@
 | [J](https://codegolf.stackexchange.com/questions/255822/replace-0s-in-a-string-with-their-consecutive-counts/255887#255887) | 13 | 16b | <code>'0+'&quot;:@#rxapply&#93;</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/255822/replace-0s-in-a-string-with-their-consecutive-counts/255841#255841) | 14 | 20b | <code>⭆⪪⁻⪫⪪ＳＩ⁰&#95;0&#95;×&#95;²&#95;∨№ι0ι</code> |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/255822/replace-0s-in-a-string-with-their-consecutive-counts/260027#260027) | 15 | 25b | <code>{,/$&#40;.'x&#41;&#124;#'x:&#40;&amp;&#126;=':x&#41;&#95;x}</code> |
+
 ## [maximum-average-ord](https://codegolf.stackexchange.com/questions/254224/maximum-average-ord)
 
 | language | rank | bytes | code |
@@ -772,6 +851,7 @@
 | [Uiua](https://codegolf.stackexchange.com/questions/254224/maximum-average-ord/266147#266147) | 20 | 15b | <code>/↥∵&#40;÷⊃⧻/+&#45;@&#92;0⊔&#41;</code> |
 | [J](https://codegolf.stackexchange.com/questions/254224/maximum-average-ord/254365#254365) | 22 | 18b | <code>&#91;:&gt;./&#40;1#.3&amp;u:%#&#41;&amp;&gt;</code> |
 | [J-uby](https://codegolf.stackexchange.com/questions/254224/maximum-average-ord/254582#254582) | 23 | 30b | <code>:&#42;&amp;:/%&#91;:bytes&#124;:sum,:+@&#124;Q&#93;&#124;:max</code> |
+
 ## [generate-parity-bits](https://codegolf.stackexchange.com/questions/252491/generate-parity-bits)
 
 | language | rank | bytes | code |
@@ -788,6 +868,7 @@
 | [Pyth](https://codegolf.stackexchange.com/questions/252491/generate-parity-bits/252530#252530) | 10 | 18b | <code>pz.&#91;&#92;0KE.B%/z&#92;1^2K</code> |
 | [J](https://codegolf.stackexchange.com/questions/252491/generate-parity-bits/252542#252542) | 11 | 19b | <code>&#91;,&#40;&#93;#2:&#41;#:+/@&#91;&#124;&#126;2^&#93;</code> |
 | [Pip](https://codegolf.stackexchange.com/questions/252491/generate-parity-bits/253611#253611) | 12 | 28b | <code>a.&#40;J&#40;0&#42;,bALTB&#40;$+a&#41;%2Eb&#41;&#41;@&gt;&#45;b</code> |
+
 ## [biplex-an-important-useless-operator](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator)
 
 | language | rank | bytes | code |
@@ -800,6 +881,7 @@
 | [APL](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/63389#63389) | 6 | 27b | <code>{2⊥S∊&#40;⌈/,⌊/&#41;0&#126;⍨S←+/⍵⊤⍨32⍴2}</code> |
 | [CJam](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/62714#62714) | 6 | 27b | <code>q&#126;2fbWf%:.+&#95;0&#45;$&#40;&#92;W&gt;&#124;fe=W%2b</code> |
 | [Pyt](https://codegolf.stackexchange.com/questions/62713/biplex-an-important-useless-operator/274263#274263) | 8 | 31b | <code>2⁴⁸Đ←+ɓąƖĐŁ⑴⊤·ĐĐŁř1=¬&#42;ž↕∈Ɩǰ2Ĩ⇹%</code> |
+
 ## [sum-every-second-digit-in-a-number](https://codegolf.stackexchange.com/questions/255650/sum-every-second-digit-in-a-number)
 
 | language | rank | bytes | code |
@@ -825,6 +907,7 @@
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/255650/sum-every-second-digit-in-a-number/255983#255983) | 19 | 13b | <code>+/&#40;2!!#:&#41;#10&#92;</code> |
 | [BQN](https://codegolf.stackexchange.com/questions/255650/sum-every-second-digit-in-a-number/255698#255698) | 20 | 18b | <code>1⊑·+˝⌊‿2⥊'0'&#45;˜•Fmt</code> |
 | [J](https://codegolf.stackexchange.com/questions/255650/sum-every-second-digit-in-a-number/255734#255734) | 21 | 19b | <code>1&#40;#.&#93;&#42;0 1$&#126;#&#41;,.&amp;.&quot;:</code> |
+
 ## [generate-an-arbitrary-half-of-a-string](https://codegolf.stackexchange.com/questions/250213/generate-an-arbitrary-half-of-a-string)
 
 | language | rank | bytes | code |
@@ -840,6 +923,7 @@
 | [Charcoal](https://codegolf.stackexchange.com/questions/250213/generate-an-arbitrary-half-of-a-string/250218#250218) | 9 | 9b | <code>Φθ﹪№…θκι²</code> |
 | [Japt `-g`](https://codegolf.stackexchange.com/questions/250213/generate-an-arbitrary-half-of-a-string/273860#273860) | 9 | 9b | <code>í ñÎë ñÌÕ</code> |
 | [J](https://codegolf.stackexchange.com/questions/250213/generate-an-arbitrary-half-of-a-string/250223#250223) | 11 | 11b | <code>#&#126;2&#124;1#.&#93;=&#93;&#92;</code> |
+
 ## [list-of-possible-birth-years-of-living-humans](https://codegolf.stackexchange.com/questions/89494/list-of-possible-birth-years-of-living-humans)
 
 | language | rank | bytes | code |
@@ -856,6 +940,7 @@
 | [CJam](https://codegolf.stackexchange.com/questions/89494/list-of-possible-birth-years-of-living-humans/89517#89517) | 10 | 11b | <code>et0=121,f&#45;p</code> |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/89494/list-of-possible-birth-years-of-living-humans/253161#253161) | 11 | 12b | <code>{x,x&#45;1+!120}</code> |
 | [K](https://codegolf.stackexchange.com/questions/89494/list-of-possible-birth-years-of-living-humans/89555#89555) | 12 | 27b | <code>1@", "/:$&#40;&#96;year$.z.d&#41;&#45;!121;</code> |
+
 ## [triangular-polkadot-numbers](https://codegolf.stackexchange.com/questions/253309/triangular-polkadot-numbers)
 
 | language | rank | bytes | code |
@@ -867,6 +952,7 @@
 | Myby | 5 | 11b | <code>R +" R +" R { ^ ! &#62;:@^&2"@R</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/253309/triangular-polkadot-numbers/253351#253351) | 6 | 22b | <code>ＮθＦθＦ⊕ι⊞υ×ιιＩＥ…υθ⊕⁺ι⊗κ</code> |
 | [Pip](https://codegolf.stackexchange.com/questions/253309/triangular-polkadot-numbers/253467#253467) | 7 | 24b | <code>&#40;&#40;RTDBa&#45;0.5&#41;//1&#41;E2+DBa&#45;1</code> |
+
 ## [create-n-sublists-with-the-powers-of-two-1-2-4-8-16](https://codegolf.stackexchange.com/questions/255804/create-n-sublists-with-the-powers-of-two-1-2-4-8-16)
 
 | language | rank | bytes | code |
@@ -885,6 +971,7 @@
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/255804/create-n-sublists-with-the-powers-of-two-1-2-4-8-16/256019#256019) | 12 | 17b | <code>{&#40;x&#45;1&#41;&#40;1,,2&#42;&#41;/,1}</code> |
 | [Pyth](https://codegolf.stackexchange.com/questions/255804/create-n-sublists-with-the-powers-of-two-1-2-4-8-16/255817#255817) | 13 | 20b | <code>L+&#91;^2b&#41;?qtQbY&#91;yhb&#41;y0</code> |
 | [Pip](https://codegolf.stackexchange.com/questions/255804/create-n-sublists-with-the-powers-of-two-1-2-4-8-16/255819#255819) | 14 | 28b | <code>FiR,a{YlAEyPE EiUi=a?Y Hy0}y</code> |
+
 ## [write-some-random-english](https://codegolf.stackexchange.com/questions/199139/write-some-random-english)
 
 | language | rank | bytes | code |
@@ -899,6 +986,7 @@
 | [Pip](https://codegolf.stackexchange.com/questions/199139/write-some-random-english/251543#251543) | 7 | 12b | <code>RC&#42;&#91;.CZVW&#93;Ha</code> |
 | [Pyth](https://codegolf.stackexchange.com/questions/199139/write-some-random-english/252404#252404) | 9 | 19b | <code>J&quot;aeiou&quot;smO?%d2J&#45;GJ</code> |
 | [GolfScript](https://codegolf.stackexchange.com/questions/199139/write-some-random-english/199450#199450) | 10 | 36b | <code>,{&#91;'aeiou'.123,97&gt;^&#93;&#92;2%=.,rand=}%''+</code> |
+
 ## [repeat-every-other-character-in-string-starting-with-second-character](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character)
 
 | language | rank | bytes | code |
@@ -925,6 +1013,7 @@
 | [APL+WIN](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/198773#198773) | 20 | 13b | <code>&#40;&#40;⍴s&#41;⍴⍳2&#41;/s←⎕</code> |
 | [K4](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/198757#198757) | 21 | 17b | <code>{,/#'&#91;&#40;#x&#41;#1 2&#93;x}</code> |
 | [Ly](https://codegolf.stackexchange.com/questions/198717/repeat-every-other-character-in-string-starting-with-second-character/236946#236946) | 21 | 17b | <code>irs&#91;l!s&#91;p:o0&#93;po&#93;&gt;</code> |
+
 ## [is-it-true-ask-pip](https://codegolf.stackexchange.com/questions/256166/is-it-true-ask-pip)
 
 | language | rank | bytes | code |
@@ -937,6 +1026,7 @@
 | [Pip](https://codegolf.stackexchange.com/questions/256166/is-it-true-ask-pip/256248#256248) | 6 | 13b | <code>aRM0N'.&amp;!aQ'.</code> |
 | [grep `-Ex`](https://codegolf.stackexchange.com/questions/256166/is-it-true-ask-pip/272986#272986) | 6 | 13b | <code>&#124;0+&#92;.?0&#42;&#124;&#92;.0+</code> |
 | [Uiua](https://codegolf.stackexchange.com/questions/256166/is-it-true-ask-pip/266397#266397) | 8 | 18b | <code>&lt;∩≍¬⊚.=@.⊃▽'△.≠@0.</code> |
+
 ## [whats-the-file-extension](https://codegolf.stackexchange.com/questions/120925/whats-the-file-extension)
 
 | language | rank | bytes | code |
@@ -960,6 +1050,7 @@
 | [Uiua](https://codegolf.stackexchange.com/questions/120925/whats-the-file-extension/272576#272576) | 16 | 7b | <code>⇌↙⊗@..⇌</code> |
 | [Pip](https://codegolf.stackexchange.com/questions/120925/whats-the-file-extension/210383#210383) | 18 | 8b | <code>@R:a^&quot;.&quot;</code> |
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/120925/whats-the-file-extension/210258#210258) | 19 | 10b | <code>⊃∘⌽'.'∘≠⊆⊢</code> |
+
 ## [find-the-prime-signature](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature)
 
 | language | rank | bytes | code |
@@ -977,6 +1068,7 @@
 | [Pyt](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256155#256155) | 10 | 8b | <code>Đϼ1&#92;⇹ḋɔŞ</code> |
 | [J](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256159#256159) | 12 | 12b | <code>&#95;&#95;&#92;:&#126;@{:@q:&#93;</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/256147/find-the-prime-signature/256161#256161) | 13 | 56b | <code>Ｎθ≔²ηＷ⊖θ¿﹪θη≦⊕η«≔⁰ζＷ¬﹪θη«≦⊕ζ≧÷ηθ»⊞υζ»≔⟦⟧ζＷ⁻υζＦ№υ⌈ι⊞ζ⌈ιＩζ</code> |
+
 ## [calculate-the-progressive-mean](https://codegolf.stackexchange.com/questions/198884/calculate-the-progressive-mean)
 
 | language | rank | bytes | code |
@@ -987,6 +1079,7 @@
 | [J](https://codegolf.stackexchange.com/questions/198884/calculate-the-progressive-mean/198890#198890) | 4 | 17b | <code>&#45;:@+/@&#124;.&#40;,,&#45;&#41;+/%#</code> |
 | [APL (Dyalog Unicode)](https://codegolf.stackexchange.com/questions/198884/calculate-the-progressive-mean/198889#198889) | 5 | 18b | <code>&#40;2÷⍨+&#41;⌿∘⌽&#40;,,&#45;&#41;+⌿÷≢</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/198884/calculate-the-progressive-mean/198896#198896) | 6 | 27b | <code>≔∕ΣθＬθη≔§θ⁰ζＦθ≔⊘⁺ιζζＩ⟦ηζ⁻ζη</code> |
+
 ## [what-do-you-get-when-you-multiply-6-by-9-42](https://codegolf.stackexchange.com/questions/124242/what-do-you-get-when-you-multiply-6-by-9-42)
 
 | language | rank | bytes | code |
@@ -1011,6 +1104,7 @@
 | [Q](https://codegolf.stackexchange.com/questions/124242/what-do-you-get-when-you-multiply-6-by-9-42/124915#124915) | 18 | 17b | <code>{&#40;prd x;42&#41;x&#126;6 9}</code> |
 | [GolfScript](https://codegolf.stackexchange.com/questions/124242/what-do-you-get-when-you-multiply-6-by-9-42/124338#124338) | 19 | 18b | <code>."6 9"={;42}{&#126;&#42;}if</code> |
 | [Prolog](https://codegolf.stackexchange.com/questions/124242/what-do-you-get-when-you-multiply-6-by-9-42/124892#124892) | 20 | 33b | <code>multiplication&#40;6, 9, 42&#41; :&#45; !.</code> <br/> <code>multiplication&#40;X, Y, Z&#41; :&#45; Z is X &#42; Y.</code> |
+
 ## [find-the-largest-and-the-smallest-number-in-an-array](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array)
 
 | language | rank | bytes | code |
@@ -1030,6 +1124,7 @@
 | [Jolf](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/71248#71248) | 13 | 20b | <code>γ fxd='nF&#126;tH0ͺZkγZKγ</code> <br/> <code> &#95;fx                 filter the input</code> <br/> <code>    d='nF&#126;tH0        checking for number type</code> <br/> <code>γ                    call that "γ"</code> <br/> <code>             ͺ       pair</code> <br/> <code>              ZkγZKγ  the min and max of the array</code> |
 | [𝔼𝕊𝕄𝕚𝕟](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/71258#71258) | 13 | 20b | <code>&#91;МƲ&#40;ï⇔⒡≔=+$⸩,МƵï</code> |
 | [MATL](https://codegolf.stackexchange.com/questions/71172/find-the-largest-and-the-smallest-number-in-an-array/71180#71180) | 15 | 23b | <code>"@Y:tX%1&#41;2&#92;?x&#93;N$htX&lt;wX&gt;</code> |
+
 ## [is-this-number-an-integer-power-of-2](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2)
 
 | language | rank | bytes | code |
@@ -1037,8 +1132,8 @@
 | [05AB1E](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/216718#216718) | 1 | 4b | <code>2&#40;вO</code> |
 | Myby | 1 | 4b | <code># e. &#95;2 ^" R</code> |
 | [Vyxal](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/256288#256288) | 1 | 4b | <code>2Nτ∑</code> |
-| [Japt `-!`](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/231626#231626) | 4 | 6b | <code>ì´J Åx</code> |
-| [Jelly](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/120257#120257) | 4 | 6b | <code>AḶ&#45;2&#42;i</code> |
+| [Jelly](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/115544#115544) | 4 | 5b | <code>æḟ&#45;2=</code> |
+| [Japt `-!`](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/231626#231626) | 5 | 6b | <code>ì´J Åx</code> |
 | [Brachylog](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/243457#243457) | 6 | 7b | <code>ḃb&#45;₂ᵐ×?</code> |
 | [Pyth](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/116767#116767) | 6 | 7b | <code>!tsjQ&#95;2</code> |
 | [Thunno 2](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/261888#261888) | 6 | 7b | <code>AĖuḌ@$Ƈ</code> |
@@ -1050,6 +1145,7 @@
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/216680#216680) | 14 | 14b | <code>{&#124;/x=&#42;&#92;1,x#&#45;2}</code> |
 | [Risky](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/241961#241961) | 14 | 14b | <code>&#95;&#95;&#45;+&#95;&#45;2{&#91;?+&#95;0:&#95;&#95;0+&#95;0+&#95;&#95;?+&#95;0</code> |
 | [J](https://codegolf.stackexchange.com/questions/115516/is-this-number-an-integer-power-of-2/243459#243459) | 16 | 17b | <code>+/@&#40;=&#95;2:^i.@&gt;:@&#124;&#41;</code> |
+
 ## [number-triangle-flip](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip)
 
 | language | rank | bytes | code |
@@ -1064,6 +1160,7 @@
 | [Pyt](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/151759#151759) | 8 | 12b | <code>←Đ2&#42;√½+⌊²&#45;&#126;⁺</code> |
 | [J](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/256297#256297) | 9 | 19b | <code>1&#45;&#93;&#45;0.5&#42;:@&lt;.@+%:@+:</code> |
 | [APL (Dyalog)](https://codegolf.stackexchange.com/questions/117879/number-triangle-flip/119407#119407) | 10 | 27b | <code>⊢⊃⊃∘&#40;,/{⌽&#40;+/⍳⍵&#45;1&#41;+⍳⍵}¨∘⍳&#41;</code> |
+
 ## [replace-all-vowels-with-repeated-aeiou](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou)
 
 | language | rank | bytes | code |
@@ -1078,6 +1175,7 @@
 | [Pyth](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/255784#255784) | 7 | 25b | <code>sm?}r0dK&quot;uaeio&quot;r@K=hZrId1</code> |
 | [Charcoal](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/255777#255777) | 9 | 28b | <code>≔uaeioθ⭆Ｓ⎇№θ↧ι§⎇№αι↥θθＬ⊞Ｏυιι</code> |
 | [Ly](https://codegolf.stackexchange.com/questions/255765/replace-all-vowels-with-repeated-aeiou/255806#255806) | 10 | 58b | <code>&quot;uoiea&quot;&gt;ir&#91;s&lt;l'ZLsf:l' &#42;+fsp&#126;&#91;p' &#42;sp:l&#45;s&gt;pl&lt;psprlr00&#93;pp&gt;o&#93;</code> |
+
 ## [print-invisible-text](https://codegolf.stackexchange.com/questions/122703/print-invisible-text)
 
 | language | rank | bytes | code |
@@ -1114,6 +1212,7 @@
 | [Carrot](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/133567#133567) | 30 | 12b | <code>#^//&#40;&#41;/gS&quot; &quot;</code> |
 | [K (ngn/k)](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/253242#253242) | 31 | 13b | <code>{x,&#40;1+#x&#41;#&quot;&quot;}</code> |
 | [pb](https://codegolf.stackexchange.com/questions/122703/print-invisible-text/122813#122813) | 32 | 17b | <code>^w&#91;B!0&#93;{&gt;}&lt;vb&#91;32&#93;</code> |
+
 ## [draw-an-asterisk-triangle](https://codegolf.stackexchange.com/questions/95780/draw-an-asterisk-triangle)
 
 | language | rank | bytes | code |
@@ -1136,6 +1235,7 @@
 | [GolfScript](https://codegolf.stackexchange.com/questions/95780/draw-an-asterisk-triangle/197018#197018) | 16 | 11b | <code>&#126;,{&#41;"&#42;"&#42;n}%</code> |
 | [K](https://codegolf.stackexchange.com/questions/95780/draw-an-asterisk-triangle/111317#111317) | 17 | 12b | <code>{&#96;0:,&#92;x#"&#42;"}</code> <br/> <code></code> <br/> <code>{          } /function&#40;x&#41;</code> <br/> <code>      x#"&#42;"  /reshape "&#42;" by x</code> <br/> <code>    ,&#92;       /scan concatenation through the list</code> <br/> <code> &#96;0:         /print line by line</code> |
 | [Pyt](https://codegolf.stackexchange.com/questions/95780/draw-an-asterisk-triangle/153142#153142) | 18 | 17b | <code>←ř↔0⇹Á&#96;⑴67&#42;&#42;Ƈǰƥłŕ</code> |
+
 ## [given-an-int-input-n-print-out-nreversedn](https://codegolf.stackexchange.com/questions/144816/given-an-int-input-n-print-out-nreversedn)
 
 | language | rank | bytes | code |
@@ -1165,3 +1265,4 @@
 | [J-uby](https://codegolf.stackexchange.com/questions/144816/given-an-int-input-n-print-out-nreversedn/255187#255187) | 23 | 11b | <code>:&#42;%&#40;S&#124;:&#126;&#124;Z&#41;</code> |
 | [APL (NARS)](https://codegolf.stackexchange.com/questions/144816/given-an-int-input-n-print-out-nreversedn/181155#181155) | 24 | 16b | <code>{⍵×⍎⌽⍕⍵}</code> |
 | [Gol&#62;&#60;&#62;](https://codegolf.stackexchange.com/questions/144816/given-an-int-input-n-print-out-nreversedn/156469#156469) | 25 | 21b | <code>I:WaSD$&#124;r}l3&#45;Fa&#42;+&#124;+&#42;h</code> |
+
