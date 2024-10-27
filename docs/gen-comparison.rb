@@ -3,11 +3,15 @@ require 'digest'
 require 'open-uri'
 require 'cgi'
 
+Dir.chdir File.dirname __FILE__
+
 problems = JSON::parse File.read("./../example/golf/problems.json")
 existing = File.read("./comparison.md").scan(/## \[(.+?)\]/).map(&:first)
 
-needed = problems.reject { |prob| existing.include? prob["name"] }
-ids = needed.map { _1["id"] }
+needed = problems
+    .reject { |prob| existing.include? prob["name"] }
+    .select { |prop| prob["id"]["csge"] }
+ids = needed.map { _1["id"][/\d+/] }
     
 if ids.empty?
     puts "No updates needed, exiting"
@@ -19,7 +23,7 @@ def unique_id(ids)
     Digest::MD5.hexdigest ids.sort * ";"
 end
 
-file_id = unique_id(ids) + ".json"
+file_id = "./.cache/" + unique_id(ids) + ".json"
 
 def scrape(ids, page)
     api = "https://api.stackexchange.com/2.3/questions/" +
@@ -29,7 +33,7 @@ def scrape(ids, page)
         "&site=codegolf&" +
         "filter=!3uiiRrdzLXJgGFmRm"
     content = URI.open(api).read
-    File.write "_lastscrape.json", content
+    File.write "./.cache/_lastscrape.json", content
     JSON::parse content
 end
 

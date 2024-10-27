@@ -54,7 +54,7 @@ problems.each.with_index { |problem, i|
         if problem["decision"] && problem["inverted"]
             result = result == "false" ? "true" : "false"
         end
-        codepath = File.join base, "#{name}.myby"
+        codepath = File.join base, "solutions", "#{name}.myby"
         unless File.exist? codepath
             raise "Could not find file at #{codepath}"
         end

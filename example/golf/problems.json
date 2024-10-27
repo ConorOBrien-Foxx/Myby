@@ -1,6 +1,6 @@
 [
     {
-        "id": 50240,
+        "id": "cgse50240",
         "name": "xor-multiplication",
         "tests": [
             { "x": 0, "y": 1, "result": 0 },
@@ -18,7 +18,7 @@
         ]
     },
     {
-        "id": 252082,
+        "id": "cgse252082",
         "name": "reconstruct-matrix-from-its-diagonals",
         "tests": [
             { "x": [[5]], "result": [[5]] },
@@ -40,7 +40,7 @@
         ]
     },
     {
-        "id": 142071,
+        "id": "cgse142071",
         "name": "find-the-sum-of-the-divisors-of-n",
         "tests": [
             { "x": 7, "result": 8 },
@@ -51,7 +51,7 @@
         ]
     },
     {
-        "id": 85,
+        "id": "cgse85",
         "name": "fibonacci-function-or-sequence",
         "tests": [
             { "x": 1, "result": 1 },
@@ -65,7 +65,7 @@
         ]
     },
     {
-        "id": 38325,
+        "id": "cgse38325",
         "name": "minimum-excluded-number",
         "tests": [
             {"x":[1],"result":0},
@@ -81,7 +81,7 @@
         ]
     },
     {
-        "id": 106149,
+        "id": "cgse106149",
         "name": "compute-the-median",
         "tests": [
             {"x":[1,2,3,4,5,6,7,8,9], "result":5},
@@ -91,7 +91,7 @@
         ]
     },
     {
-        "id": 251594,
+        "id": "cgse251594",
         "name": "find-the-nth-mersenne-prime",
         "tests": [
             {"x":1, "result":3},
@@ -102,7 +102,7 @@
         ]
     },
     {
-        "id": 130454,
+        "id": "cgse130454",
         "name": "product-of-divisors",
         "tests": [
             {"x":1, "result":1},
@@ -124,7 +124,7 @@
         ]
     },
     {
-        "id": 208982,
+        "id": "cgse208982",
         "name": "antisymmetry-of-a-matrix",
         "tests": [
             {"x":[[0,2,-1],[-2,0,0],[1,0,0]], "result":true},
@@ -134,12 +134,12 @@
         ]
     },
     {
-        "id": 5977,
+        "id": "cgse5977",
         "name": "list-of-primes-under-a-million",
         "tests": []
     },
     {
-        "id": 1744,
+        "id": "cgse1744",
         "name": "mathematical-combination",
         "tests": [
             {"x":"5,2", "result":10},
@@ -151,7 +151,7 @@
         ]
     },
     {
-        "id": 185674,
+        "id": "cgse185674",
         "name": "pwas-eht-tirsf-dna-tasl-setterl-fo-hace-dorw",
         "tests": [
             {
@@ -181,7 +181,7 @@
         ]
     },
     {
-        "id": 252189,
+        "id": "cgse252189",
         "name": "carryless-factors",
         "tests": [
             {"x":2,"result":[1,2]},
@@ -196,7 +196,7 @@
         "note": "Too long for x=574,5040,848640."
     },
     {
-        "id": 240612,
+        "id": "cgse240612",
         "name": "scan-a-ragged-list",
         "tests": [
             {"x":[], "result":[]},
@@ -216,7 +216,7 @@
         ]
     },
     {
-        "id": 136713,
+        "id": "cgse136713",
         "name": "find-the-first-duplicated-element",
         "tests": [
             {"x":[2, 3, 3, 1, 5, 2], "result":3},
@@ -224,7 +224,7 @@
         ]
     },
     {
-        "id": 252758,
+        "id": "cgse252758",
         "name": "number-to-string-in-aaaaa-way",
         "tests": [
             {"x":[4,3,2,1,3], "result":["d","c","b","a","c"]},
@@ -234,7 +234,7 @@
         ]
     },
     {
-        "id": 103377,
+        "id": "cgse103377",
         "name": "appending-string-lengths",
         "tests": [
             {"x":"aaa", "result":"aaa4"},
@@ -253,7 +253,7 @@
         "note": "Alternative 6b: #+=+@+HG"
     },
     {
-        "id": 167818,
+        "id": "cgse167818",
         "name": "concatenating-n-with-n-1",
         "tests": [
             {"x":1, "result": [1]},
@@ -263,7 +263,7 @@
         ]
     },
     {
-        "id": 252442,
+        "id": "cgse252442",
         "name": "repeat-values-in-array",
         "tests": [
             {"y":[1,2,3], "x":[1,2,3], "result":[1,2,2,3,3,3]},
@@ -272,7 +272,7 @@
         ]
     },
     {
-        "id": 224000,
+        "id": "cgse224000",
         "name": "are-all-the-items-the-same",
         "tests": [
             {"x":[1, 1, 1, 1, 1, 1, 1], "result":true},
@@ -284,7 +284,7 @@
         ]
     },
     {
-        "id": 150563,
+        "id": "cgse150563",
         "name": "modulus-summation",
         "tests": [
             {"x":2, "result":0},
@@ -294,7 +294,7 @@
         ]
     },
     {
-        "id": 241357,
+        "id": "cgse241357",
         "name": "implement-an-argwhere-function",
         "tests": [
             {
@@ -325,7 +325,7 @@
         ]
     },
     {
-        "id": 241267,
+        "id": "cgse241267",
         "name": "remove-odd-indices-and-double-the-even-indices",
         "tests": [
             {"x":"abcdef", "result":"bbddff"},
@@ -342,7 +342,7 @@
         ]
     },
     {
-        "id": 64315,
+        "id": "cgse64315",
         "name": "separate-a-list-into-even-indexed-and-odd-indexed-parts",
         "tests": [
             {"x":[0, 1, 2, 3, 4], "result":[0, 2, 4, 1, 3]},
@@ -354,7 +354,7 @@
         "note": "Alternative 7b: ({ % 2)G&.!"
     },
     {
-        "id": 146402,
+        "id": "cgse146402",
         "name": "count-the-changes-in-an-array",
         "tests": [
             {"x":[],"result":0},
@@ -372,7 +372,7 @@
         ]
     },
     {
-        "id": 55051,
+        "id": "cgse55051",
         "name": "twisting-words",
         "tests": [
             {
@@ -388,7 +388,7 @@
         ]
     },
     {
-        "id": 63772,
+        "id": "cgse63772",
         "name": "determine-the-color-of-a-chess-square",
         "tests": [
             {"x":"b1","result":"light"},
@@ -397,7 +397,7 @@
         ]
     },
     {
-        "id": 108675,
+        "id": "cgse108675",
         "name": "is-this-word-lexically-ordered",
         "tests": [
             {"x":"ABCDEF", "result":true},
@@ -412,7 +412,7 @@
         "note": "Alternative 6b: (# e. #`-@%) /"
     },
     {
-        "id": 137632,
+        "id": "cgse137632",
         "name": "triangle-a-number",
         "tests": [
             {"x":[0], "result":0},
@@ -425,7 +425,7 @@
         ]
     },
     {
-        "id": 203893,
+        "id": "cgse203893",
         "name": "bl-lu-ur-rr-ry-yv-vi-is-si-io-on-blur-the-text",
         "tests": [
             {"x":"Ab","result":"Ab"},
@@ -441,7 +441,7 @@
         ]
     },
     {
-        "id": 165793,
+        "id": "cgse165793",
         "name": "new-password-idea-word-walker",
         "tests": [
             {"x":"Once Upon A Time","result":"OpAe"},
@@ -453,7 +453,7 @@
         "note": "Alternative 12.5b: > {\\\" ! +-@>:@<:H\" /&' ' @."
     },
     {
-        "id": 60610,
+        "id": "cgse60610",
         "name": "non-unique-duplicate-elements",
         "tests": [
             {"x":[],"result":[]},
@@ -465,7 +465,7 @@
         "note": "Alternative 7b: /#(+\\>1)\"@="
     },
     {
-        "id": 253568,
+        "id": "cgse253568",
         "name": "alphabet-checksum",
         "tests": [
             {"x":"helloworld", "result":"k"},
@@ -476,7 +476,7 @@
         ]
     },
     {
-        "id": 255850,
+        "id": "cgse255850",
         "name": "8086-segment-address",
         "tests": [
             {"x":"0000:0000", "result":0},
@@ -486,7 +486,7 @@
         ]
     },
     {
-        "id": 111707,
+        "id": "cgse111707",
         "name": "simple-csv-dsv-importer",
         "tests": [
             {
@@ -507,7 +507,7 @@
         ]
     },
     {
-        "id": 255822,
+        "id": "cgse255822",
         "name": "replace-0s-in-a-string-with-their-consecutive-counts",
         "tests": [
             {"x":"1234500362000440", "result":"1234523623441"},
@@ -521,7 +521,7 @@
         "note": "Alternative 11b: >@(('0'&e.{#`+)\" #C)"
     },
     {
-        "id": 254224,
+        "id": "cgse254224",
         "name": "maximum-average-ord",
         "tests": [
             {"x":["hello","world","bye"], "result":110.4},
@@ -532,7 +532,7 @@
         "float_precision": 3
     },
     {
-        "id": 252491,
+        "id": "cgse252491",
         "name": "generate-parity-bits",
         "tests": [
             {
@@ -558,7 +558,7 @@
         ]
     },
     {
-        "id": 62713,
+        "id": "cgse62713",
         "name": "biplex-an-important-useless-operator",
         "tests": [
             {"x":[1], "result":1},
@@ -570,7 +570,7 @@
         ]
     },
     {
-        "id": 255650,
+        "id": "cgse255650",
         "name": "sum-every-second-digit-in-a-number",
         "tests": [
             {"x":10, "result":0},
@@ -589,7 +589,7 @@
         ]
     },
     {
-        "id": 250213,
+        "id": "cgse250213",
         "name": "generate-an-arbitrary-half-of-a-string",
         "tests": [
             {"x": "aaaabbbb", "result": ["aabb"]},
@@ -606,12 +606,12 @@
         ]
     },
     {
-        "id": 89494,
+        "id": "cgse89494",
         "name": "list-of-possible-birth-years-of-living-humans",
         "tests": []
     },
     {
-        "id": 253309,
+        "id": "cgse253309",
         "name": "triangular-polkadot-numbers",
         "tests": [
             {"x":15, "result":[1, 4, 6, 11, 13, 15, 22, 24, 26, 28, 37, 39, 41, 43, 45]}
@@ -621,7 +621,7 @@
         ]
     },
     {
-        "id": 255804,
+        "id": "cgse255804",
         "name": "create-n-sublists-with-the-powers-of-two-1-2-4-8-16",
         "tests": [
             {"x":1, "result":[1]},
@@ -641,7 +641,7 @@
         ]
     },
     {
-        "id": 199139,
+        "id": "cgse199139",
         "name": "write-some-random-english",
         "tests": [],
         "alternatives": [
@@ -650,7 +650,7 @@
         ]
     },
     {
-        "id": 198717,
+        "id": "cgse198717",
         "name": "repeat-every-other-character-in-string-starting-with-second-character",
         "tests": [
             {"x":"abcde", "result":"abbcdde"},
@@ -662,7 +662,7 @@
         ]
     },
     {
-        "id": 256166,
+        "id": "cgse256166",
         "name": "is-it-true-ask-pip",
         "tests": [
             {"x":"", "result":false},
@@ -693,7 +693,7 @@
         ]
     },
     {
-        "id": 120925,
+        "id": "cgse120925",
         "name": "whats-the-file-extension",
         "tests": [
             {"x":"hi.txt", "result": ["txt", ".txt"]},
@@ -706,7 +706,7 @@
         "option": true
     },
     {
-        "id": 256147,
+        "id": "cgse256147",
         "name": "find-the-prime-signature",
         "tests": [
             {"x":1, "result":[]},
@@ -761,7 +761,7 @@
         ]
     },
     {
-        "id": 198884,
+        "id": "cgse198884",
         "name": "calculate-the-progressive-mean",
         "tests": [
             {"x":[1,2,3], "result": [2.0, 2.25, 0.25]},
@@ -777,7 +777,7 @@
         "unordered": true
     },
     {
-        "id": 124242,
+        "id": "cgse124242",
         "name": "what-do-you-get-when-you-multiply-6-by-9-42",
         "tests": [
             {"x":6, "y":8, "result":48},
@@ -795,7 +795,7 @@
         ]
     },
     {
-        "id": 71172,
+        "id": "cgse71172",
         "name": "find-the-largest-and-the-smallest-number-in-an-array",
         "tests": [
             {"x":[1, 2, 3, 4, 5, 6, 7, 8], "result":[1, 8]},
@@ -811,7 +811,7 @@
         ]
     },
     {
-        "id": 115516,
+        "id": "cgse115516",
         "name": "is-this-number-an-integer-power-of-2",
         "tests": [
             {"x":-2, "result":true},
@@ -829,7 +829,7 @@
         ]
     },
     {
-        "id": 117879,
+        "id": "cgse117879",
         "name": "number-triangle-flip",
         "tests": [
             {"x":1, "result":1},
@@ -854,7 +854,7 @@
         ]
     },
     {
-        "id": 255765,
+        "id": "cgse255765",
         "name": "replace-all-vowels-with-repeated-aeiou",
         "tests": [
             {
@@ -868,7 +868,7 @@
         ]
     },
     {
-        "id": 122703,
+        "id": "cgse122703",
         "name": "print-invisible-text",
         "tests": [
             {"x":"Hello, World!", "result":"             "},
@@ -883,7 +883,7 @@
         ]
     },
     {
-        "id": 95780,
+        "id": "cgse95780",
         "name": "draw-an-asterisk-triangle",
         "tests": [
             {"x":1, "result":"*"},
@@ -895,7 +895,7 @@
         ]
     },
     {
-        "id": 144816,
+        "id": "cgse144816",
         "name": "given-an-int-input-n-print-out-nreversedn",
         "tests": [
             {"x":5, "result":25},
