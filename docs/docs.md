@@ -469,6 +469,8 @@ h e ll o !
 
 ### `O` - Split Compose
 
+### `?` - Ternary
+
 ## Verbs
 
 ### `+` - Add
@@ -790,7 +792,8 @@ NB. @ is necessary here, since ;'s marked arity is 2, and (;5) redirects to ;&5
 
 | Signature | Explanation |
 |----|----|
-| list → any; string → string | Last element of |
+| list → any <br/> string → string | Last element of |
+| list, number → list(list) <br/> string, number → list(string) | Split at index |
 
 ### `=` - Equality
 

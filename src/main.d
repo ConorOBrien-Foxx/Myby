@@ -95,9 +95,9 @@ int main(string[] args) {
         "nocode|x", "Prevents program execution", &noCode,
         "truthy|y", "Coalesces the return value to truthy/falsey", &forceTruthy,
         "size|s", "Measures the size of the program", &measureSize,
-        "f", "Sets verb F:", &fValue,
-        "g", "Sets verb G:", &gValue,
-        "h", "Sets verb H:", &hValue,
+        "F", "Sets verb F:", &fValue,
+        "G", "Sets verb G:", &gValue,
+        "H", "Sets verb H:", &hValue,
         // quick aliases for other commands
         // "K", "know.rb", &scriptKnow,
         // "R", "runner.rb", &scriptRunner,

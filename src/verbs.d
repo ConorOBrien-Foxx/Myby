@@ -452,6 +452,14 @@ Verb getVerb(InsName name) {
                 // multiset subtraction
                 (Atom[] a, Atom[] b) => Atom(multisetDifference(a, b)),
                 (string a, string b) => Atom(multisetDifference(a, b)),
+                // split at index
+                (Atom[] a, BigInt b) => Atom(splitAtIndex(a, b.to!long).map!Atom.array),
+                (string a, BigInt b) => Atom(
+                    splitAtIndex(a.atomChars, b.to!long)
+                        .map!joinToString
+                        .map!Atom
+                        .array
+                ),
                 (_1, _2) => Nil.nilAtom,
             )(l, r))
             .setMarkedArity(1);

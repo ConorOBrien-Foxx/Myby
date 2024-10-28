@@ -3,14 +3,21 @@ REM I hate batch.
 SET Error=0
 
 IF "%1"=="clean" GOTO :CLEAN
+SET TEST=
+IF "%1"=="test" SET TEST=test
 
 :COMPILE
     SET FLAGS=-g -w
+    IF "%TEST%" NEQ "" SET FLAGS=%FLAGS% -unittest
     SETLOCAL EnableDelayedExpansion
     SET FILES=src\main.d
     FOR %%A IN (src\*.d) DO IF "%%~nxA" NEQ "main.d" SET FILES=!FILES! %%A
     dmd %FLAGS% %FILES% -of=myby.exe
     SET Error=%ERRORLEVEL%
+    IF "%TEST%" NEQ "" (
+        ECHO Running unit tests...
+        myby.exe
+    )
     GOTO :End
 
 :CLEAN
