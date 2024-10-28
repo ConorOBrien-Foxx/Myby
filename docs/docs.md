@@ -484,12 +484,14 @@ h e ll o !
 
 | Signature | Explanation |
 |----|----|
-| int → int; real → real | Absolute value |
+| int → int <br/> real → real | Absolute value |
 | bool → int | `1` if `a`, `0` otherwise |
-| string → int; list → int | Length |
+| string → int <br/> list → int | Length |
 | number, number → number | Addition |
 | string, string → string | String concatenation |
-| list, list → list | list concatenation |
+| list, list → list | List concatenation |
+| list, any → list | List concatenation with singleton |
+| string, any → string <br/> any, string → string | String concatenation with implicit cast to string |
 
 ### `-` - Subtract
 
@@ -505,8 +507,10 @@ h e ll o !
 |----|----|
 | number → number | Negation |
 | bool → bool | Logical negation |
-| string → string; list → list | Reverse |
+| string → string <br/> list → list | Reverse |
 | number, number → number | Subtraction |
+| list, list → list <br/> string, string → string | Setwise difference. (Removes all copies of elements in `y` from `x`.) |
+| list, any → list <br/> any, list → list | Remove elements. (Deletes all copies of the non-list element from the list argument.) |
 
 ### `*` - Multiplication
 
@@ -525,8 +529,8 @@ h e ll o !
 | number → number | Sign. (1 if positive, -1 if negative, 0 if zero.) |
 | list → list | Flatten |
 | number, number → number | Multiplication |
-| string, number → string; number, string → string | Repeat |
-| list, string → string | Join by |
+| string, number → string <br/> number, string → string | Repeat |
+| list, string → string <br/> string, list → string | Join by |
 
 ### `/` - Division
 
@@ -546,8 +550,35 @@ h e ll o !
 | list → list | Unique |
 | number → real | Reciprocal |
 | number, number → number | Division |
-| list, number; string, number | Chunk. (Splits `x` into parts of no longer than `y`.) |
+| list, number → list(list) <br/> string, number → list(string) | Chunk. (Splits `x` into parts of no longer than `y`.) |
 | string, string → list(string) | Split. (Splits `x` on occurrences of `y`.) |
+| number, string → string | Impart case. (If `x` is negative, lowercase; if `x` is positive, uppercase; otherwise, no-op.) |
+| list(number), string → string | Impart case from mask. (Using elements from `x`, converts corresponding elements from `y` to lowercase if negative, uppercase if positive, or no-op otherwise.) |
+
+#### Examples
+
+```myby
+NB. Monads
+::: /@'asdf'
+a s d f
+::: /@1 1 2 3 3 3 4 5 1
+1 2 3 4 5
+::: /@2
+0.5
+NB. Dyads
+::: 4/5
+0.8
+::: 1 9 2 3 4 9 2 3 / 3
+1 9 2
+3 4 9
+2 3
+::: json 'hello, world, here' / ', '
+["hello","world","here"]
+::: json 1 0 _1 /" 'Hello!'
+["HELLO!","Hello!","hello!"]
+::: json 1 0 _1 / 'ABCDEF'
+ABc
+```
 
 ### `^` - Exponentiation
 
@@ -567,6 +598,7 @@ h e ll o !
 | number → list(number) | Inclusive range starting at 1 |
 | duration → real | Number of seconds |
 | number, number → number | Exponentiation |
+| list, any → number | Zero-index. (First index of `y` in `x`, starting with the first index being 0; -1 if not found.) |
 
 ### `#` - Identity
 
@@ -581,7 +613,7 @@ h e ll o !
 | Signature | Explanation |
 |----|----|
 | any → any | Identity |
-| string & number → string; list & number → list | Reshape |
+| string & number → string <br/> list & number → list | Reshape |
 | list, list | Filter. (Returns elements in `x` where the corresponding element in `y` is truthy, aka, `{" }\ ;" @.`.) |
 
 ### `R` - Range
@@ -599,7 +631,7 @@ h e ll o !
 | string → string | Lowercase |
 | number → list(number) | Range \[0,a). (Reversed if a < 0.) |
 | number, number → list(number) | Range [x,y] |
-| list, any → number; string, any → number | One-index. (First index of y in x, starting with the first index being 1; 0 if not found.) |
+| list, any → number <br/> string, any → number | One-index. (First index of `y` in `x`, starting with the first index being 1; 0 if not found.) |
 
 #### Examples
 
@@ -633,7 +665,39 @@ h e ll o !
 | Signature | Explanation |
 |----|----|
 | list → list | Sorted |
+| string → number | Charcode. (Converts the first character of the string `a` to its UTF-8 character code.) |
+| number → string | Ordinate. (Converts the number `a` into the corresponding one-character UTF-8 string.) |
 | number, number → number | Modulus |
+| list, list → list <br/> list, any → list | Intersection. (All items in `x` which can be found at least once in `y`.) |
+| number, list → list <br/> number, string → string | Uninterleave. (Every `x`th item in `y`.) |
+
+#### Examples
+
+```myby
+NB. Monads
+::: %@9 2 3 2 4
+2 2 3 4 9
+::: %@'Aunt'
+65
+::: % 67
+C
+NB. Dyads
+::: 150 % 7
+3
+::: 9 10 10 13 % 10 11 12
+10 10
+::: 9 10 10 13 % 10
+10 10
+::: 3 % 1 9 3 8 4 6 7
+1 8 7
+9 4
+3 6
+::: 2 % 1 9 3 8 4 6 7
+1 3 4 7
+9 8 6
+::: json 2 % 'hello'
+["hlo","el"]
+```
 
 ### `;` - Pair
 
@@ -711,8 +775,8 @@ NB. @ is necessary here, since ;'s marked arity is 2, and (;5) redirects to ;&5
 
 | Signature | Explanation |
 |----|----|
-| list → any; string → string | First element of |
-| number, list → any; number, string → string | `x`th element of `y`. (Implements modular indexing, i.e., wraps around. E.g., `_1{y` ⇔ `(+-1){y`.) |
+| list → any <br/> string → string | First element of |
+| number, list → any <br/> number, string → string | `x`th element of `y`. (Implements modular indexing, i.e., wraps around. E.g., `_1{y` ⇔ `(+-1){y`.) |
 
 ### `}` - Last
 
@@ -832,7 +896,7 @@ NB. @ is necessary here, since ;'s marked arity is 2, and (;5) redirects to ;&5
 
 | Signature | Explanation |
 |----|----|
-| any → any; any, any → any | Last Chain. (Calls the previous line of the program with the given arguments.) |
+| any → any <br/> any, any → any | Last Chain. (Calls the previous line of the program with the given arguments.) |
 
 #### Examples
 
@@ -857,7 +921,7 @@ NB.=> (#+5)^2
 
 | Signature | Explanation |
 |----|----|
-| any → any; any, any → any | Last Chain as Nilad. (Calls the previous line of the program, disregarding any arguments given to it.) |
+| any → any <br/> any, any → any | Last Chain as Nilad. (Calls the previous line of the program, disregarding any arguments given to it.) |
 
 ### `$:` - This Chain
 | Statistic | Value |
@@ -870,7 +934,7 @@ NB.=> (#+5)^2
 
 | Signature | Explanation |
 |----|----|
-| any → any; any, any → any | This Chain. (Recursion; calls the same line of the program with the given arguments.) |
+| any → any <br/> any, any → any | This Chain. (Recursion; calls the same line of the program with the given arguments.) |
 
 ### `$v` - Next Chain
 | Statistic | Value |
@@ -883,7 +947,7 @@ NB.=> (#+5)^2
 
 | Signature | Explanation |
 |----|----|
-| any → any; any, any → any | Next Chain. (Calls the *next* line of the program with the given arguments.) |
+| any → any <br/> any, any → any | Next Chain. (Calls the *next* line of the program with the given arguments.) |
 
 ### `echo`
 

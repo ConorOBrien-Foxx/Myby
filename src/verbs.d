@@ -42,7 +42,7 @@ Verb getVerb(InsName name) {
             // Addition
             .setDyad((Atom a, Atom b) => a + b)
             .setInverse(new Verb("+!.")
-                .setMonad(b => Nil.nilAtom)
+                .setMonad(b => assert(false, "Cannot invert monadic + (abs/length)"))
                 .setDyad((a, b) => a - b)
                 .setMarkedArity(2) // TODO: check if this is a bad idea
             )
@@ -161,7 +161,8 @@ Verb getVerb(InsName name) {
                 _ => Nil.nilAtom,
             ))
             .setDyad((Atom a, Atom b) => a % b)
-            .setInverseMutual(new Verb("!.")
+            // setInverseMutual is used for when the monad is its own inverse
+            .setInverseMutual(new Verb("%!.")
                 .setMonadSelf((Verb v, a) => v.inverse(a))
                 .setDyad((_1, _2) => Nil.nilAtom)
                 .setMarkedArity(1)
