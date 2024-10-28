@@ -63,7 +63,7 @@ tests = [
 def indent_all(str)
     return "" if str.nil?
     str.force_encoding "ASCII-8BIT"
-    str.inspect
+    str.lines.map { |line| " │ #{line}" }.join
 end
 
 success_count = 0
@@ -76,7 +76,7 @@ tests.each.with_index(1) { |test, i|
         failed = true
         expectation = test[:succeeds] ? "pass" : "fail"
         reality = status.success? ? "passed" : "failed"
-        fail_reason = "Expected the test to #{expectation}, but it actually #{reality}"
+        fail_reason = "Expected the test to #{expectation}, but it actually #{reality}:\n#{indent_all stderr}"
     
     elsif test[:output] != nil && !(test[:output] === stdout)
         failed = true
