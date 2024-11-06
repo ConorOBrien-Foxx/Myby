@@ -26,6 +26,6 @@ __dummy.html
 # Other weird files
 *.ilk
 *.pdb
-test.myby
-test.d
+/test.myby
+/test.d
 test.exe

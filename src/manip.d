@@ -581,6 +581,9 @@ Atom[] duplicateEach(T)(Atom[] arr, T by) {
 }
 
 S[][] splitAtIndex(S, T)(S[] arr, T index) {
+    if(index < 0) {
+        index += arr.length;
+    }
     index = min(max(0, index), arr.length);
     S[][] result = [
         arr[0..index],
@@ -592,7 +595,7 @@ S[][] splitAtIndex(S, T)(S[] arr, T index) {
 unittest {
     import myby.test : assertEqual;
     Atom[] a = [ 1, 2, 3, 4, 5 ].map!Atom.array;
-    assertEqual(splitAtIndex(a, -1), [ [ ], [ 1, 2, 3, 4, 5 ] ]);
+    assertEqual(splitAtIndex(a, -1), [ [ 1, 2, 3, 4 ], [ 5 ] ]);
     assertEqual(splitAtIndex(a, 0), [ [ ], [ 1, 2, 3, 4, 5 ] ]);
     assertEqual(splitAtIndex(a, 1), [ [ 1 ], [ 2, 3, 4, 5 ] ]);
     assertEqual(splitAtIndex(a, 2), [ [ 1, 2 ], [ 3, 4, 5 ] ]);

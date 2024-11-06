@@ -58,6 +58,12 @@ tests = [
         output: "#{n}\n",
         succeeds: true,
     } },
+    *%w(1.0 10.0 100.0 200.0 2.71828 3.5 3.14159265 0.0 _0.0 _1.0 _0.1 _0.00003 _2.0 _3.0).map { |n| {
+        input: "-l -e \"#{n}\"",
+        output: "#{n}\n",
+        succeeds: true,
+        comparison: :float,
+    } },
 ]
 
 def indent_all(str)
@@ -65,6 +71,8 @@ def indent_all(str)
     str.force_encoding "ASCII-8BIT"
     str.lines.map { |line| " │ #{line}" }.join
 end
+
+MAX_FLOAT_TOLERANCE = 1e-5
 
 success_count = 0
 tests.each.with_index(1) { |test, i|
@@ -78,10 +86,20 @@ tests.each.with_index(1) { |test, i|
         reality = status.success? ? "passed" : "failed"
         fail_reason = "Expected the test to #{expectation}, but it actually #{reality}:\n#{indent_all stderr}"
     
-    elsif test[:output] != nil && !(test[:output] === stdout)
-        failed = true
-        fail_reason = "Incongruent outputs.\nExpected:\n#{indent_all test[:output]}\nReceived:\n#{indent_all stdout}"
-    
+    elsif test[:output] != nil
+        if test[:comparison] == :float
+            out_float = stdout.tr("_", "-").to_f
+            expect_float = test[:output].tr("_", "-").to_f
+            diff = (out_float - expect_float).abs
+            if diff >= MAX_FLOAT_TOLERANCE
+                failed = true
+            end
+        elsif !(test[:output] === stdout)
+            failed = true
+        end
+        if failed
+            fail_reason = "Incongruent outputs.\nExpected:\n#{indent_all test[:output]}\nReceived:\n#{indent_all stdout}"
+        end
     elsif test[:error] != nil && !(test[:error] === stderr)
         failed = true
         fail_reason = "Incongruent stderrs.\nExpected:\n#{indent_all test[:error]}\nReceived:\n#{indent_all stderr}"

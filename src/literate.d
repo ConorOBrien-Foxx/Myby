@@ -6,6 +6,7 @@ import std.conv : to;
 import std.range : popFrontN, popBackN, retro;
 import std.stdio : writeln;
 import std.string : strip;
+import std.typecons : Tuple;
 
 import myby.debugger;
 import myby.instructions;
@@ -94,6 +95,12 @@ bool isAliasAlphabetic(T)(T c) {
     return 'a' <= c && c <= 'z';
 }
 
+alias SignStringPair = Tuple!(int, "sign", string, "rep");
+BigInt toBigInt(SignStringPair data, bool reverse=false) {
+    // we wrap `data.sign` in BigInt because of https://issues.dlang.org/show_bug.cgi?id=24844
+    return BigInt(data.sign) * BigInt(reverse ? to!string(data.rep.retro) : data.rep);
+}
+
 enum IdentifierPostfixes = [ '.', ':' ];
 enum IdentifierPrefixes = [ '$' ];
 enum MaxAliasCount = 32;
@@ -127,20 +134,28 @@ LiterateToken[] tokenizeLiterate(T)(T str) {
         return hasIndex(i + 1)
             && fn(str[i + 1]);
     }
-    
-    BigInt parseNumber(bool reverse=false) {
-        int sign = 1;
+
+    // `parseNumber` also parses sign, but combines them together; without this method,
+    // information would be lost in the case of `-0` for floating point parsing
+    SignStringPair parseSignAndNumber() {
+        SignStringPair result;
+        result.sign = 1;
         auto start = i;
         if(str[start] == '_') {
-            sign = -1;
+            result.sign = -1;
             start++;
             i++;
         }
         while(i < str.length && str[i].isDigit) {
             i++;
         }
-        string rep = str[start..i];
-        return sign * BigInt(reverse ? to!string(rep.retro) : rep);
+        result.rep = str[start..i];
+        return result;
+    }
+    
+    deprecated
+    BigInt parseNumber(bool reverse=false) {
+        return parseSignAndNumber().toBigInt(reverse);
     }
     
     string readAlphabetic() {
@@ -163,10 +178,18 @@ LiterateToken[] tokenizeLiterate(T)(T str) {
         }
         else if(str[i].isDigit || str[i] == '_' && hasAheadFn!isDigit) {
             // Integer or Real
-            token.head = parseNumber();
+            SignStringPair headData = parseSignAndNumber();
+            token.head = headData.toBigInt();
             if(i < str.length && str[i] == '.') {
                 i++;
                 token.tail = parseNumber(true);
+                // skip token.tail == 0 because -0.0 == 0.0
+                if(headData.sign < 0 && token.head == 0 && token.tail != 0) {
+                    assert(token.tail > 0, "Fraction part cannot be negative");
+                    // store the sign bit in the fractional part for the case of `-0.3` e.g.
+                    // because `-0` isn't a thing
+                    token.tail *= -1;
+                }
                 token.type = LiterateType.Real;
             }
             else {
@@ -385,6 +408,7 @@ Nibble[] parseLiterate(T)(T str) {
 
 // gonna keep this around for a bit, despite not being called
 // TODO: remove
+deprecated("prefer `parseLiteral`")
 Nibble[] parseLiterateOld(T)(T str) {
     str = str.strip;
     Nibble[] code;

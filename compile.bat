@@ -18,6 +18,10 @@ IF "%1"=="test" SET TEST=test
     dmd %FLAGS% %FILES% -of=myby.exe
     SET Error=%ERRORLEVEL%
     IF "%TEST%" NEQ "" (
+        IF "%Error%" NEQ "0" (
+            ECHO Tests did not compile, exiting...
+            GOTO :End
+        )
         ECHO Running compiled unit tests...
         myby.exe
         ECHO Recompiling without tests...

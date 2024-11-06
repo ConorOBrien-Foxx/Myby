@@ -16,12 +16,12 @@ import myby.nibble;
  *    | 3 | 3
  *    | 4 | 4
  *    | 5 | 5
- *    | 6 | 8
- *    | 7 | 9
+ *    | 6 | -2 (USED TO BE 8)
+ *    | 7 | -1 (USED TO BE 9)
  *    | 8 | 10
  *    | 9 | Overridden: ?.
  *    | a | A pair of numbers
- *    | b | A real number encoded using the next two integers
+ *    | b | A real number x.y encoded using the next two integers (x and y)
  *    | cw | A special constant encoded using the next nibble
  *    | c0 | 6
  *    | c1 | 1000
@@ -35,8 +35,8 @@ import myby.nibble;
  *    | c9 | 100
  *    | ca | 255
  *    | cb | 1000000
- *    | cc | -2
- *    | cd | -1
+ *    | cc | 8 (USED TO BE -2)
+ *    | cd | 9 (USED TO BE -1)
  *    | ce | A triple of numbers
  *    | cfq* | A series of q numbers in a row
  *    | dww  | A number encoded using the next two nibbles
@@ -47,7 +47,7 @@ import myby.nibble;
 
 enum BaseConstants = [
     0, 1, 2, 3, 4,
-    5, 8, 9, 10
+    5, -2, -1, 10
 ];
 
 enum OneMillionPlaceholder = -3; // limits inferred cache size
@@ -56,7 +56,7 @@ enum ExtraConstants = [
     6, 1000, 16, 32, 64,
     128, 256, 15, 1024,
     100, 255,
-    OneMillionPlaceholder, -2, -1
+    OneMillionPlaceholder, 8, 9
 ];
 enum HIGHEST_NEGATIVE = -3;
 
@@ -306,12 +306,31 @@ BigInt nibblesToInteger(Nibble[] nibbles) {
     return nibblesToInteger(nibbles, i);
 }
 
-Nibble[] realToNibbles(BigInt num, BigInt den)
+unittest {
+    import myby.test : assertEqual;
+    import std.algorithm : each, substitute;
+    // don't test for underyling representation, just test for correctness in encode/decode
+    void assertCorrectEncodeDecode(T)(T n) {
+        BigInt big = n;
+        Nibble[] encoded = integerToNibbles(big);
+        BigInt decoded = nibblesToInteger(encoded);
+        assertEqual(big, decoded);
+    }
+    
+    assertCorrectEncodeDecode(BaseConstants[0]);
+
+    BaseConstants.each!(n => assertCorrectEncodeDecode(n));
+    ExtraConstants
+        .substitute(OneMillionPlaceholder, OneMillion)
+        .each!(n => assertCorrectEncodeDecode(n));
+}
+
+Nibble[] realToNibbles(BigInt iPart, BigInt fPart)
 out(r; r.length >= 4, "Must return 0x0B and at least 1 nibble for each part")
 {
     return cast(Nibble[]) [0x0, 0xB]
-        ~ integerToNibbles(num)[1..$]
-        ~ integerToNibbles(den)[1..$];
+        ~ integerToNibbles(iPart)[1..$]
+        ~ integerToNibbles(fPart)[1..$];
 }
 
 real nibblesToReal(Nibble[] nibbles, ref uint i) {
@@ -322,6 +341,14 @@ real nibblesToReal(Nibble[] nibbles, ref uint i) {
     i += 2;
     BigInt ip = nibblesToInteger(nibbles, i, true);
     BigInt fp = nibblesToInteger(nibbles, i, true);
+    real sign = 1.0;
+
+    if(ip == 0 && fp < 0) {
+        // exchange signs: allow `0.-3` to represent `-0.3`, because `-0` isn't a thing
+        sign = -1.0;
+        fp = -fp;
+    }
+
     assert(fp >= 0, "Fraction part cannot be negative");
     
     string fpStr = fp.toDecimalString();
@@ -334,5 +361,7 @@ real nibblesToReal(Nibble[] nibbles, ref uint i) {
     // match signs so addition is concatenation
     if(first < 0) second *= -1;
     
-    return first + second;
+    return sign * (first + second);
 }
+
+// tests handled in the Ruby script
