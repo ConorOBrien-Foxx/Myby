@@ -438,6 +438,41 @@ Verb getVerb(InsName name) {
                     assert(0, "Runtime Error: Invalid index `" ~ l.atomToString() ~ "` into `" ~ r.atomToString() ~ "`");
                 }
             })
+            // Under Select
+            .setUnderInverse((l, r, selected) {
+                return match!(
+                    (BigInt idx, Atom[] arr) {
+                        uint properIndex = idx.to!uint;
+                        Atom[] head = arr[0..properIndex];
+                        Atom[] tail = arr[properIndex + 1..$];
+                        return Atom(match!(
+                            (Atom[] items) => head ~ items ~ tail,
+                            _ => head ~ selected ~ tail,
+                        )(selected));
+                    },
+                    (Atom[] idxs, Atom[] arr) => match!(
+                        (Atom[] _) {
+                            Atom[] result;
+                            foreach(arrIndex, el; arr) {
+                                auto sourceIndex = idxs.countUntil(Atom(arrIndex));
+                                if(sourceIndex != -1) {
+                                    Atom innerResult = verbs[InsName.First](Atom(BigInt(sourceIndex)), selected);
+                                    match!(
+                                        (Atom[] items) => result ~= items,
+                                        _ => result ~= innerResult,
+                                    )(innerResult);
+                                }
+                                else {
+                                    result ~= el;
+                                }
+                            }
+                            return Atom(result);
+                        },
+                        _ => Nil.nilAtom,
+                    )(selected),
+                    (_1, _2) => Nil.nilAtom,
+                )(l, r);
+            })
             .setMarkedArity(2);
         
         verbs[InsName.Last] = new Verb("}")

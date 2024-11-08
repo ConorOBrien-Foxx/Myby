@@ -514,6 +514,8 @@ alias VerbDyad = SumType!(
     VerbDyadSimple, VerbDyadSelf, VerbDyadConjunction, VerbDyadMultiConjunction
 );
 
+alias VerbTriadSimple = Atom delegate(Atom, Atom, Atom);
+
 alias AdjectiveMonad = Verb delegate(Verb);
 alias ConjunctionDyad = Verb delegate(Verb, Verb);
 alias MultiConjunctionFunction = Verb delegate(Verb[]);
@@ -548,6 +550,7 @@ class Verb {
     VerbDyad dyad;
     VerbDyadSelf dyadSelf;
     Verb inverse; // TODO: figure this out idfk
+    VerbTriadSimple underInverse;
     ChainInfo info;
     
     uint markedArity = 2;
@@ -572,6 +575,7 @@ class Verb {
         res.dyad = dyad;
         res.dyadSelf = dyadSelf;
         res.inverse = inverse;
+        res.underInverse = underInverse;
         res.info = info;
         res.niladic = niladic;
         res.inferSelf = inferSelf;
@@ -640,6 +644,10 @@ class Verb {
     bool invertable() {
         return inverse !is null;
     }
+
+    bool underInvertable() {
+        return underInverse !is null;
+    }
     
     string head() {
         return display;
@@ -705,6 +713,12 @@ class Verb {
     
     Verb setInverse(Verb i) {
         inverse = i;
+        return this;
+    }
+
+    // would need to exhausitvely iterate over all possible VerbTriad* stuff if more are added
+    Verb setUnderInverse(VerbTriadSimple t) {
+        underInverse = t;
         return this;
     }
     

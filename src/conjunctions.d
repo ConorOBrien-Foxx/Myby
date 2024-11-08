@@ -73,6 +73,14 @@ Conjunction getConjunction(InsName name) {
         
         conjunctions[InsName.Under] = new Conjunction(
             (Verb f, Verb g) {
+                if(g.underInvertable()) {
+                    assert(!g.invertable(), "Verb cannot have both inverse and under inverse, I think?" ~ g.display);
+                    return new Verb("&.₂")
+                        .setMonad(_ => Nil.nilAtom)
+                        .setDyad((f, g, a, b) => g.underInverse(a, b, f(g(a, b))))
+                        .setMarkedArity(2)
+                        .setChildren([f, g]);
+                }
                 assert(g.invertable(), "Cannot invert " ~ g.display);
                 return new Verb("&.")
                     .setMonad((f, g, a) => g.inverse(f(g(a))))
