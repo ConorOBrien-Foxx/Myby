@@ -77,7 +77,7 @@ Conjunction getConjunction(InsName name) {
                     assert(!g.invertable(), "Verb cannot have both inverse and under inverse, I think?" ~ g.display);
                     return new Verb("&.₂")
                         .setMonad(_ => Nil.nilAtom)
-                        .setDyad((f, g, a, b) => g.underInverse(a, b, f(g(a, b))))
+                        .setDyad((f, g, a, b) => g.underInverse(f, g, a, b))
                         .setMarkedArity(2)
                         .setChildren([f, g]);
                 }

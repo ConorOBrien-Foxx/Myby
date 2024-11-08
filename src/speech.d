@@ -514,7 +514,7 @@ alias VerbDyad = SumType!(
     VerbDyadSimple, VerbDyadSelf, VerbDyadConjunction, VerbDyadMultiConjunction
 );
 
-alias VerbTriadSimple = Atom delegate(Atom, Atom, Atom);
+// alias VerbTriadSimple = Atom delegate(Atom, Atom, Atom);
 
 alias AdjectiveMonad = Verb delegate(Verb);
 alias ConjunctionDyad = Verb delegate(Verb, Verb);
@@ -550,7 +550,7 @@ class Verb {
     VerbDyad dyad;
     VerbDyadSelf dyadSelf;
     Verb inverse; // TODO: figure this out idfk
-    VerbTriadSimple underInverse;
+    VerbDyadConjunction underInverse;
     ChainInfo info;
     
     uint markedArity = 2;
@@ -716,8 +716,9 @@ class Verb {
         return this;
     }
 
-    // would need to exhausitvely iterate over all possible VerbTriad* stuff if more are added
-    Verb setUnderInverse(VerbTriadSimple t) {
+    // below comment is no longer relevant, but still a good idea to keep in mind :]
+    // // would need to exhausitvely iterate over all possible VerbTriad* stuff if more are added
+    Verb setUnderInverse(VerbDyadConjunction t) {
         underInverse = t;
         return this;
     }

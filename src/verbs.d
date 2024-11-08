@@ -439,39 +439,56 @@ Verb getVerb(InsName name) {
                 }
             })
             // Under Select
-            .setUnderInverse((l, r, selected) {
+            .setUnderInverse((f, g, a, b) {
+                import std.stdio : writeln;
                 return match!(
                     (BigInt idx, Atom[] arr) {
-                        uint properIndex = idx.to!uint;
+                        Atom selected = f(g(a, b));
+                        uint properIndex = moldIndex(idx, arr.length);
                         Atom[] head = arr[0..properIndex];
                         Atom[] tail = arr[properIndex + 1..$];
-                        return Atom(match!(
+                        return Atom(selected.match!(
                             (Atom[] items) => head ~ items ~ tail,
                             _ => head ~ selected ~ tail,
-                        )(selected));
+                        ));
                     },
-                    (Atom[] idxs, Atom[] arr) => match!(
-                        (Atom[] _) {
-                            Atom[] result;
-                            foreach(arrIndex, el; arr) {
-                                auto sourceIndex = idxs.countUntil(Atom(arrIndex));
-                                if(sourceIndex != -1) {
-                                    Atom innerResult = verbs[InsName.First](Atom(BigInt(sourceIndex)), selected);
-                                    match!(
-                                        (Atom[] items) => result ~= items,
-                                        _ => result ~= innerResult,
-                                    )(innerResult);
-                                }
-                                else {
-                                    result ~= el;
-                                }
-                            }
-                            return Atom(result);
-                        },
+                    (BigInt _, string str) => verbs[InsName.First].underInverse(f, g, a, Atom(str.atomChars)).match!(
+                        (Atom[] items) => Atom(items.joinToString),
+                        (string str) => Atom(str), // how did we even get here?? I'm not complaining
                         _ => Nil.nilAtom,
-                    )(selected),
+                    ),
+                    (Atom[] idxs, Atom[] arr) {
+                        Atom selected = f(g(a, b));
+                        return selected.match!(
+                            (Atom[] selectedItems) {
+                                Atom[] result;
+                                uint offset = 0;
+                                foreach(selectionIndex, targetIndex; idxs) {
+                                    uint properTargetIndex = moldIndex(targetIndex.as!BigInt, arr.length);
+                                    result ~= arr[offset..properTargetIndex];
+                                    Atom replaceItem = selectedItems[selectionIndex];
+                                    replaceItem.match!(
+                                        (Atom[] items) => result ~= items,
+                                        _ => result ~= replaceItem,
+                                    );
+                                    offset = properTargetIndex + 1;
+                                }
+                                result ~= arr[offset..$];
+                                return Atom(result);
+                            },
+                            _ => assert(false, "TODO " ~ selected.to!string),
+                        );
+                    },
+                    (Atom[] idxs, string str) {
+                        // we don't want to simply apply f(g(a, b)) here because sometimes ops on strings return strings,
+                        // whereas we always want an array
+                        return verbs[InsName.First].underInverse(f, g, a, Atom(str.atomChars)).match!(
+                            (Atom[] items) => Atom(items.joinToString),
+                            _ => Nil.nilAtom,
+                        );
+                    },
                     (_1, _2) => Nil.nilAtom,
-                )(l, r);
+                )(a, b);
             })
             .setMarkedArity(2);
         
