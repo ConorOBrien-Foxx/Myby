@@ -123,6 +123,38 @@ string toLiterateAligned(Nibble[] nibs) {
     return toLiterateAligned(nibs, nibs.tokenize);
 }
 
+alias LiterateAlignedBuilder = Tuple!(string[], "reps", string[], "nibbles");
+// list of sections
+LiterateAlignedBuilder[] toLiterateAlignedBuilder(Nibble[] nibs, Token[] tokens) {
+    LiterateAlignedBuilder[] result;
+    LiterateAlignedBuilder build;
+
+    auto lb = toLiterateBuilder(nibs, tokens);
+
+    foreach(i, rep; lb.reps) {
+        Token tok = tokens[i];
+        ulong nextIndex = i + 1 < tokens.length
+            ? tokens[i + 1].index
+            : nibs.length;
+        
+        if(tok.name == InsName.Break) {
+            result ~= build;
+            build = LiterateAlignedBuilder([], []);
+        }
+        else {
+            build.reps ~= rep;
+            Nibble[] slice = nibs[tok.index..nextIndex];
+            build.nibbles ~= slice.basicNibbleFmt("");
+        }
+    }
+
+    if(build.reps.length > 0) {
+        result ~= build;
+    }
+    
+    return result;
+}
+
 string toLiterateAligned(Nibble[] nibs, Token[] tokens) {
     import std.array : join;
     import std.range : lockstep, empty, padRight;
@@ -156,6 +188,7 @@ string toLiterateAligned(Nibble[] nibs, Token[] tokens) {
         reps = [];
     }
     
+    // TODO: rewrite using toLiterateAlignedBuilder
     // Debugger.print("=== literate aligned ===");
     foreach(i, rep; lb.reps) {
         // Debugger.print("Rep:  ", rep);

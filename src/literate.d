@@ -408,7 +408,7 @@ Nibble[] parseLiterate(T)(T str) {
 
 // gonna keep this around for a bit, despite not being called
 // TODO: remove
-deprecated("prefer `parseLiteral`")
+deprecated("prefer `parseLiterate`")
 Nibble[] parseLiterateOld(T)(T str) {
     str = str.strip;
     Nibble[] code;

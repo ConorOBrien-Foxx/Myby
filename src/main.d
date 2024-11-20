@@ -15,6 +15,7 @@ import std.sumtype;
 import core.exception : AssertError;
 
 import myby.debugger;
+import myby.gui : startGui;
 import myby.instructions;
 import myby.interpreter;
 import myby.json : atomToJson;
@@ -68,6 +69,7 @@ int main(string[] args) {
     bool jsonOutput;
     bool decompile, decompileAlign;
     bool noCode;
+    bool useGui;
     // bool scriptKnow, scriptRunner, scriptDistribution;
     bool forceTruthy;
     bool measureSize;
@@ -97,6 +99,7 @@ int main(string[] args) {
         "nocode|x", "Prevents program execution", &noCode,
         "truthy|y", "Coalesces the return value to truthy/falsey", &forceTruthy,
         "size|s", "Measures the size of the program", &measureSize,
+        "gui|g", "Initializes an interface for the Myby GUI", &useGui,
         "F", "Sets verb F:", &fValue,
         "G", "Sets verb G:", &gValue,
         "H", "Sets verb H:", &hValue,
@@ -107,6 +110,10 @@ int main(string[] args) {
         //todo:remove
         "z", "temp", &temp,
     );
+
+    if(useGui) {
+        return startGui();
+    }
     
     void writelnResult(Atom a) {
         if(forceTruthy) {

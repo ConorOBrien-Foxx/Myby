@@ -1,0 +1,17 @@
+html {
+    font-family: "Host Grotesk", sans-serif;
+}
+
+code, pre, textarea {
+    font-family: "Geist Mono", monospace;
+}
+
+table {
+    border-collapse: collapse;
+    margin: 18px 0;
+}
+table td {
+    border: 1px solid black;
+    padding: 5px;
+    text-align: center;
+}
