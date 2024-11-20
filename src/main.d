@@ -80,7 +80,8 @@ int main(string[] args) {
     auto info = getoptSafeError(
         args,
         std.getopt.config.bundling,
-        "repl|R", "Uses REPL to interactively write Myby code", &useRepl,
+        std.getopt.config.caseSensitive,
+        "repl|r", "Uses REPL to interactively write Myby code", &useRepl,
         "tree|t", "Display tree-form", &dispTree,
         "jsonout|j", "Outputs data in a JSON friendly format", &jsonOutput,
         "compile|c", "Compile literate program", &compile,
@@ -90,8 +91,9 @@ int main(string[] args) {
         "literate|l", "Input source is a literate program", &literate,
         "file|i", "Uses named file", &fpath,
         "execute|e", "Executes provided code", &code,
+        // TODO: levels of debug information?
         "debug|d", "Prints debug information", &useDebug,
-        "rundebug|r", "Runtime debug information", &useRuntimeDebug,
+        "rundebug|D", "Runtime debug information", &useRuntimeDebug,
         "nocode|x", "Prevents program execution", &noCode,
         "truthy|y", "Coalesces the return value to truthy/falsey", &forceTruthy,
         "size|s", "Measures the size of the program", &measureSize,
