@@ -58,6 +58,10 @@ const Coordinator = new (class {
         const data = await this.request("tokenize", { code });
         return data.tokens;
     }
+
+    nibbleCount(code) {
+        return this.request("nibbleCount", { code });
+    }
 });
 
 const app = express();
@@ -65,7 +69,7 @@ const expressWs = require("express-ws")(app);
 
 app.use(express.static(path.join(__dirname, "public")));
 
-app.ws("/echo", function(ws, req) {
+app.ws("/ws_myby_serv", function(ws, req) {
     ws.on("message", function(msg) {
         let data;
         try {
@@ -85,11 +89,15 @@ app.ws("/echo", function(ws, req) {
                     payload: tokenized,
                 }));
             });
-            /*
-            ws.send(JSON.stringify({
-                message: "todo: tokenize " + data.payload,
-            }));
-            */
+        }
+        else if(data.action === "nibbleCount") {
+            Coordinator.nibbleCount(data.payload).then(data => {
+                ws.send(JSON.stringify({
+                    action: "nibbleCount",
+                    payload: data.nibbleCount,
+                    error: data.error,
+                }));
+            })
         }
     });
 });

@@ -8,36 +8,53 @@ window.addEventListener("load", function () {
     const code = document.getElementById("code");
     const button = document.getElementById("submit");
     const output = document.getElementById("output");
+    const byteCount = document.getElementById("byteCount");
 
-    const wsProtocol = new URL("echo", window.location.toString().replace("http", "ws")).href;
+    const showTokens = (tokens, error) => {
+        clearChildren(output);
+        for(let { nibbles, reps } of tokens) {
+            let table = document.createElement("table");
+            let repsEl = document.createElement("tr");
+            for(let token of reps) {
+                let td = document.createElement("td");
+                let code = document.createElement("code");
+                code.textContent = token;
+                td.appendChild(code);
+                repsEl.appendChild(td);
+            }
+            let nibblesEl = document.createElement("tr");
+            for(let token of nibbles) {
+                let td = document.createElement("td");
+                let code = document.createElement("code");
+                code.textContent = token;
+                td.appendChild(code);
+                nibblesEl.appendChild(td);
+            }
+            table.appendChild(repsEl);
+            table.appendChild(nibblesEl);
+            output.appendChild(table);
+        }
+    };
+
+    const updateByteCount = (nibbleCount, error) => {
+        byteCount.textContent = error
+            ? byteCount.textContent
+            : `${nibbleCount / 2} byte(s) (${nibbleCount} nibble(s))`;
+    };
+
+    const actionMap = {
+        tokenize: showTokens,
+        nibbleCount: updateByteCount,
+    }
+
+    const wsProtocol = new URL("ws_myby_serv", window.location.toString().replace("http", "ws")).href;
     console.log("Connecting to ", wsProtocol);
     const mybySocket = new WebSocket(wsProtocol);
     mybySocket.onmessage = event => {
         let data = JSON.parse(event.data);
-        if(data.action === "tokenize") {
-            clearChildren(output);
-            for(let { nibbles, reps } of data.payload) {
-                let table = document.createElement("table");
-                let repsEl = document.createElement("tr");
-                for(let token of reps) {
-                    let td = document.createElement("td");
-                    let code = document.createElement("code");
-                    code.textContent = token;
-                    td.appendChild(code);
-                    repsEl.appendChild(td);
-                }
-                let nibblesEl = document.createElement("tr");
-                for(let token of nibbles) {
-                    let td = document.createElement("td");
-                    let code = document.createElement("code");
-                    code.textContent = token;
-                    td.appendChild(code);
-                    nibblesEl.appendChild(td);
-                }
-                table.appendChild(repsEl);
-                table.appendChild(nibblesEl);
-                output.appendChild(table);
-            }
+        let action = actionMap[data.action];
+        if(action) {
+            action(data.payload, data.error ?? false);
         }
         else {
             console.log("Idk what to do with ", data.action);
@@ -51,10 +68,18 @@ window.addEventListener("load", function () {
                 payload: code.value,
             }));
         });
-
-        // mybySocket.send("This is a test.");
+        
+        const requestUpdatedByteCount = () => {
+            mybySocket.send(JSON.stringify({
+                action: "nibbleCount",
+                payload: code.value,
+            }));
+        };
+        code.addEventListener("input", requestUpdatedByteCount);
+        requestUpdatedByteCount();
     };
     mybySocket.onclose = event => {
-        alert("Connection with websocket lost. Please refresh.");
+        // TODO: check if connection unsuccessful first
+        console.error("Connection with websocket lost. Please refresh.");
     };
 });

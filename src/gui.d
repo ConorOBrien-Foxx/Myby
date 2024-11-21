@@ -50,8 +50,25 @@ int startGui() {
             pipes.stdin.writeln(data.toString);
             pipes.stdin.flush();
         }
+        else if(action == "nibbleCount") {
+            JSONValue data = [
+                "id": j["id"],
+                "error": JSONValue(false),
+            ];
+            try {
+                Nibble[] nibs = parseLiterate(j["code"].str);
+                data["nibbleCount"] = nibs.length;
+            }
+            catch(Throwable t) {
+                stderr.writeln("Error while trying to count nibbles of ", j["code"].str, ":");
+                stderr.writeln(t);
+                data["error"] = true;
+            }
+            pipes.stdin.writeln(data.toString);
+            pipes.stdin.flush();
+        }
         else {
-            stderr.writeln("Malformed request " ~ line);
+            stderr.writeln("Unknown action " ~ action ~ " from " ~ line);
             break;
         }
     }
