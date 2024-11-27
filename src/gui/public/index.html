@@ -9,10 +9,21 @@
     <link rel="STYLESHEET" href="client.css">
 </head>
 <body>
-    <h1>Code</h1>
-    <h2>Bytes: <span id="byteCount">?</span></h2>
-    <textarea id="code">+/ % #</textarea>
-    <button id="submit">Submit</button>
-    <div id="output"></div>
+    <header><h1>Myby</h1></header>
+    <div class="monoline">
+        <h2>Bytes: <span id="byteCount">?</span></h2> &bull; <button id="submit">Submit</button>
+    </div>
+    <div class="bicontainer">
+        <div class="panel">
+            <h2>Code</h2>
+            <textarea id="code">+/ % #</textarea>
+            <h2>Input</h2>
+            <textarea id="input">3 _4 5</textarea>
+        </div>
+        <div class="panel">
+            <h2>Output</h2>
+            <div id="output"></div>
+        </div>
+    </div>
 </body>
 </html>
