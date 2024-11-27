@@ -77,8 +77,8 @@ const Coordinator = new (class {
         return this.request("nibbleCount", { code });
     }
 
-    evaluate({ code, input }) {
-        return this.request("evaluate", { code, input });
+    evaluate({ code, x, y }) {
+        return this.request("evaluate", { code, x, y });
     }
 });
 

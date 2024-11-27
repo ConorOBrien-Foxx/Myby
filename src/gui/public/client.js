@@ -82,16 +82,18 @@ window.addEventListener("load", function () {
     const wsProtocol = new URL("ws_myby_serv", window.location.toString().replace("http", "ws")).href;
 
     const codeEl = document.getElementById("code");
-    const inputEl = document.getElementById("input");
+    const inputXEl = document.getElementById("inputX");
+    const inputYEl = document.getElementById("inputY");
     const submitEl = document.getElementById("submit");
     const outputEl = document.getElementById("output");
+    const tokensEl = document.getElementById("tokens");
     const byteCountEl = document.getElementById("byteCount");
 
     let mybySocket = new SocketResolver(wsProtocol);
     mybySocket.connect();
 
     const showTokens = (tokens, error) => {
-        clearChildren(outputEl);
+        clearChildren(tokensEl);
         for(let { nibbles, reps } of tokens) {
             let table = document.createElement("table");
             let repsEl = document.createElement("tr");
@@ -112,7 +114,7 @@ window.addEventListener("load", function () {
             }
             table.appendChild(repsEl);
             table.appendChild(nibblesEl);
-            outputEl.appendChild(table);
+            tokensEl.appendChild(table);
         }
     };
 
@@ -133,13 +135,15 @@ window.addEventListener("load", function () {
 
     submitEl.addEventListener("click", () => {
         let codeString = codeEl.value;
-        let inputString = inputEl.value;
+        let xString = inputXEl.value;
+        let yString = inputYEl.value;
         mybySocket.requestAction("evaluate", {
             code: codeString,
-            input: inputString,
+            x: xString,
+            y: yString,
         })
             .then(data => {
-                outputEl.textContent = data.repr;
+                outputEl.value = data.repr;
             })
             .catch(err => {
                 console.error(err);

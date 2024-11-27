@@ -84,8 +84,9 @@ int startGui() {
             else if(action == "evaluate") {
                 string code = j["code"].str;
                 // TODO: multiple inputs
-                string input = j["input"].str;
-                debugWarn("Code: ", code, "; Input: ", input);
+                string x = j["x"].str;
+                string y = j["y"].str;
+                debugWarn("Code: ", code, "; x: ", x, "; y: ", y);
                 Interpreter i = new Interpreter(code);
                 i.shunt;
                 Verb[] chains = i.condense;
@@ -96,13 +97,14 @@ int startGui() {
                     Verb mainVerb = chains[$ - 1];
                     Atom result;
                     try {
-                        if(input.length == 0) {
-                            result = mainVerb();
+                        Atom[] verbArgs;
+                        if(x.length != 0) {
+                            verbArgs ~= Interpreter.evaluate(x ~ " @.");
                         }
-                        else {
-                            Atom[] verbArgs = [ Interpreter.evaluate(input ~ " @.") ];
-                            result = mainVerb(verbArgs);
+                        if(y.length != 0) {
+                            verbArgs ~= Interpreter.evaluate(y ~ " @.");
                         }
+                        result = mainVerb(verbArgs);
                     }
                     catch(Throwable t) {
                         // TODO: we should probably be using custom errors
