@@ -13,6 +13,7 @@ import myby.debugger;
 import myby.interpreter;
 import myby.literate;
 import myby.nibble;
+import myby.speech;
 import myby.token;
 
 string getTimeId() {
@@ -56,43 +57,69 @@ int startGui() {
 
             debugWarn("Action: ", action);
 
+            JSONValue response = [
+                "id": j["id"],
+                "error": JSONValue(false),
+            ];
             if(action == "tokenize") {
                 Nibble[] nibs = parseLiterate(j["code"].str);
                 Token[] tokens = nibs.tokenize;
                 auto sections = toLiterateAlignedBuilder(nibs, tokens);
 
-                JSONValue data = [
-                    "id": j["id"],
-                    // sad JSONValue cannot automatically convert structs to JSON
-                    "tokens": JSONValue(sections.map!(section => JSONValue([
-                        "reps": section.reps,
-                        "nibbles": section.nibbles,
-                    ])).array),
-                ];
-                pipes.stdin.writeln(data.toString);
-                pipes.stdin.flush();
+                response["tokens"] = sections.map!(section => JSONValue([
+                    "reps": section.reps,
+                    "nibbles": section.nibbles,
+                ])).array;
             }
             else if(action == "nibbleCount") {
-                JSONValue data = [
-                    "id": j["id"],
-                    "error": JSONValue(false),
-                ];
                 try {
                     Nibble[] nibs = parseLiterate(j["code"].str);
-                    data["nibbleCount"] = nibs.length;
+                    response["nibbleCount"] = nibs.length;
                 }
                 catch(Throwable t) {
+                    response["error"] = true;
                     warn("Error while trying to count nibbles of ", j["code"].str, ":\n", t);
-                    data["error"] = true;
                 }
-                debugWarn("Writing: ", data.toString);
-                pipes.stdin.writeln(data.toString);
-                pipes.stdin.flush();
+            }
+            else if(action == "evaluate") {
+                string code = j["code"].str;
+                // TODO: multiple inputs
+                string input = j["input"].str;
+                debugWarn("Code: ", code, "; Input: ", input);
+                Interpreter i = new Interpreter(code);
+                i.shunt;
+                Verb[] chains = i.condense;
+                if(chains.length == 0) {
+                    // TODO: implement empty program no-op behavior
+                }
+                else {
+                    Verb mainVerb = chains[$ - 1];
+                    Atom result;
+                    try {
+                        if(input.length == 0) {
+                            result = mainVerb();
+                        }
+                        else {
+                            Atom[] verbArgs = [ Interpreter.evaluate(input ~ " @.") ];
+                            result = mainVerb(verbArgs);
+                        }
+                    }
+                    catch(Throwable t) {
+                        // TODO: we should probably be using custom errors
+                        response["error"] = true;
+                    }
+                    response["value"] = result.as!JSONValue;
+                    response["repr"] = result.as!string;
+                }
             }
             else {
+                response["error"] = true;
                 warn("Unknown action " ~ action ~ " from " ~ line);
                 break;
             }
+            debugWarn("Writing: ", response.toString);
+            pipes.stdin.writeln(response.toString);
+            pipes.stdin.flush();
         }
         catch(Throwable t) {
             warn("Uncaught exception during main loop:\n", t);

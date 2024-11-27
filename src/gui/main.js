@@ -54,6 +54,7 @@ const Coordinator = new (class {
         this.rl.on("line", line => {
             // warn("We got a line back from the D server:", line);
             let jsonData = JSON.parse(line);
+            assert(Object.hasOwn(jsonData, "id"), "Did not receive an ID back from server: " + JSON.stringify(jsonData));
             let { id } = jsonData;
             let { resolve, reject } = this.promiseResolutionCache[id];
             delete this.promiseResolutionCache[id]; // TODO: performance?
@@ -75,6 +76,10 @@ const Coordinator = new (class {
     nibbleCount(code) {
         return this.request("nibbleCount", { code });
     }
+
+    evaluate({ code, input }) {
+        return this.request("evaluate", { code, input });
+    }
 });
 
 const app = express();
@@ -86,6 +91,7 @@ app.use(express.static(path.join(__dirname, "public")));
 const coordinatorMap = {
     tokenize: "tokenize",
     nibbleCount: "nibbleCount",
+    evaluate: "evaluate",
 };
 
 app.ws("/ws_myby_serv", function(ws, req) {
@@ -103,6 +109,7 @@ app.ws("/ws_myby_serv", function(ws, req) {
 
         let targetAction = coordinatorMap[input.action];
         if(targetAction) {
+            assert(Coordinator[targetAction], "Could not find method " + targetAction + " in Coordinator");
             Coordinator[targetAction](input.payload).then(output => {
                 ws.send(JSON.stringify({
                     ...output,

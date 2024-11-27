@@ -131,7 +131,21 @@ window.addEventListener("load", function () {
     codeEl.addEventListener("input", requestUpdatedByteCount);
     mybySocket.waitForReady().then(requestUpdatedByteCount);
 
-    const updateByteCount = (nibbleCount, error) => {
-    };
+    submitEl.addEventListener("click", () => {
+        let codeString = codeEl.value;
+        let inputString = inputEl.value;
+        mybySocket.requestAction("evaluate", {
+            code: codeString,
+            input: inputString,
+        })
+            .then(data => {
+                outputEl.textContent = data.repr;
+            })
+            .catch(err => {
+                console.error(err);
+                // TODO: proper error handling
+            })
+    });
+
     console.log("Connecting to ", wsProtocol);
 });

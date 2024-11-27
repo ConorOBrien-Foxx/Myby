@@ -8,6 +8,7 @@ import std.array;
 import std.bigint;
 import std.conv : to;
 import std.datetime;
+import std.json;
 import std.meta : AliasSeq;
 import std.range;
 import std.sumtype;
@@ -219,6 +220,25 @@ struct Atom {
             (Infinity _) => false,
             _ => false,
         );
+    }
+
+    JSONValue as(Type : JSONValue)() {
+        JSONValue converted = [
+            "type": JSONValue(value.readableTypeName),
+            "value": value.match!(
+                (Nil _) => JSONValue(null),
+                (BigInt n) => JSONValue(n.to!string),
+                (Duration d) => JSONValue(d.to!string),
+                (Infinity i) => JSONValue(i.isPositive),
+                (Atom[] a) => JSONValue(a.map!(atom => atom.as!JSONValue).array),
+                (AVHash h) => JSONValue(h.byPair
+                    .map!(pair => JSONValue([ Atom(pair.key).as!JSONValue, Atom(pair.value).as!JSONValue ]))
+                    .array
+                ),
+                b => JSONValue(b),
+            ),
+        ];
+        return converted;
     }
     
     real as(Type : real)() {
