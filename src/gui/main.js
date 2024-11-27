@@ -9,7 +9,17 @@ const assert = (value, msg) => {
     if(!value) {
         throw new Error(msg);
     }
-}
+};
+
+const getTimeId = () => `[node.js@${new Date().toLocaleString()}]`;
+
+const warn = (...args) => {
+    console.warn(getTimeId(), ...args);
+};
+
+const error = (...args) => {
+    console.error(getTimeId(), ...args);
+};
 
 const Coordinator = new (class {
     constructor() {
@@ -26,7 +36,9 @@ const Coordinator = new (class {
         return new Promise((resolve, reject) => {
             const id = this.getNewRequestId();
             this.promiseResolutionCache[id] = { resolve, reject };
-            console.log(JSON.stringify({ id, action, ...params }));
+            const message = JSON.stringify({ id, action, ...params });
+            // warn("Sending message:", message);
+            console.log(message);
         });
     }
 
@@ -40,6 +52,7 @@ const Coordinator = new (class {
         });
 
         this.rl.on("line", line => {
+            // warn("We got a line back from the D server:", line);
             let jsonData = JSON.parse(line);
             let { id } = jsonData;
             let { resolve, reject } = this.promiseResolutionCache[id];
@@ -69,35 +82,37 @@ const expressWs = require("express-ws")(app);
 
 app.use(express.static(path.join(__dirname, "public")));
 
+
+const coordinatorMap = {
+    tokenize: "tokenize",
+    nibbleCount: "nibbleCount",
+};
+
 app.ws("/ws_myby_serv", function(ws, req) {
     ws.on("message", function(msg) {
-        let data;
+        let input;
         try {
-            data = JSON.parse(msg);
+            input = JSON.parse(msg);
         }
         catch {
-            console.error("Could not parse user input as JSON.");
-            console.error(msg);
+            error("Could not parse user input as JSON.");
+            error(msg);
             ws.send(JSON.stringify({ type: "error", reason: "malformed JSON" }));
             return;
         }
-        
-        if(data.action === "tokenize") {
-            Coordinator.tokenize(data.payload).then(tokenized => {
+
+        let targetAction = coordinatorMap[input.action];
+        if(targetAction) {
+            Coordinator[targetAction](input.payload).then(output => {
                 ws.send(JSON.stringify({
-                    action: "tokenize",
-                    payload: tokenized,
+                    ...output,
+                    action: output.action, // or is it supposed to be `targetAction`?
+                    id: input.id,
                 }));
             });
         }
-        else if(data.action === "nibbleCount") {
-            Coordinator.nibbleCount(data.payload).then(data => {
-                ws.send(JSON.stringify({
-                    action: "nibbleCount",
-                    payload: data.nibbleCount,
-                    error: data.error,
-                }));
-            })
+        else {
+            warn("Could not handle action from server:", msg);
         }
     });
 });
@@ -105,5 +120,5 @@ app.ws("/ws_myby_serv", function(ws, req) {
 // this line must happen before we start listening
 Coordinator.initReadline();
 
-console.warn("Listening on port:", PORT);
+warn("Listening on port:", PORT);
 app.listen(PORT);

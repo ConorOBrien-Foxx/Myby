@@ -110,6 +110,10 @@ int main(string[] args) {
         //todo:remove
         "z", "temp", &temp,
     );
+    
+    if(useDebug) {
+        Debugger.enable();
+    }
 
     if(useGui) {
         return startGui();
@@ -127,9 +131,6 @@ int main(string[] args) {
         }
     }
     
-    if(useDebug) {
-        Debugger.enable();
-    }
     Debugger.print("args: ", args);
 
     if(useRepl) {

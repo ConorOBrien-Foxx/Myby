@@ -2,16 +2,33 @@ module myby.gui;
 
 import std.algorithm.iteration;
 import std.array;
+import std.datetime.systime;
 import std.file : exists;
 import std.json;
 import std.process;
 import std.stdio;
 import std.string : strip, startsWith;
 
+import myby.debugger;
 import myby.interpreter;
 import myby.literate;
 import myby.nibble;
 import myby.token;
+
+string getTimeId() {
+    SysTime now = Clock.currTime();
+    return "[D@" ~ now.toString ~ "]";
+}
+
+void warn(A...)(A a) {
+    stderr.writeln(getTimeId(), ": ", a);
+}
+
+void debugWarn(A...)(A a) {
+    if(Debugger.enabled) {
+        warn(a);
+    }
+}
 
 int startGui() {
     string serverPath = environment.get("MYBY_NODE_SERVER", "./src/gui/main.js");
@@ -28,48 +45,57 @@ int startGui() {
     while(true) {
         auto line = pipes.stdout.readln();
         if(line is null || line.strip == "quit") {
+            debugWarn("Quiting...");
             break;
         }
+        debugWarn("Line received: ", line.strip);
         // TODO: verify successful JSON parse
-        JSONValue j = parseJSON(line);
-        string action = j["action"].str;
+        try {
+            JSONValue j = parseJSON(line);
+            string action = j["action"].str;
 
-        if(action == "tokenize") {
-            Nibble[] nibs = parseLiterate(j["code"].str);
-            Token[] tokens = nibs.tokenize;
-            auto sections = toLiterateAlignedBuilder(nibs, tokens);
+            debugWarn("Action: ", action);
 
-            JSONValue data = [
-                "id": j["id"],
-                // sad JSONValue cannot automatically convert structs to JSON
-                "tokens": JSONValue(sections.map!(section => JSONValue([
-                    "reps": section.reps,
-                    "nibbles": section.nibbles,
-                ])).array),
-            ];
-            pipes.stdin.writeln(data.toString);
-            pipes.stdin.flush();
-        }
-        else if(action == "nibbleCount") {
-            JSONValue data = [
-                "id": j["id"],
-                "error": JSONValue(false),
-            ];
-            try {
+            if(action == "tokenize") {
                 Nibble[] nibs = parseLiterate(j["code"].str);
-                data["nibbleCount"] = nibs.length;
+                Token[] tokens = nibs.tokenize;
+                auto sections = toLiterateAlignedBuilder(nibs, tokens);
+
+                JSONValue data = [
+                    "id": j["id"],
+                    // sad JSONValue cannot automatically convert structs to JSON
+                    "tokens": JSONValue(sections.map!(section => JSONValue([
+                        "reps": section.reps,
+                        "nibbles": section.nibbles,
+                    ])).array),
+                ];
+                pipes.stdin.writeln(data.toString);
+                pipes.stdin.flush();
             }
-            catch(Throwable t) {
-                stderr.writeln("Error while trying to count nibbles of ", j["code"].str, ":");
-                stderr.writeln(t);
-                data["error"] = true;
+            else if(action == "nibbleCount") {
+                JSONValue data = [
+                    "id": j["id"],
+                    "error": JSONValue(false),
+                ];
+                try {
+                    Nibble[] nibs = parseLiterate(j["code"].str);
+                    data["nibbleCount"] = nibs.length;
+                }
+                catch(Throwable t) {
+                    warn("Error while trying to count nibbles of ", j["code"].str, ":\n", t);
+                    data["error"] = true;
+                }
+                debugWarn("Writing: ", data.toString);
+                pipes.stdin.writeln(data.toString);
+                pipes.stdin.flush();
             }
-            pipes.stdin.writeln(data.toString);
-            pipes.stdin.flush();
+            else {
+                warn("Unknown action " ~ action ~ " from " ~ line);
+                break;
+            }
         }
-        else {
-            stderr.writeln("Unknown action " ~ action ~ " from " ~ line);
-            break;
+        catch(Throwable t) {
+            warn("Uncaught exception during main loop:\n", t);
         }
     }
     pipes.stdin.close();
