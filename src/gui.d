@@ -111,7 +111,7 @@ int startGui() {
                         response["error"] = true;
                     }
                     response["value"] = result.as!JSONValue;
-                    response["repr"] = result.as!string;
+                    response["repr"] = result.atomToString;
                 }
             }
             else {

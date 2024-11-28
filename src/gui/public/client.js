@@ -130,10 +130,8 @@ window.addEventListener("load", function () {
                 // ignore error, it just means malformed content
             })
     };
-    codeEl.addEventListener("input", requestUpdatedByteCount);
-    mybySocket.waitForReady().then(requestUpdatedByteCount);
 
-    submitEl.addEventListener("click", () => {
+    const runCode = () => {
         let codeString = codeEl.value;
         let xString = inputXEl.value;
         let yString = inputYEl.value;
@@ -148,8 +146,20 @@ window.addEventListener("load", function () {
             .catch(err => {
                 console.error(err);
                 // TODO: proper error handling
-            })
-    });
+            });
+    };
+
+    codeEl.addEventListener("input", requestUpdatedByteCount);
+    for(let el of [ codeEl, inputXEl, inputYEl ]) {
+        el.addEventListener("keydown", ev => {
+            if(ev.key === "Enter" && ev.ctrlKey) {
+                runCode();
+            }
+        });
+    }
+    mybySocket.waitForReady().then(requestUpdatedByteCount);
+
+    submitEl.addEventListener("click", runCode);
 
     console.log("Connecting to ", wsProtocol);
 });
