@@ -1,3 +1,5 @@
+const ForkRepresentation = "Ψ";
+
 const clearChildren = el => {
     while(el.firstChild) {
         el.removeChild(el.firstChild);
@@ -87,11 +89,15 @@ window.addEventListener("load", function () {
     const submitEl = document.getElementById("submit");
     const outputEl = document.getElementById("output");
     const tokensEl = document.getElementById("tokens");
+    const interactiveEl = document.getElementById("interactive");
     const byteCountEl = document.getElementById("byteCount");
+
+    outputEl.value = "";
 
     let mybySocket = new SocketResolver(wsProtocol);
     mybySocket.connect();
 
+    /*
     const showTokens = (tokens, error) => {
         clearChildren(tokensEl);
         for(let { nibbles, reps } of tokens) {
@@ -116,6 +122,62 @@ window.addEventListener("load", function () {
             table.appendChild(nibblesEl);
             tokensEl.appendChild(table);
         }
+    };*/
+    const implicitNamedMap = {
+        implicitFork: "Fork",
+        implicitCompose: "Compose",
+        implicitBind: "Bind",
+    }
+
+    const generateAST = (ast) => {
+        let container = document.createElement("span");
+        if(ast.head === ForkRepresentation) {
+            container.classList.add("ast-fork");
+        }
+        if(ast.children.length === 0) {
+            let leaf = document.createElement("span");
+            leaf.classList.add("ast-leaf");
+            leaf.textContent = ast.head;
+            return leaf;
+        }
+        else {
+            container.classList.add("ast-container");
+            container.classList.add(`ast-type-${ast.type}`);
+            let headEl = document.createElement("span");
+            headEl.textContent = ast.head;
+            headEl.classList.add("ast-container-head");
+
+            let includeInlineLabel = true;
+            if(ast.type.startsWith("implicit")) {
+                includeInlineLabel = false;
+                let title = document.createElement("div");
+                title.classList.add("ast-label");
+                title.textContent = implicitNamedMap[ast.type];
+                container.appendChild(title);
+            }
+
+            let childrenContainer = document.createElement("span");
+            childrenContainer.classList.add("ast-children");
+            container.appendChild(childrenContainer);
+
+            let insertAfterIndex = ast.type === "conjunction"
+                ? 0
+                : ast.children.length - 1;
+            // container
+            ast.children.forEach((child, idx) => {
+                let subAST = generateAST(child);
+                childrenContainer.appendChild(subAST);
+                if(includeInlineLabel && idx === insertAfterIndex) {
+                    childrenContainer.appendChild(headEl);
+                }
+            });
+            return container;
+        }
+    };
+    const showAST = (ast) => {
+        clearChildren(interactiveEl);
+        interactiveEl.classList.add("ast");
+        interactiveEl.appendChild(generateAST(ast));
     };
 
     const requestUpdatedByteCount = async () => {
@@ -142,6 +204,7 @@ window.addEventListener("load", function () {
         })
             .then(data => {
                 outputEl.value = data.repr;
+                showAST(data.ast);
             })
             .catch(err => {
                 console.error(err);

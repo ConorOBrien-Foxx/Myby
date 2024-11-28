@@ -10,6 +10,7 @@ import std.stdio;
 import std.string : strip, startsWith;
 
 import myby.debugger;
+import myby.instructions;
 import myby.interpreter;
 import myby.literate;
 import myby.nibble;
@@ -29,6 +30,85 @@ void debugWarn(A...)(A a) {
     if(Debugger.enabled) {
         warn(a);
     }
+}
+
+struct ReconstructedASTNode {
+    string head;
+    string type;
+    ReconstructedASTNode[] children;
+
+    JSONValue asJSON() {
+        JSONValue hash = [
+            "head": JSONValue(head),
+            "type": JSONValue(type),
+            "children": JSONValue(children.map!(child => child.asJSON).array),
+        ];
+        return hash;
+    }
+}
+
+ReconstructedASTNode reconstructAST(Verb v) {
+    ReconstructedASTNode result;
+    // writeln(v);
+    if(v.display == Verb.ForkRepresentation) {
+        result.head = v.display;
+    }
+    else {
+        result.head = v.token.toRepresentation;
+    }
+    if(v.children.length > 0) {
+        if(v.token.isInitialized) {
+            auto info = v.token.name in Info;
+            if(info != null) {
+                auto partOfSpeech = info.speech;
+                switch(partOfSpeech) {
+                    case SpeechPart.Adjective:
+                        result.type = "adjective";
+                        break;
+                    case SpeechPart.Conjunction:
+                        result.type = "conjunction";
+                        break;
+                    case SpeechPart.MultiConjunction:
+                        result.type = "multiConjunction";
+                        break;
+                    default:
+                        stderr.writeln("How does this " ~ v.token.toString ~ " have children?!");
+                        result.type = "genericContainer";
+                }
+            }
+            else {
+                stderr.writeln("What is this " ~ v.token.toString ~ " even?!");
+                result.type = "genericContainer";
+            }
+        }
+        // the implicit constructions require special cases
+        else if(v.display == Verb.ForkRepresentation) {
+            result.type = "implicitFork";
+        }
+        else if(v.display == Verb.ComposeRepresentation) {
+            result.type = "implicitCompose";
+        }
+        else if(v.display == Verb.BindRepresentation) {
+            result.type = "implicitBind";
+        }
+        else {
+            stderr.writeln("What is this un-tokened " ~ v.toString ~ " even?!");
+            result.type = "genericContainer";
+        }
+        
+        // writeln(v.children.length, " children");
+        foreach(child; v.children) {
+            // writeln("Child: ", child);
+            ReconstructedASTNode val = reconstructAST(child);
+            result.children ~= val;
+        }
+    }
+    else {
+        result.type = "leaf";
+        // writeln("leaf.");
+    }
+
+    return result;
 }
 
 int startGui() {
@@ -104,14 +184,31 @@ int startGui() {
                         if(y.length != 0) {
                             verbArgs ~= Interpreter.evaluate(y ~ " @.");
                         }
+                        verbChildValueRetainer.enable();
+                        verbChildValueRetainer.begin();
                         result = mainVerb(verbArgs);
+                        verbChildValueRetainer.end();
                     }
                     catch(Throwable t) {
                         // TODO: we should probably be using custom errors
                         response["error"] = true;
                     }
-                    response["value"] = result.as!JSONValue;
-                    response["repr"] = result.atomToString;
+                    if(!response["error"].boolean) {
+                        // store the AST
+                        response["ast"] = reconstructAST(mainVerb).asJSON;
+                        // value flow
+                        response["flow"] = verbChildValueRetainer
+                            .values
+                            .byPair
+                            .map!(pair => [
+                                JSONValue(pair.key),
+                                JSONValue(pair.value.map!(atom => atom.as!JSONValue).array)
+                            ])
+                            .array;
+                        verbChildValueRetainer.disable();
+                        response["value"] = result.as!JSONValue;
+                        response["repr"] = result.atomToString;
+                    }
                 }
             }
             else {

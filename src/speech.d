@@ -564,32 +564,35 @@ struct ChainInfo {
 }
 
 private struct VerbChildValueRetainer {
-    import std.stdio : writeln;
-
     bool enabled = false;
     bool writing = false;
-    Atom[][int] hash;
+    Atom[][int] values;
     Token[int] tokens;
     
+    // TODO: use counter to allow "nesting" enable/disable calls?
+    void enable() { enabled = true; }
+    void disable() { enabled = false; }
+
     void begin() {
         writing = true;
-        writeln("Beginning retaining child values!");
-        assert(hash.length == 0, "Unimplemented: Resetting hash");
+        Debugger.print("Beginning retaining child values!");
+        values.clear();
     }
 
     void update(Token token, Atom atom) {
         if(!writing) {
             return;
         }
-        writeln(token, " -> ", atom);
-        hash[token.index] ~= atom;
+        Debugger.print("Retaining value from ", token, ": ", atom);
+        values[token.index] ~= atom;
         tokens[token.index] = token;
     }
-    
+
     void end() {
         assert(writing, "Cannot end without having began");
-        writeln("Retained Values! ", hash);
-        writeln("Corresponding Tokens! ", tokens);
+        writing = false;
+        Debugger.print("Retained Values! ", values);
+        Debugger.print("Corresponding Tokens! ", tokens);
     }
 }
 
@@ -903,8 +906,13 @@ class Verb {
         return res;
     }
     
+    static string ForkRepresentation = "Ψ";
+    static string ComposeRepresentation = "@";
+    static string BindRepresentation = "&";
+    // PowerRepresentation isn't really necessary here since it's never implicit, but nice to have symmetry
+    static string PowerRepresentation = "^:";
     static Verb fork(Verb f, Verb g, Verb h) {
-        return new Verb("Ψ")
+        return new Verb(Verb.ForkRepresentation) // "Ψ"
             .setMonad((Verb[] verbs, a) {
                 Verb f = verbs[0];
                 Verb g = verbs[1];
@@ -976,7 +984,7 @@ class Verb {
             return g.dup
                 .setChildren(g.children.map!(child => Verb.compose(f, child)).array);
         }
-        return new Verb("@")
+        return new Verb(Verb.ComposeRepresentation) // "@"
             .setMonad((f, g, a) => f(g(a)))
             .setDyad((f, g, a, b) => f(g(a, b)))
             .setMarkedArity(g.markedArity)
@@ -994,9 +1002,41 @@ class Verb {
             )
             .setChildren([f, g]);
     }
+
+    static Verb bind(Verb f, Verb g) {
+        auto markedArity = 
+            f.niladic || g.niladic
+                ? 1
+                : g.markedArity;
+        return new Verb(Verb.BindRepresentation) // "&"
+            .setMonad((f, g, a) =>
+                f.niladic
+                    ? g(f(), a)
+                    : g.niladic
+                        ? f(a, g())
+                        : f(g(a)))
+            // TODO: niladic as per above
+            .setDyad((f, g, a, b) =>
+                f(g(a), g(b)))
+            .setMarkedArity(markedArity)
+            .setInverseMutual(new Verb("!.")
+                // (f&n)!. => f!.&n
+                // (n&g)!. => n&(g!.)
+                .setMonadSelf((Verb v, a) {
+                    return v.inverse.monad.match!(
+                        t => t(v.f.invert(), v.g.invert(), a),
+                        _ => assert(0, "Improperly initialized `&` Verb")
+                    );
+                })
+                .setDyad((f, g, _1, _2) => Nil.nilAtom)
+                .setMarkedArity(markedArity)
+                .setChildren([f, g])
+            )
+            .setChildren([f, g]);
+    }
     
     static Verb power(Verb f, Verb g) {
-        return new Verb("^:")
+        return new Verb(Verb.PowerRepresentation) // "^:"
             .setMonad((f, g, a) {
                 Atom times = g(a);
                 return times.match!(

@@ -27,7 +27,7 @@ button:hover {
     cursor: pointer;
 }
 
-code, pre, textarea {
+code, pre, textarea, .ast {
     font-family: "Geist Mono", monospace;
 }
 
@@ -57,3 +57,59 @@ h1, h2, h3, h4, h5, h6 {
 .bicontainer > .panel {
     flex: 50%;
 }
+
+.ast {
+    display: flex;
+    /* align-items: flex-end; */
+    justify-content: center;
+}
+.ast-leaf, .ast-container, .ast-container-head {
+    border: 1px solid;
+    margin: 2px;
+    padding: 2px 4px;
+}
+.ast-container-head {
+    /* border-color: green; */
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+}
+.ast-leaf {
+    color: #1cb392;
+    display: flex;
+    align-items: center;
+}
+.ast-container {
+    /* border-color: green; */
+    border-width: 3px;
+    border-style: double;
+}
+.ast-container > .ast-children {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+/* https://stackoverflow.com/a/2213946/4119004 */
+.ast-container > .ast-label {
+    text-align: center;
+    font-style: italic;
+    /* display: inline;
+    position: relative;
+    top: -1em;
+    padding-bottom: -1em; */
+}
+.ast-fork {
+    border-style: dashed;
+    border-width: 1px;
+}
+.ast-type-conjunction {
+    color: #6e6efc;
+}
+.ast-type-adjective {
+    color: #0dc80d;
+}
+.ast-type-multiConjunction {
+    color: #ff4444;
+}
+

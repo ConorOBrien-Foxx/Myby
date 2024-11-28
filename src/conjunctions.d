@@ -30,37 +30,7 @@ Conjunction getConjunction(InsName name) {
     
     if(!conjunctions) {
          conjunctions[InsName.Bond] = new Conjunction(
-            (Verb f, Verb g) {
-                auto markedArity = 
-                    f.niladic || g.niladic
-                        ? 1
-                        : g.markedArity;
-                return new Verb("&")
-                    .setMonad((f, g, a) =>
-                        f.niladic
-                            ? g(f(), a)
-                            : g.niladic
-                                ? f(a, g())
-                                : f(g(a)))
-                    // TODO: niladic as per above
-                    .setDyad((f, g, a, b) =>
-                        f(g(a), g(b)))
-                    .setMarkedArity(markedArity)
-                    .setInverseMutual(new Verb("!.")
-                        // (f&n)!. => f!.&n
-                        // (n&g)!. => n&(g!.)
-                        .setMonadSelf((Verb v, a) {
-                            return v.inverse.monad.match!(
-                                t => t(v.f.invert(), v.g.invert(), a),
-                                _ => assert(0, "Improperly initialized `&` Verb")
-                            );
-                        })
-                        .setDyad((f, g, _1, _2) => Nil.nilAtom)
-                        .setMarkedArity(markedArity)
-                        .setChildren([f, g])
-                    )
-                    .setChildren([f, g]);
-            }
+            (Verb f, Verb g) => Verb.bind(f, g)
         );
         
         conjunctions[InsName.Compose] = new Conjunction(
