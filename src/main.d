@@ -74,6 +74,7 @@ int main(string[] args) {
     bool forceTruthy;
     bool measureSize;
     bool useRepl;
+    bool retainValues;
     string outfile;
     string fpath;
     string code;
@@ -100,6 +101,7 @@ int main(string[] args) {
         "truthy|y", "Coalesces the return value to truthy/falsey", &forceTruthy,
         "size|s", "Measures the size of the program", &measureSize,
         "gui|g", "Initializes an interface for the Myby GUI", &useGui,
+        "retain|E", "Retains values from all executed verbs for debug purposes", &retainValues,
         "F", "Sets verb F:", &fValue,
         "G", "Sets verb G:", &gValue,
         "H", "Sets verb H:", &hValue,
@@ -113,6 +115,10 @@ int main(string[] args) {
     
     if(useDebug) {
         Debugger.enable();
+    }
+
+    if(retainValues) {
+        verbChildValueRetainer.enabled = true;
     }
 
     if(useGui) {
@@ -320,6 +326,9 @@ int main(string[] args) {
     Debugger.print("Verb args: ", verbArgs.map!"a.toString()");
     
     try {
+        if(verbChildValueRetainer.enabled) {
+            verbChildValueRetainer.begin();
+        }
         if(verbArgs.length > 0) {
             writelnResult(mainVerb(verbArgs));
         }
@@ -327,6 +336,9 @@ int main(string[] args) {
             //TODO: For now, just call it without arguments.
             //In the future, probably read from STDIN
             writelnResult(mainVerb());
+        }
+        if(verbChildValueRetainer.enabled) {
+            verbChildValueRetainer.end();
         }
     }
     catch(AssertError e) {

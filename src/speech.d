@@ -17,6 +17,7 @@ import myby.debugger;
 import myby.format;
 import myby.nibble;
 import myby.manip;
+import myby.token;
 
 class Nil {
     this() {
@@ -562,6 +563,38 @@ struct ChainInfo {
     }
 }
 
+private struct VerbChildValueRetainer {
+    import std.stdio : writeln;
+
+    bool enabled = false;
+    bool writing = false;
+    Atom[][int] hash;
+    Token[int] tokens;
+    
+    void begin() {
+        writing = true;
+        writeln("Beginning retaining child values!");
+        assert(hash.length == 0, "Unimplemented: Resetting hash");
+    }
+
+    void update(Token token, Atom atom) {
+        if(!writing) {
+            return;
+        }
+        writeln(token, " -> ", atom);
+        hash[token.index] ~= atom;
+        tokens[token.index] = token;
+    }
+    
+    void end() {
+        assert(writing, "Cannot end without having began");
+        writeln("Retained Values! ", hash);
+        writeln("Corresponding Tokens! ", tokens);
+    }
+}
+
+static VerbChildValueRetainer verbChildValueRetainer;
+
 class Verb {
     //!!!! NOTE: ADD ANY PROPERTY ADDED TO .dup !!!!
     string display;
@@ -572,7 +605,8 @@ class Verb {
     Verb inverse; // TODO: figure this out idfk
     VerbDyadConjunction underInverse;
     ChainInfo info;
-    
+
+    Token token;
     uint markedArity = 2;
     bool niladic = false;
     bool inferSelf = true;
@@ -597,6 +631,8 @@ class Verb {
         res.inverse = inverse;
         res.underInverse = underInverse;
         res.info = info;
+
+        res.token = token;
         res.niladic = niladic;
         res.inferSelf = inferSelf;
         res.markedArity = markedArity;
@@ -684,88 +720,33 @@ class Verb {
     // This fact cannot be fixed by an appropriate call to
     // toDelegate, and I'm also not sure why.
     // Also applies to setDyad
-    Verb setMonad(VerbMonadSimple m) {
-        monad = m;
-        return this;
-    }
-    
-    Verb setMonad(VerbMonadSelf m) {
-        monad = m;
-        inferSelf = true;
-        return this;
-    }
-    
-    Verb setMonadSelf(VerbMonadSelf m) {
-        monad = m;
-        inferSelf = false;
-        return this;
-    }
-    
-    Verb setMonad(VerbMonadConjunction m) {
-        monad = m;
-        return this;
-    }
-    
-    Verb setMonad(VerbMonadMultiConjunction m) {
-        monad = m;
-        return this;
-    }
-    
-    Verb setDyad(VerbDyadSimple d) {
-        dyad = d;
-        return this;
-    }
-    
-    Verb setDyad(VerbDyadSelf d) {
-        dyad = d;
-        return this;
-    }
-    
-    Verb setDyad(VerbDyadConjunction d) {
-        dyad = d;
-        return this;
-    }
-    
-    Verb setDyad(VerbDyadMultiConjunction d) {
-        dyad = d;
-        return this;
-    }
-    
-    Verb setInverse(Verb i) {
-        inverse = i;
-        return this;
-    }
+    Verb setMonad(VerbMonadSimple m) { monad = m; return this; }
+    Verb setMonad(VerbMonadSelf m) { monad = m; inferSelf = true; return this; }
+    Verb setMonadSelf(VerbMonadSelf m) { monad = m; inferSelf = false; return this; }
+    Verb setMonad(VerbMonadConjunction m) { monad = m; return this; }
+    Verb setMonad(VerbMonadMultiConjunction m) { monad = m; return this; }
 
+    Verb setDyad(VerbDyadSimple d) { dyad = d; return this; }
+    Verb setDyad(VerbDyadSelf d) { dyad = d; return this; }
+    Verb setDyad(VerbDyadConjunction d) { dyad = d; return this; }    
+    Verb setDyad(VerbDyadMultiConjunction d) { dyad = d; return this; }
+    
+    Verb setInverse(Verb i) { inverse = i; return this; }
     // below comment is no longer relevant, but still a good idea to keep in mind :]
     // // would need to exhausitvely iterate over all possible VerbTriad* stuff if more are added
-    Verb setUnderInverse(VerbDyadConjunction t) {
-        underInverse = t;
-        return this;
-    }
+    Verb setUnderInverse(VerbDyadConjunction t) { underInverse = t; return this; }
+    Verb setInverseMutual(Verb i) { inverse = i; i.inverse = this; return this; }
     
-    Verb setInverseMutual(Verb i) {
-        inverse = i;
-        i.inverse = this;
-        return this;
-    }
+    Verb setChildren(Verb[] c) { children = c; return this; }
+    Verb setMarkedArity(uint ma) { markedArity = ma; return this; }
+    Verb setNiladic(bool n) { niladic = n; return this; }
     
-    Verb setChildren(Verb[] c) {
-        children = c;
-        return this;
-    }
-    
+    Verb setToken(Token t) { token = t; return this; }
+    Verb stripToken() { token = Token(); return this; }
+
     @property bool initialized() {
         return monad.match!(v => v !is null)
             && dyad.match!(v => v !is null);
-    }
-    
-    Verb setMarkedArity(uint ma) {
-        markedArity = ma;
-        return this;
-    }
-    Verb setNiladic(bool n) {
-        niladic = n;
-        return this;
     }
     Verb setIdentity(Atom i) {
         identity = i;//todo: clone?
@@ -797,7 +778,7 @@ class Verb {
     }
     
     Atom executeMonadic(VerbMonad m, Atom a) {
-        return m.match!(
+        Atom value = m.match!(
             f => f(children, a),
             f => f(children[0], children[1], a),
             f => children.length && inferSelf
@@ -805,6 +786,10 @@ class Verb {
                 : f(this, a),
             f => f(a)
         );
+        if(verbChildValueRetainer.enabled && token.isInitialized) {
+            verbChildValueRetainer.update(token, value);
+        }
+        return value;
     }
     
     Atom getIdentity(Atom a) {
@@ -828,7 +813,7 @@ class Verb {
     }
     
     Atom dyadic(Atom a, Atom b) {
-        return dyad.match!(
+        Atom value = dyad.match!(
             f => f(children, a, b),
             f => f(children[0], children[1], a, b),
             f => children.length && inferSelf
@@ -836,6 +821,10 @@ class Verb {
                 : f(this, a, b),
             f => f(a, b)
         );
+        if(verbChildValueRetainer.enabled && token.isInitialized) {
+            verbChildValueRetainer.update(token, value);
+        }
+        return value;
     }
     
     Atom evaluate() {

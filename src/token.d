@@ -16,6 +16,11 @@ struct Token {
         BigInt[] arr;
     };
     int index = -1;
+
+    @property
+    bool isInitialized() {
+        return index != -1;
+    }
     
     bool isNilad() {
         return name == InsName.Integer

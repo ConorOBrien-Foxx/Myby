@@ -206,7 +206,8 @@ Verb foldFor(Verb v) {
             (Atom[] arr) {
                 Debugger.print("Fold for  ", v);
                 Debugger.print("Identity: ", v.identity);
-                Debugger.print("Head id:  ", v.getIdentity(arr));
+                // debugger should not trigger executeMonadic
+                Debugger.print("Head id:  ", v.dup.stripToken().getIdentity(arr));
                 Debugger.print("Array:    ", arr);
                 return reduceHelper(v, arr);
             },

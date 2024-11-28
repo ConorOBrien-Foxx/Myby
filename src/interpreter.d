@@ -540,6 +540,7 @@ class Interpreter {
         Debugger.silence();
         auto temp = new Interpreter(str);
         temp.shunt;
+        // TODO: evaluate first line? or should this be last line?
         auto value = temp.condense()[0](args);
         Debugger.unsilence();
         return value;

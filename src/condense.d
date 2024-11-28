@@ -22,10 +22,11 @@ struct CondenserState {
         listBuild = [];
     }
     
-    void addNilad(T)(ref Verb[] verbs, T n) {
+    Verb addNilad(T)(ref Verb[] verbs, T n) {
         Debugger.print("Adding nilad to verb chain");
-        auto v = Verb.nilad(n);
+        Verb v = Verb.nilad(n);
         verbs ~= v;
+        return v;
     }
 }
 
@@ -88,7 +89,7 @@ struct Condenser {
                 return result;
             }
             else {
-                state.addNilad(verbs, result);
+                state.addNilad(verbs, result).setToken(token);
             }
         }
         else {
@@ -107,10 +108,13 @@ struct Condenser {
                     // TODO: ephemeral children for display purposes (╴╴a)
                     // .setChildren([ v??? ], true)
                     // TODO: copy marked arity
-                    .setMarkedArity(1);
+                    .setMarkedArity(1)
+                    .setToken(token);
             }
             else {
-                verbs ~= getVerb(token.name);
+                Verb v = getVerb(token.name).dup;
+                v.setToken(token);
+                verbs ~= v;
             }
         }
         return Nil.nilAtom;
@@ -123,7 +127,7 @@ struct Condenser {
             Debugger.print("Nilad separator!");
             if(state.listBuild.length == 0) {
                 Debugger.print("Initializing with top (niladic) verb");
-                state.addNilad(verbs, verbs[$-1]());
+                state.addNilad(verbs, verbs[$-1]()).setToken(token);
                 verbs.popBack;
             }
             state.nextParseState = NiladParseState.LastWasNiladSeparator;
@@ -135,7 +139,7 @@ struct Condenser {
             state.finishListBuild(verbs);
             Verb u = verbs[$-1];
             verbs.popBack;
-            verbs ~= adj.transform(u);
+            verbs ~= adj.transform(u).setToken(token);
         }
     }
     
@@ -147,7 +151,7 @@ struct Condenser {
         Verb f = verbs[$-2];
         Verb g = verbs[$-1];
         verbs.popBackN(2);
-        verbs ~= con.transform(f, g);
+        verbs ~= con.transform(f, g).setToken(token);
     }
     
     void handleMultiConjunction(Token token) {
@@ -173,7 +177,7 @@ struct Condenser {
         // we cannot replace the back of the array,
         // since this would replace the front of args,
         // causing circular referencing
-        verbs ~= mc.transform(args);
+        verbs ~= mc.transform(args).setToken(token);
     }
     
     void handleSyntax(Token token) {
